@@ -71,6 +71,7 @@ export class TourAudio implements StepDirector {
       this.finish = resolve;
       voice.onended = voice.onerror = () => this.settle();
       voice.src = `/tour/${step.id}.mp3`;
+      voice.playbackRate = 1.12;
       voice.play().catch(() => this.settle());
     });
   };

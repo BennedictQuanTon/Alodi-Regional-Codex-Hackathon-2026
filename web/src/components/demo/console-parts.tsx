@@ -38,7 +38,7 @@ const STEP_OF: Record<CaseStage, number> = { pre: 0, delivering: 0, chat: 1, cal
 export function FlowRail({ state: s }: { state: DemoState }) {
   const memo = s.oco.trigger === "RESCHEDULE";
   const steps = ["Tap", "Chat", memo ? "Memo" : "Call", "Extract", "Decide", "Delivered"];
-  const active = s.ttc.triggerAt == null && s.stage !== "cs" ? 0 : Math.max(1, STEP_OF[s.stage]);
+  const active = s.ttc.triggerAt == null && s.stage !== "cs" ? 0 : Math.max(1, s.card && s.stage === "delivering" ? STEP_OF.ready : STEP_OF[s.stage]);
   const fill = (Math.min(active, steps.length - 1) / (steps.length - 1)) * 100;
   return (
     <div className="relative px-2">
