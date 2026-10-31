@@ -7,7 +7,8 @@
  *   Monad Ink        -> Alodi Deep Navy #121a2c
  *   Monad Lake Blue  -> Alodi Orange    #f05a00 (single primary action per screen)
  *   Monad Periwinkle -> Peach Mist       #fbe3d4
- * Fonts: Source Serif 4 (Untitled Serif), Geist Mono (ABC Diatype Mono), Geist (Untitled Sans).
+ * Fonts: Source Serif 4 (Untitled Serif) for display, Geist for everything else. No monospace face is shown anywhere:
+ * --font-mono is kept as a token name for the UI role but resolves to Geist (see /CLAUDE.md).
  * JetBrains Mono and citation markers are banned — see /CLAUDE.md.
  */
 :root {
@@ -63,11 +64,9 @@
   --color-bad: var(--status-bad);
 
   --font-serif: var(--font-serif-face), "Untitled Serif", Georgia, serif;
-  --font-mono: var(--font-mono-face), "ABC Diatype Mono", ui-monospace, monospace;
+  --font-mono: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-sans-face), "Untitled Sans", ui-sans-serif, system-ui, sans-serif;
   --font-logo: var(--font-logo-face), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-display-face), Georgia, serif;
-  --font-ui: var(--font-ui-face), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Lenis smooth scroll (copied from lenis/dist/lenis.css; native smooth scroll stays off) */
@@ -145,9 +144,10 @@ body {
 }
 @utility t-eyebrow {
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.3;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 @utility t-label {
@@ -170,7 +170,7 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Buttons — monad pill language: 48px tall, mono uppercase, trailing chevron */
+/* Buttons — monad pill language: 48px tall, uppercase Geist, trailing chevron */
 @utility btn {
   display: inline-flex;
   align-items: center;
@@ -180,10 +180,10 @@ body {
   padding: 0 32px;
   border-radius: 100px;
   font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
   white-space: nowrap;
   transition:
     background-color 0.2s ease,
@@ -279,6 +279,97 @@ body {
 }
 .marquee:hover .marquee-track {
   animation-play-state: paused;
+}
+
+/* Architecture panel: neutral technical palette; OpenAI green only on OpenAI-powered parts */
+.oa-panel {
+  --oa-ink: #0d0d0d;
+  --oa-text-2: #5d5d5d;
+  --oa-muted: #8f8f8f;
+  --oa-line: #e5e5e5;
+  --oa-line-strong: #c9c9c9;
+  --oa-subtle: #f9f9f9;
+  --oa-green: #0e8a6c;
+  --oa-green-soft: #eef8f4;
+  --oa-green-line: #bfe3d6;
+  font-family: var(--font-sans);
+  color: var(--oa-ink);
+}
+
+/* Open-licence photography toned to the parchment palette */
+.photo-tone {
+  filter: grayscale(0.55) sepia(0.12) contrast(1.05) brightness(0.95);
+}
+
+/* Courier logo strip: greyscale at rest, brand colour on hover */
+.courier-logo img {
+  filter: grayscale(1) contrast(1.1);
+  opacity: 0.55;
+  transition:
+    filter 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.courier-logo:hover img {
+  filter: none;
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* Tech-stack chip marquee: monochrome logo + name; never pauses, hover only tints the chip */
+.mq {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.mq-track {
+  display: flex;
+  width: max-content;
+  animation: marquee linear infinite;
+}
+.mq-reverse {
+  animation-direction: reverse;
+}
+.mq ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.mq-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 30px;
+  color: var(--color-smoke);
+  font: 400 26px/1 var(--font-serif);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+.mq-chip:hover {
+  color: var(--color-navy);
+}
+.mq-chip img {
+  filter: grayscale(1) opacity(0.65);
+  transition: filter 0.3s ease;
+}
+.mq-chip:hover img {
+  filter: none;
+}
+.mq-mono {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1.5px solid currentColor;
+  font: 600 10px var(--font-mono);
+  letter-spacing: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mq-track {
+    animation: none;
+  }
 }
 
 @keyframes pulse-ring {
@@ -535,21 +626,22 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
- * Dashboard (Dashboard_Desig.md "Ember Studio"), Alodi colours, light + dark
+ * Dashboard: SPX-style hub operations, built on the demo UI language
+ * (Geist, white cards on a neutral canvas, hairlines, navy + one orange action), light + dark
  * ------------------------------------------------------------------------- */
 .dash {
-  --d-bg: #faf8f6;
-  --d-side: #f4efea;
+  --d-bg: #f5f5f5;
+  --d-side: #fafafa;
   --d-surface: #ffffff;
-  --d-tint: #fbefe7;
-  --d-raised: #f1e9e2;
-  --d-border: #e4ddd6;
+  --d-tint: #fafafa;
+  --d-raised: #f4f4f5;
+  --d-border: #e5e5e5;
   --d-text: #1f2a44;
   --d-text-2: #4a5268;
-  --d-muted: #7a7f8f;
+  --d-muted: #737373;
   --d-primary: #d14e00;
   --d-primary-hover: #b34300;
-  --d-primary-soft: #fde3d2;
+  --d-primary-soft: #fff1e8;
   --d-accent: #f59e0b;
   --d-good: #15803d;
   --d-good-soft: #dcf3e4;
@@ -560,11 +652,11 @@ body {
   --d-chart-1: #f05a00;
   --d-chart-2: #3f5fae;
   --d-chart-3: #c9a227;
-  --d-chart-track: #ebe4dd;
-  --d-shadow: 0 4px 16px rgba(31, 42, 68, 0.06);
+  --d-chart-track: #ededed;
+  --d-shadow: 0 0 0 1px rgba(23, 23, 23, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
   background: var(--d-bg);
   color: var(--d-text);
-  font-family: var(--font-ui);
+  font-family: var(--font-sans);
   letter-spacing: 0;
 }
 .dash[data-theme="dark"] {
@@ -598,7 +690,7 @@ body {
 .d-card {
   background: var(--d-surface);
   border: 1px solid var(--d-border);
-  border-radius: 12px;
+  border-radius: 16px;
   transition:
     box-shadow 0.15s ease,
     transform 0.15s ease;
@@ -609,19 +701,18 @@ body {
 }
 .d-tint {
   background: var(--d-tint);
-  border-radius: 12px;
+  border-radius: 16px;
 }
 .d-title {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 400;
+  font-family: var(--font-sans);
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 .d-num {
-  font-family: var(--font-display);
-  font-weight: 400;
+  font-family: var(--font-sans);
+  font-weight: 500;
   letter-spacing: -0.02em;
-  font-variant-numeric: lining-nums;
+  font-variant-numeric: tabular-nums;
 }
 .d-overline {
   font-size: 11px;

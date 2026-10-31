@@ -63,51 +63,56 @@ function Slider({ label, value, set, min, max, step, fmt }: { label: string; val
   );
 }
 
+// One area, one month, following the team cost model (PRD §18.8). Defaults reproduce the best-in-class headline.
 function Money() {
-  const [orders, setOrders] = useState(10000);
+  const [orders, setOrders] = useState(4000);
   const [failRate, setFailRate] = useState(8);
-  const [uplift, setUplift] = useState(15);
-  const [auto, setAuto] = useState(60);
-  const [cost, setCost] = useState(1500);
+  const [uplift, setUplift] = useState(40);
+  const [auto, setAuto] = useState(65);
+  const [running, setRunning] = useState(20.9);
   const failed = orders * (failRate / 100);
-  const fee = failed * (uplift / 100) * 40000;
-  const csHours = (failed * (auto / 100) * 2 * 4) / 60;
+  const fee = failed * (uplift / 100) * 40000 * 30;
+  const redelivery = failed * (uplift / 100) * 0.75 * 7000 * 30;
+  const door = (failed / 320) * (uplift / 40) * 11.8e6;
+  const csHours = (failed * (auto / 100) * 2 * 4 * 30) / 60;
   const csSave = csHours * 35000;
-  const agentCost = failed * cost;
-  const net = fee + csSave - agentCost;
+  const cost = running * 1e6;
+  const net = fee + redelivery + door + csSave - cost;
   const m = (n: number) => `₫${(n / 1e6).toFixed(1)}M`;
+  const rows: [string, string][] = [
+    ["Return fees avoided", `+${m(fee)}`],
+    ["Redelivery attempts avoided", `+${m(redelivery)}`],
+    ["Courier door time saved", `+${m(door)}`],
+    [`CS calls by the agent (${csHours.toFixed(0)} h)`, `+${m(csSave)}`],
+    ["Running cost", `−${m(cost)}`],
+  ];
   return (
     <div className="grid gap-8 md:grid-cols-2">
       <div className="space-y-5">
-        <Slider label="Orders per day (one depot)" value={orders} set={setOrders} min={2000} max={30000} step={1000} fmt={(n) => n.toLocaleString("en-US")} />
+        <Slider label="Orders per day (one area, 20 couriers)" value={orders} set={setOrders} min={1000} max={12000} step={500} fmt={(n) => n.toLocaleString("en-US")} />
         <Slider label="First-attempt failure rate" value={failRate} set={setFailRate} min={4} max={20} step={1} fmt={(n) => `${n}%`} />
-        <Slider label="Extra rescue from Alodi (assumed)" value={uplift} set={setUplift} min={0} max={35} step={1} fmt={(n) => `${n} pts`} />
+        <Slider label="Extra rescue over today’s 25% (assumed)" value={uplift} set={setUplift} min={0} max={40} step={5} fmt={(n) => `${n} pts`} />
         <Slider label="Cases handled by the agent" value={auto} set={setAuto} min={20} max={90} step={5} fmt={(n) => `${n}%`} />
-        <Slider label="Agent cost per case" value={cost} set={setCost} min={300} max={5000} step={100} fmt={(n) => `₫${n.toLocaleString("en-US")}`} />
+        <Slider label="Running cost a month" value={running} set={setRunning} min={5} max={70} step={0.1} fmt={(n) => `₫${n.toFixed(1)}M`} />
       </div>
       <div className="flex flex-col justify-between rounded-xl bg-[var(--d-tint)] p-6">
         <div>
-          <div className="d-overline">Net per day, per depot</div>
-          <motion.div key={Math.round(net / 1e5)} initial={{ opacity: 0.4, y: 4 }} animate={{ opacity: 1, y: 0 }} className="d-num mt-2 text-[56px] leading-none" style={{ color: net < 0 ? "var(--d-bad)" : undefined }}>
+          <div className="d-overline">Net saving a month, one area</div>
+          <motion.div key={Math.round(net / 1e6)} initial={{ opacity: 0.4, y: 4 }} animate={{ opacity: 1, y: 0 }} className="d-num mt-2 text-[56px] leading-none" style={{ color: net < 0 ? "var(--d-bad)" : undefined }}>
             {m(net)}
           </motion.div>
+          <div className="mt-2 text-[13px] d-muted">{((net / 473e6) * 100).toFixed(0)}% of the ₫473M monthly loss</div>
         </div>
         <dl className="mt-6 space-y-2 text-[14px]">
-          <div className="flex justify-between">
-            <dt className="d-text2">Return fees avoided</dt>
-            <dd className="tabular-nums">+{m(fee)}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt className="d-text2">CS hours saved ({csHours.toFixed(0)} h)</dt>
-            <dd className="tabular-nums">+{m(csSave)}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt className="d-text2">Agent cost</dt>
-            <dd className="tabular-nums">−{m(agentCost)}</dd>
-          </div>
+          {rows.map(([k, v]) => (
+            <div key={k} className="flex justify-between gap-4">
+              <dt className="d-text2">{k}</dt>
+              <dd className="tabular-nums">{v}</dd>
+            </div>
+          ))}
         </dl>
         <p className="mt-5 text-[12px] leading-[1.5] d-muted">
-          ₫40,000 return fee per Shopee policy. 2 calls × 4 min per case and ₫35,000 per CS hour are team assumptions. The extra rescue rate is assumed, not measured.
+          ₫40,000 return fee per Shopee policy; ₫7,000 courier pay per attempt (GHN); 2 calls × 4 min at ₫35,000 per CS hour and the running cost are team estimates. Defaults are the best-in-class case (25% → 65%, Shipsy vendor range). Projected, not measured.
         </p>
       </div>
     </div>
@@ -209,7 +214,7 @@ export function MetricsDash() {
           </Card>
         </div>
 
-        <Card title="Money" sub="Everything here is projected. Agent cost per case will be measured in the demo." tag="Projected" className="mt-4">
+        <Card title="Money" sub="One area, one month. Projected from the team cost model until the pilot measures the real rescue rate." tag="Projected" className="mt-4">
           <Money />
         </Card>
       </div>

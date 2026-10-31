@@ -277,7 +277,7 @@ function WideCard({ title, body, mark, children, wash }: { title: string; body: 
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="scroll-mt-28 py-24 md:py-32">
+    <section id="how-it-works" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
         <RevealText text="How Alodi Works" className="t-h1" />
         <div className="mt-12 grid gap-4 lg:grid-cols-[1fr_2fr]">

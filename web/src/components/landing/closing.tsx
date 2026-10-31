@@ -3,35 +3,13 @@
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { COMPETITORS, FAQ, ROADMAP, SOURCES } from "@/lib/content";
+import { COMPETITORS, FAQ, SOURCES } from "@/lib/content";
 import { Chevron, LogoLink, SourceNote, Wordmark } from "@/components/site/brand";
 import { Reveal, RevealText } from "./motion";
 
-export function Roadmap() {
-  return (
-    <section id="roadmap" className="scroll-mt-28 py-24 md:py-32">
-      <div className="container-page">
-        <RevealText text="What Comes After the Demo" className="t-h1" />
-        <ol className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          {ROADMAP.map((r, i) => (
-            <Reveal as="li" key={r.k} delay={i * 0.07} className="flex flex-col rounded-[16px] border border-ash p-6">
-              <div className="flex items-baseline justify-between">
-                <span className="t-number text-[56px] text-navy/90">{r.k}</span>
-                <span className={`text-[12px] uppercase ${i === 0 ? "text-orange-deep" : "text-smoke"}`}>{r.when}</span>
-              </div>
-              <h3 className="t-h4 mt-10">{r.title}</h3>
-              <p className="t-body-sans mt-3 text-[15px] leading-[1.45] text-graphite">{r.body}</p>
-            </Reveal>
-          ))}
-        </ol>
-      </div>
-    </section>
-  );
-}
-
 export function Competitors() {
   return (
-    <section id="competitors" className="scroll-mt-28 py-24 md:py-32">
+    <section id="competitors" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
         <Reveal>
           <div className="t-eyebrow">Competitive landscape</div>
@@ -91,7 +69,7 @@ function ArrowDown() {
 export function Faq() {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section id="faq" className="scroll-mt-28 py-24 md:py-32">
+    <section id="faq" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
         <RevealText text="Frequently Asked Questions" className="t-h1" />
         <div className="mt-12">

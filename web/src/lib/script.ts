@@ -1,4 +1,4 @@
-// Demo script for 31 October. The editable copy for the team lives in docs/DEMO_SCRIPT.md — keep both in sync.
+// Demo script for 31 October, rendered at /script. Keep in sync with prep/01-pitch/1-LIVE-DEMO.md.
 
 export type Shot = { tc: string; screen: string; action: string; vo: string; onScreen?: string };
 
@@ -7,8 +7,8 @@ export const TRAILER: Shot[] = [
     tc: "0:00–0:06",
     screen: "Logo motion",
     action: "Orange dot blinks on navy → the ring expands → orange fills the frame, cut (variant A from the branding sheet).",
-    vo: "Every day, a 10,000-order depot sees about 800 deliveries fail on the first try.",
-    onScreen: "800 / 10,000",
+    vo: "Every day, an area of 4,000 orders sees about 320 deliveries fail on the first try.",
+    onScreen: "320 / 4,000",
   },
   {
     tc: "0:06–0:18",
@@ -64,7 +64,7 @@ export const LIVE: Beat[] = [
   {
     time: "0:00",
     who: "Nomura Yoshio",
-    say: "A depot handling 10,000 orders a day sees about 800 fail on the first attempt. Each return costs the seller up to forty thousand dong. And Shopee still doesn’t let buyers choose a delivery time.",
+    say: "An area handling 4,000 orders a day sees about 320 fail on the first attempt. Each return costs the seller up to forty thousand dong. And Shopee still doesn’t let buyers choose a delivery time.",
     do: "Problem slide (or landing · The problem).",
   },
   {

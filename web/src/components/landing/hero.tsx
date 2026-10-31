@@ -4,9 +4,7 @@ import Link from "next/link";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { Mark } from "@/components/site/brand";
-import { SourceLogo } from "@/components/site/logos";
-import { SOURCE_LOGOS } from "@/lib/content";
-import { VelocityMarquee } from "./velocity-marquee";
+import { COURIER_LOGOS } from "@/lib/content";
 import { Reveal, RevealText } from "./motion";
 
 const W = 1440;
@@ -284,19 +282,32 @@ export function Hero() {
   );
 }
 
+/** Logo strip: couriers whose riders we interviewed. Greyscale at rest, brand colour on hover (DESIGN.md logo strip). */
 export function SourceStrip() {
   return (
     <section className="py-10">
       <div className="container-page">
-        <div className="grid items-center gap-6 border-y border-ash py-9 md:grid-cols-[220px_1fr] md:gap-10">
-          <div className="t-eyebrow text-smoke">Built on public figures from</div>
-          <VelocityMarquee speed={36} className="[mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
-            {SOURCE_LOGOS.map((l) => (
-              <a key={l.name} href={l.url} target="_blank" rel="noreferrer" className="mx-9 flex h-12 items-center md:mx-12" title={l.name}>
-                <SourceLogo name={l.name} src={l.src} ratio={l.ratio} height={l.ratio > 5 ? 26 : 34} mono={"mono" in l && l.mono} />
-              </a>
+        <div className="grid items-center gap-8 border-y border-ash py-10 md:grid-cols-[200px_1fr] md:gap-12">
+          <div className="t-eyebrow text-smoke">
+            Couriers we
+            <br className="hidden md:block" /> interviewed
+          </div>
+          <ul className="flex flex-wrap items-center justify-between gap-x-10 gap-y-8">
+            {COURIER_LOGOS.map((l, i) => (
+              <motion.li
+                key={l.name}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: i * 0.06, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <a href={l.url} target="_blank" rel="noreferrer" title={l.name} className="courier-logo block">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={l.src} alt={l.name} style={{ height: 30, width: 30 * l.ratio }} className="object-contain" />
+                </a>
+              </motion.li>
             ))}
-          </VelocityMarquee>
+          </ul>
         </div>
       </div>
     </section>
