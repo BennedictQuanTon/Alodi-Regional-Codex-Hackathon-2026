@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-10-31T13:41:08.837095</dc:date>
+    <dc:date>2026-10-31T14:30:45.039986</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -1616,22 +1616,22 @@ z
     <use xlink:href="#Geist-Regular-121" transform="translate(1286.3125 0)"/>
     <use xlink:href="#Geist-Regular-106" transform="translate(1343.203125 0)"/>
    </g>
-   <!-- courier’s card -->
-   <g style="fill: #f6f3f1" transform="translate(443.52 426.533203) scale(0.17 -0.17)">
-    <use xlink:href="#Geist-Regular-fc"/>
-    <use xlink:href="#Geist-Regular-144" transform="translate(53.59375 0)"/>
-    <use xlink:href="#Geist-Regular-16e" transform="translate(109.890625 0)"/>
-    <use xlink:href="#Geist-Regular-15e" transform="translate(167.390625 0)"/>
-    <use xlink:href="#Geist-Regular-124" transform="translate(202.296875 0)"/>
-    <use xlink:href="#Geist-Regular-106" transform="translate(225.703125 0)"/>
-    <use xlink:href="#Geist-Regular-15e" transform="translate(280.796875 0)"/>
-    <use xlink:href="#Geist-Regular-31f" transform="translate(318.703125 0)"/>
-    <use xlink:href="#Geist-Regular-162" transform="translate(339 0)"/>
-    <use xlink:href="#Geist-Regular-2e1" transform="translate(391 0)"/>
-    <use xlink:href="#Geist-Regular-fc" transform="translate(416 0)"/>
-    <use xlink:href="#Geist-Regular-e3" transform="translate(471 0)"/>
-    <use xlink:href="#Geist-Regular-15e" transform="translate(525.6875 0)"/>
-    <use xlink:href="#Geist-Regular-102" transform="translate(559.59375 0)"/>
+   <!-- shipper’s card -->
+   <g style="fill: #f6f3f1" transform="translate(443.52 425.360469) scale(0.17 -0.17)">
+    <use xlink:href="#Geist-Regular-162"/>
+    <use xlink:href="#Geist-Regular-121" transform="translate(51 0)"/>
+    <use xlink:href="#Geist-Regular-124" transform="translate(108.5 0)"/>
+    <use xlink:href="#Geist-Regular-15b" transform="translate(133.5 0)"/>
+    <use xlink:href="#Geist-Regular-15b" transform="translate(192 0)"/>
+    <use xlink:href="#Geist-Regular-106" transform="translate(250.5 0)"/>
+    <use xlink:href="#Geist-Regular-15e" transform="translate(305.59375 0)"/>
+    <use xlink:href="#Geist-Regular-31f" transform="translate(343.5 0)"/>
+    <use xlink:href="#Geist-Regular-162" transform="translate(363.796875 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(415.796875 0)"/>
+    <use xlink:href="#Geist-Regular-fc" transform="translate(440.796875 0)"/>
+    <use xlink:href="#Geist-Regular-e3" transform="translate(495.796875 0)"/>
+    <use xlink:href="#Geist-Regular-15e" transform="translate(550.484375 0)"/>
+    <use xlink:href="#Geist-Regular-102" transform="translate(584.390625 0)"/>
    </g>
   </g>
   <g id="text_10">

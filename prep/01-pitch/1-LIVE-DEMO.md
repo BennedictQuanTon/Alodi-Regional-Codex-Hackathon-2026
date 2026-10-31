@@ -10,8 +10,8 @@ Technical setup, failure plan and the mock data pack: [`../02-technical/PRD.md`]
 
 | # | Screen | Device | Route | Held by | On the projector? | What it shows |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | **Courier app** | Phone, portrait, installed as an app | `/courier` | Presenter, playing courier **Tuan** (route R07, 200 stops) | Mirrored for close-ups | Today’s stops, window notes, **A / B / C** with the 2-minute undo ring, 10-second voice memo, context card, Delivered |
-| 2 | **Carrier ops dashboard** (“what SPX sees”) | iPad, landscape, on a stand | `/ops` | Updates by itself; a teammate acts as **CS** | Corner mirror, or on cue | Area KPIs (4,000 orders, 20 couriers), live case timeline across the 8 steps, timers on the demo clock, policy checks, live transcript, extracted fields with confidence, card pushed, CS queue with Approve |
+| 1 | **Shipper app** | Phone, portrait, installed as an app | `/courier` | Presenter, playing shipper **Tuan** (route R07, 200 stops) | Mirrored for close-ups | Today’s stops, window notes, **A / B / C** with the 2-minute undo ring, 10-second voice memo, context card, Delivered |
+| 2 | **Carrier ops dashboard** (“what SPX sees”) | iPad, landscape, on a stand | `/ops` | Updates by itself; a teammate acts as **CS** | Corner mirror, or on cue | Area KPIs (4,000 orders, 20 shippers), live case timeline across the 8 steps, timers on the demo clock, policy checks, live transcript, extracted fields with confidence, card pushed, CS queue with Approve |
 | 3 | **Buyer’s phone** | Laptop, in a phone frame | `/buyer` | Teammate, playing buyer **Minh** (headset mic) | **Main projection** | Chat with 4 window buttons and “Can’t receive today”, incoming AI call, live transcript line |
 | 4 | **Demo control** | Laptop’s second display | `/control` | Presenter’s assistant | No | Scenario picker, Reset, clock speed / pause / jump, device status dots, QR codes, Auto-buyer, Offline mode |
 
@@ -29,9 +29,9 @@ Stage layout: the projector shows screen 3 (buyer). The iPad stands beside the p
 
 Follows the business flow in [`../02-technical/diagrams/alodi-flow.png`](../02-technical/diagrams/alodi-flow.png). Buyer: Minh Hoang · 6L air fryer · COD 1,290,000 VND · Tower B, Sky Garden · stop 37 of 200.
 
-| Flow step | Demo clock | 1 · Phone (courier) | 2 · iPad (ops) | 3 · Laptop (buyer) | 4 · Control |
+| Flow step | Demo clock | 1 · Phone (shipper) | 2 · iPad (ops) | 3 · Laptop (buyer) | 4 · Control |
 | --- | --- | --- | --- | --- | --- |
-| 1 · Morning load | Sat 06:30 | Route R07 appears | “4,000 orders loaded · 20 couriers · 4 windows” | — | Scenario A_main, clock 06:28, speed 600× |
+| 1 · Morning load | Sat 06:30 | Route R07 appears | “4,000 orders loaded · 20 shippers · 4 windows” | — | Scenario A_main, clock 06:28, speed 600× |
 | 2 · Window question | 06:32 | — | Case: “Window question sent” | Bubble with **4 windows** + “Can’t receive today” | — |
 | Branch | 08:00 cut-off | — | “No reply · deliver as planned” | Buyer ignores it | Jump to 10:00 |
 | 4 · Delivery fails | 10:02 | Presenter taps **A · No answer** | Event **pending**, 2:00 undo ring | — | — |
@@ -78,7 +78,7 @@ Assistant: warm female voice; greeting and consent are pre-recorded. Buyer: team
 
 1. **Assistant** *(pre-recorded)*: Hello, this is the automated delivery assistant calling about your air fryer. This call is recorded so we get the delivery right — is that okay?
 2. **Buyer**: Sure, go ahead.
-3. **Assistant**: Our courier missed you this morning. Tomorrow we have 8 to 10, 10 to 12, 2 to 5, or 5 to 8 in the evening. Which works for you?
+3. **Assistant**: Our shipper missed you this morning. Tomorrow we have 8 to 10, 10 to 12, 2 to 5, or 5 to 8 in the evening. Which works for you?
 4. **Buyer**: Tomorrow after five, please. I’m out until late, so leave it with security in Tower B. Or call my wife.
 5. **Assistant**: Confirming: Sunday 1 November, 5 to 8 pm, left with Tower B security, and your wife if needed. Is that right?
 6. **Buyer**: That’s right.

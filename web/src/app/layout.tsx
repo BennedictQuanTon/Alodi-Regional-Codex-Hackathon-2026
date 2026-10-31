@@ -26,7 +26,7 @@ const logo = Be_Vietnam_Pro({
 export const metadata: Metadata = {
   title: "Alodi · Make the second drop land",
   description:
-    "Alodi rescues failed deliveries. The courier taps one button; the agent messages and calls the buyer, then hands back structured context for the next attempt.",
+    "Alodi rescues failed deliveries. The shipper taps one button; the agent messages and calls the buyer, then hands back structured context for the next attempt.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

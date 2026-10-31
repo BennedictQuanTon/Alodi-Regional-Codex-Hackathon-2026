@@ -112,10 +112,10 @@ def chart_loss(theme):
     rows = [(k, sum(v) / 2) for k, v in items.items()]
     rows.sort(key=lambda r: r[1])
     labels = {"Return fees paid by sellers": "Return fees paid by sellers",
-              "Courier pay for redelivery attempts": "Courier pay for redelivery",
-              "Courier time lost when the buyer doesn't answer": "Courier time at unanswered doors",
+              "Shipper pay for redelivery attempts": "Shipper pay for redelivery",
+              "Shipper time lost when the buyer doesn't answer": "Shipper time at unanswered doors",
               "Hub / CS staff calling buyers back": "CS staff calling buyers back"}
-    fig = frame(t, f"One area loses ≈ {M(LOSS_MID)} every month", "20 couriers · 4,000 orders a day · 8% fail on the first attempt")
+    fig = frame(t, f"One area loses ≈ {M(LOSS_MID)} every month", "20 shippers · 4,000 orders a day · 8% fail on the first attempt")
     ax = axes(fig, t, (0.30, 0.16, 0.62, 0.62))
     ax.set_xlim(0, max(v for _, v in rows) * 1.25)
     for i, (k, v) in enumerate(rows):
@@ -123,7 +123,7 @@ def chart_loss(theme):
         ax.text(v + 4e6, i, M(v), va="center", color=t["ink"], fontsize=20, fontweight=500)
     ax.set_yticks(range(len(rows)), [labels[k] for k, _ in rows], fontsize=17, color=t["ink"])
     ax.set_xticks([])
-    source(fig, t, "Source: Shopee Return & Refund Policy §7.1 (40,000 VND) · VECOM 8% · Shipsy 25% rescue (vendor) · GHN 6–8k VND per order · Glints courier income. Midpoints; model in PRD §18.8")
+    source(fig, t, "Source: Shopee Return & Refund Policy §7.1 (40,000 VND) · VECOM 8% · Shipsy 25% rescue (vendor) · GHN 6–8k VND per order · Glints shipper income. Midpoints; model in PRD §18.8")
     save(fig, "02-problem-monthly-loss", theme)
 
 
@@ -197,11 +197,11 @@ def chart_cost_share(theme):
 def chart_survey(theme):
     t = THEMES[theme]
     rows = list(csv.DictReader(open(HERE / "../../06-survey/customers.csv", encoding="utf-8-sig")))
-    qs = [("q01_courier_called_while_busy", "Courier called while I was busy"),
-          ("q06_had_to_remind_courier", "I had to remind the courier"),
-          ("q03_called_back_courier_unreachable", "I called back, courier unreachable"),
+    qs = [("q01_courier_called_while_busy", "Shipper called while I was busy"),
+          ("q06_had_to_remind_courier", "I had to remind the shipper"),
+          ("q03_called_back_courier_unreachable", "I called back, shipper unreachable"),
           ("q07_instruction_not_followed", "My instruction was ignored"),
-          ("q02_missed_courier_call", "I missed the courier’s call")]
+          ("q02_missed_courier_call", "I missed the shipper’s call")]
     fig = frame(t, "Buyers feel it every month", f"Customer survey, n = {len(rows)} · last 3 months")
     mock_badge(fig, t)
     ax = axes(fig, t, (0.34, 0.20, 0.58, 0.58))
@@ -230,14 +230,14 @@ def chart_survey(theme):
     save(fig, "06-problem-survey-buyers-MOCK", theme)
 
 
-# ------------------------------------------------------------------ 7. courier adoption (mock, dot grid)
+# ------------------------------------------------------------------ 7. shipper adoption (mock, dot grid)
 def chart_couriers(theme):
     t = THEMES[theme]
     rows = list(csv.DictReader(open(HERE / "../../06-survey/couriers.csv", encoding="utf-8-sig")))
     yes = sum(1 for r in rows if r["q12_would_like_alodi_like_system"] == "Yes")
     unsure = sum(1 for r in rows if r["q12_would_like_alodi_like_system"] == "Not sure")
     no = len(rows) - yes - unsure
-    fig = frame(t, f"{yes} of {len(rows)} couriers want it. None said no.",
+    fig = frame(t, f"{yes} of {len(rows)} shippers want it. None said no.",
                 "“If a system asked buyers for a time and gave you a card, would you like it?”")
     mock_badge(fig, t)
     ax = axes(fig, t, (0.06, 0.22, 0.60, 0.50))
@@ -255,7 +255,7 @@ def chart_couriers(theme):
     fig.text(0.80, 0.555, "Not sure", color=t["ink2"], fontsize=18)
     fig.text(0.90, 0.60, f"{no}", color=t["ink"], fontsize=72, fontweight=600)
     fig.text(0.90, 0.555, "No", color=t["ink2"], fontsize=18)
-    source(fig, t, "Source: Alodi courier interviews (SPX, GHN, J&T, BEST, GHTK, Viettel Post), Oct 2026 — MOCK placeholder (06-survey)")
+    source(fig, t, "Source: Alodi shipper interviews (SPX, GHN, J&T, BEST, GHTK, Viettel Post), Oct 2026 — MOCK placeholder (06-survey)")
     save(fig, "07-problem-survey-couriers-MOCK", theme)
 
 
@@ -265,7 +265,7 @@ def chart_tiles(theme):
     fig = frame(t, "What Alodi delivers, per area", "Money is projected; time and autonomy are measured in the demo and eval")
     tiles = [
         (f"{HEAD['net_month'] / 1e6:,.0f}M", "VND saved a month", f"{HEAD['net_pct']:.0%} of the loss · ≈\u00a0{B(HEAD['net_year'])} a year", "Projected"),
-        ("6 s", "from the buyer’s answer to the courier’s card", "today the answer is said on the phone and lost", "Mock · measure in demo"),
+        ("6 s", "from the buyer’s answer to the shipper’s card", "today the answer is said on the phone and lost", "Mock · measure in demo"),
         ("65%", "of failed deliveries resolved without a person", "0 calls out of hours · 0 labels without approval", "Mock · measure in eval"),
     ]
     for i, (big, lab, sub, tag) in enumerate(tiles):

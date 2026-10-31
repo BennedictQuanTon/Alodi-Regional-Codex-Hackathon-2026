@@ -33,7 +33,7 @@ function SurveyPhotos() {
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-8 text-center">
           <span className="grid size-14 place-items-center rounded-full border border-dashed border-smoke text-[22px] text-smoke">+</span>
           <span className="text-[13px] font-medium uppercase tracking-[0.08em] text-smoke">Field survey photos</span>
-          <span className="max-w-[260px] text-[13px] leading-[1.45] text-smoke">Photos from our interviews with couriers and buyers go here.</span>
+          <span className="max-w-[260px] text-[13px] leading-[1.45] text-smoke">Photos from our interviews with shippers and buyers go here.</span>
         </div>
       )}
     </motion.figure>
@@ -43,7 +43,7 @@ function SurveyPhotos() {
 function SurveyBand() {
   const groups = [
     { who: "Buyers", n: SURVEY.buyers.n, sub: "online shoppers", stats: SURVEY.buyers.stats },
-    { who: "Couriers", n: SURVEY.couriers.n, sub: SURVEY.couriers.from, stats: SURVEY.couriers.stats },
+    { who: "Shippers", n: SURVEY.shippers.n, sub: SURVEY.shippers.from, stats: SURVEY.shippers.stats },
   ];
   return (
     <div className="overflow-hidden rounded-[24px] bg-ink text-parchment">

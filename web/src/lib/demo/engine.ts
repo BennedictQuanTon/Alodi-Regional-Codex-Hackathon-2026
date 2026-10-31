@@ -8,7 +8,7 @@ import type { ActionKey, ChoiceKey, DemoState, ScenarioId } from "./types";
  * Demo scenario player.
  *
  * - Each scenario is a list of steps; a step with `wait` pauses for an action
- *   (courier taps, buyer answers, CS approves). With Auto-tap on, the engine performs it
+ *   (shipper taps, buyer answers, CS approves). With Auto-tap on, the engine performs it
  *   after a few seconds so the trailer can be recorded hands-free.
  * - Fast-forward clock: steps with `dt`/`to` interpolate the time over `ms` of real time.
  * - Multi-tab sync over BroadcastChannel: the tab that last acted is the "driver" and broadcasts

@@ -47,12 +47,12 @@ def read_csv(p):
 
 
 # ---------------------------------------------------------------- survey
-couriers = read_csv(ROOT / "prep/06-survey/couriers.csv")
+shippers = read_csv(ROOT / "prep/06-survey/couriers.csv")
 customers = read_csv(ROOT / "prep/06-survey/customers.csv")
 summary = read_csv(ROOT / "prep/06-survey/summary_MOCK.csv")
 codebook = read_csv(ROOT / "prep/06-survey/codebook.csv")
-status = Counter(r["data_status"] for r in couriers + customers)
-companies = Counter(r["company"] for r in couriers)
+status = Counter(r["data_status"] for r in shippers + customers)
+companies = Counter(r["company"] for r in shippers)
 segments = Counter(r["persona_segment"] for r in customers)
 KEY_Q = ["q01_courier_called_while_busy", "q02_missed_courier_call", "q03_called_back_courier_unreachable", "q06_had_to_remind_courier",
          "q10_want_to_choose_window", "q12_ok_with_automated_call", "q16_would_use_alodi_like_service",
@@ -63,14 +63,14 @@ is_placeholder = status.get("REAL", 0) == 0
 
 # ---------------------------------------------------------------- inputs table
 INPUTS = [
-    ("Orders a day, one area", f"{cm.ORDERS_PER_DAY:,}", "Estimate", "Team sizing: 20 couriers × 200 stops"),
+    ("Orders a day, one area", f"{cm.ORDERS_PER_DAY:,}", "Estimate", "Team sizing: 20 shippers × 200 stops"),
     ("First-attempt failure rate", f"{cm.FAIL_RATE:.0%}", "Sourced", "VECOM 8–12% nationwide, low end (Nguoi Lao Dong, 19 Jul 2025)"),
     ("Rescued today (baseline)", f"{cm.BASELINE_RESCUE:.0%}", "Vendor", "Shipsy: industry rescue rate 20–30%"),
     ("Return fee per failed order", f"₫{cm.RETURN_FEE:,}", "Sourced", "Shopee Return & Refund Policy §7.1 (seller pays on failed orders); cap ₫40,000 since 1 Apr 2025, GHN"),
     ("Extra attempts per failed order", f"{cm.EXTRA_ATTEMPTS}", "Estimate", "Inside Shopee’s 2–3 contact attempts (Help Center 79569)"),
-    ("Courier pay per attempt", "₫6,000–8,000", "Sourced", "GHN blog, courier earnings per order"),
-    ("Courier income a month", "₫8–15M", "Sourced", "Glints Vietnam, full-time courier income"),
-    ("Courier hours a month", f"{cm.COURIER_HOURS_MONTH}", "Estimate", "26 days × 9 hours"),
+    ("Shipper pay per attempt", "₫6,000–8,000", "Sourced", "GHN blog, shipper earnings per order"),
+    ("Shipper income a month", "₫8–15M", "Sourced", "Glints Vietnam, full-time shipper income"),
+    ("Shipper hours a month", f"{cm.COURIER_HOURS_MONTH}", "Estimate", "26 days × 9 hours"),
     ("Door time lost per failure", f"{cm.DOOR_MIN_PER_FAIL} min", "Estimate", "Two calls plus waiting at the door"),
     ("CS calls per failure × minutes", f"{cm.CS_CALLS_PER_FAIL} × {cm.CS_MIN_PER_CALL} min", "Estimate", "Team assumption"),
     ("CS cost per hour", f"₫{cm.CS_COST_HOUR:,}", "Estimate", "Team assumption"),
@@ -82,8 +82,8 @@ returned = L["returned_per_day"]
 items = L["items"]
 LOSS_LINES = [
     ("Return fees paid by sellers", f"{failed:.0f} failed × 75% not rescued = {returned:.0f}/day × ₫40,000 × 30", items["Return fees paid by sellers"]),
-    ("Courier pay for redelivery", f"{failed:.0f} × {cm.EXTRA_ATTEMPTS} attempts × ₫6,000–8,000 × 30", items["Courier pay for redelivery attempts"]),
-    ("Courier time at unanswered doors", f"{failed:.0f} × {cm.DOOR_MIN_PER_FAIL} min × (₫8–15M ÷ {cm.COURIER_HOURS_MONTH} h) × 30", items["Courier time lost when the buyer doesn't answer"]),
+    ("Shipper pay for redelivery", f"{failed:.0f} × {cm.EXTRA_ATTEMPTS} attempts × ₫6,000–8,000 × 30", items["Shipper pay for redelivery attempts"]),
+    ("Shipper time at unanswered doors", f"{failed:.0f} × {cm.DOOR_MIN_PER_FAIL} min × (₫8–15M ÷ {cm.COURIER_HOURS_MONTH} h) × 30", items["Shipper time lost when the buyer doesn't answer"]),
     ("CS calling buyers back", f"{failed:.0f} × {cm.CS_CALLS_PER_FAIL} calls × {cm.CS_MIN_PER_CALL} min × ₫35,000/h × 30", items["Hub / CS staff calling buyers back"]),
 ]
 
@@ -96,7 +96,7 @@ def rng(v):
 SAVE_FORMULA = {
     "Return fees avoided": "320 × extra rescue points × ₫40,000 × 30",
     "Redelivery attempts avoided": "320 × (1.5 − attempts after) × ₫7,000 × 30",
-    "Courier door time saved": "attempts saved × 5 min × ₫49k/h × 30",
+    "Shipper door time saved": "attempts saved × 5 min × ₫49k/h × 30",
     "CS calls handled by the agent": "320 × 2 × 4 min × ₫35,000/h × agent share × 30",
 }
 
@@ -125,7 +125,7 @@ cover = page(1, "Cover", f"""
 <div class="cover-mid">
   <div class="mono orange">Proof document</div>
   <h1>The numbers<br>behind Alodi</h1>
-  <p class="lead">How one area of 20 couriers and 4,000 orders a day loses {m(MID, 0)} a month to failed deliveries,
+  <p class="lead">How one area of 20 shippers and 4,000 orders a day loses {m(MID, 0)} a month to failed deliveries,
   and how Alodi cuts {BEST['net_pct']:.0%} of it. Every input, formula and source, in one place.</p>
 </div>
 <div class="kpis">
@@ -195,8 +195,8 @@ savings = page(5, "Savings", f"""
 survey_rows = "".join(f'<tr><td>{e(r["audience"])}</td><td>{e(r["metric"])}</td><td class="r num">{e(r["value"])}</td><td class="r num">{e(r["n"])}</td></tr>' for r in summary)
 q_rows = "".join(f'<tr><td class="mono">{e(q["audience"][:4])}</td><td>{e(q["question_en"])}<div class="vi">{e(q["question_vi"])}</div></td><td class="src">{e(q["values"])}</td></tr>' for q in questions)
 survey = page(6, "Survey", f"""
-<div class="eyebrow">05 · Survey</div><h2>{len(couriers)} couriers, {len(customers)} buyers.</h2>
-<p class="sub">Couriers from {', '.join(f'{k} ({v})' for k, v in companies.most_common())}. Buyers by segment: {', '.join(f'{k.lower()} {v}' for k, v in segments.most_common())}. Instrument in Vietnamese and English (prep/06-survey/codebook.csv, {len(codebook)} coded columns).</p>
+<div class="eyebrow">05 · Survey</div><h2>{len(shippers)} shippers, {len(customers)} buyers.</h2>
+<p class="sub">Shippers from {', '.join(f'{k} ({v})' for k, v in companies.most_common())}. Buyers by segment: {', '.join(f'{k.lower()} {v}' for k, v in segments.most_common())}. Instrument in Vietnamese and English (prep/06-survey/codebook.csv, {len(codebook)} coded columns).</p>
 <div class="status{' warn' if is_placeholder else ''}"><b>Data status · {', '.join(f'{k} {v}' for k, v in status.items())}.</b> {'The response files in the repository are still the generated placeholders, so the values below are illustrative and are not quoted as findings anywhere. Replace couriers.csv and customers.csv with the interview export (data_status = REAL) and rebuild this document.' if is_placeholder else 'Real interview responses.'}</div>
 <table class="tight"><thead><tr><th>Who</th><th>Key questions</th><th>Answers</th></tr></thead><tbody>{q_rows}</tbody></table>
 """)
@@ -222,8 +222,8 @@ sources = page(8, "Simulation and sources", f"""
 <li>GHN, who pays for Shopee returns — ₫40,000 cap per order since 1 Apr 2025 (₫20,000 express) — ghn.vn/blogs/tip-ban-hang/tra-hang-shopee-ai-chiu-phi</li>
 <li>VECOM and Tran Anh Tung (UEF), Nguoi Lao Dong, 19 Jul 2025 — refusal rates 8–12%, 25–30% in sale season</li>
 <li>Shopee Help Center, articles 79559 (no delivery time choice), 79569 (2–3 contacts, 5 days), 79196 (COD lock)</li>
-<li>GHN blog — courier earnings ₫6,000–8,000 per order</li>
-<li>Glints Vietnam — courier income ₫8–15M a month</li>
+<li>GHN blog — shipper earnings ₫6,000–8,000 per order</li>
+<li>Glints Vietnam — shipper income ₫8–15M a month</li>
 <li>Shipsy, What is NDR management — industry rescue 20–30%, best-in-class 50–65% (vendor)</li>
 <li>Phong Vu listings — RTX 5060 Ti 16 GB ₫16.4–21.0M; Viettel Mobile SIP reseller price list; oazns.vn / worldfone ZNS price tables; EVN business tariff</li>
 <li>OpenAI pricing for gpt-5-mini and gpt-4o-mini-tts (third-party price lists, checked 30 Oct 2026)</li>
@@ -286,6 +286,7 @@ footer .mini svg { height: 4.5mm; width: auto; }
 doc = f"<!doctype html><html lang='en'><head><meta charset='utf-8'><title>The numbers behind Alodi</title><style>{CSS}</style></head><body>{cover}{inputs}{loss}{running}{savings}{survey}{survey_results}{sources}</body></html>"
 out_html = HERE / "alodi-numbers.html"
 out_pdf = HERE / "alodi-numbers.pdf"
+doc = doc.replace(">cour<", ">ship<").replace("courier", "shipper").replace("Courier", "Shipper")
 out_html.write_text(doc, encoding="utf-8")
 
 chrome = next((p for p in ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", shutil.which("google-chrome"), shutil.which("chromium")] if p and Path(p).exists()), None)

@@ -42,7 +42,7 @@ head = f"""
 <header class="band">
   <div class="bt"><span class="logo">{LOGO_W}</span><span class="ey">Project write-up</span></div>
   <p class="tag">Make the second drop land.</p>
-  <p class="abs">An AI agent that rescues failed deliveries for Vietnamese e-commerce. One tap from the courier starts it. The next attempt gets the
+  <p class="abs">An AI agent that rescues failed deliveries for Vietnamese e-commerce. One tap from the shipper starts it. The next attempt gets the
   time, place and person it needs. Decisions about money or a buyer’s record stay with people.</p>
   <p class="by">Team Develarper · Sea × OpenAI Regional Codex Hackathon, Ho Chi Minh City · 31 October 2026</p>
 </header>"""
@@ -50,25 +50,25 @@ head = f"""
 s1 = f"""
 <section><h2><span>1</span>The problem</h2>
 <p class="lead">A failed delivery is a time negotiation that happens off the system.</p>
-<p>Shopee buyers cannot choose a delivery window, so buyer and courier settle the time over the phone. When the call is missed, everything that would
+<p>Shopee buyers cannot choose a delivery window, so buyer and shipper settle the time over the phone. When the call is missed, everything that would
 fix the next attempt shrinks into one error code. The second attempt repeats the first, and the seller pays for the return.</p>
-{kf([("₫40,000", "return fee per failed order, paid by the seller", "Shopee §7.1 · GHN · Sourced"), ("8–12%", "of orders refused at the door, nationwide", "VECOM · Sourced"), ("0", "delivery windows a buyer can choose", "Shopee 79559 · Sourced"), (f"≈ {m(MID)}", "lost a month in one area of 20 couriers and 4,000 orders a day", "Team cost model · Modelled")])}
+{kf([("₫40,000", "return fee per failed order, paid by the seller", "Shopee §7.1 · GHN · Sourced"), ("8–12%", "of orders refused at the door, nationwide", "VECOM · Sourced"), ("0", "delivery windows a buyer can choose", "Shopee 79559 · Sourced"), (f"≈ {m(MID)}", "lost a month in one area of 20 shippers and 4,000 orders a day", "Team cost model · Modelled")])}
 </section>"""
 
 s2 = f"""
 <section><h2><span>2</span>The solution we built</h2>
-<p class="lead">The courier taps one button. Alodi does the rest, inside Shopee’s rules, and hands back structured context.</p>
+<p class="lead">The shipper taps one button. Alodi does the rest, inside Shopee’s rules, and hands back structured context.</p>
 <ol class="flow">
 <li><b>Tap</b><span>No answer, Rescheduled or Refused</span></li>
 <li><b>Reach</b><span>Chat at once; calls if silent, only 08:00–20:30</span></li>
 <li><b>Extract</b><span>When, where and who, as a context card</span></li>
 <li><b>Decide</b><span>Clear answers apply; the rest goes to a person</span></li>
-<li><b>Redeliver</b><span>The courier’s next attempt carries the card</span></li>
+<li><b>Redeliver</b><span>The shipper’s next attempt carries the card</span></li>
 </ol>
 <table><thead><tr><th>Working today</th><th>What it does</th></tr></thead><tbody>
-<tr><td><b>Workflow backend</b></td><td>FastAPI and SQLite: morning availability, courier outcomes, rescue policy, customer-service decisions and a durable scheduler that survives restarts, on 4,000 synthetic orders. 193 automated tests pass, with AI providers simulated.</td></tr>
-<tr><td><b>Voice and memo</b></td><td>GPT-Live-1 over WebRTC holds the buyer call, GPT Transcribe reads the courier’s voice memo, and GPT-6.1 Terra extracts the fields. Consent gates, a 180-second call cap and a memo limit are built in. Runs in stub or live mode, through the integrated workspace.</td></tr>
-<tr><td><b>Demo stage</b></td><td>Courier, buyer and operations views side by side, plus an SPX-style hub dashboard. These run a scripted scenario on mock data, so the story stays reliable on stage.</td></tr>
+<tr><td><b>Workflow backend</b></td><td>FastAPI and SQLite: morning availability, shipper outcomes, rescue policy, customer-service decisions and a durable scheduler that survives restarts, on 4,000 synthetic orders. 193 automated tests pass, with AI providers simulated.</td></tr>
+<tr><td><b>Voice and memo</b></td><td>GPT-Live-1 over WebRTC holds the buyer call, GPT Transcribe reads the shipper’s voice memo, and GPT-6.1 Terra extracts the fields. Consent gates, a 180-second call cap and a memo limit are built in. Runs in stub or live mode, through the integrated workspace.</td></tr>
+<tr><td><b>Demo stage</b></td><td>Shipper, buyer and operations views side by side, plus an SPX-style hub dashboard. These run a scripted scenario on mock data, so the story stays reliable on stage.</td></tr>
 </tbody></table>
 <p class="note"><b>Projected value.</b> At best-in-class rescue rates (vendor benchmark) Alodi would save {m(BEST['net_month'], 1)} a month per area, {BEST['net_pct']:.0%} of the loss, after a running cost of {m(BEST['cost_month'], 1)}. Not yet measured. The production design adds Decisions API triage on GPT-6 Luna and local speech and PII services, which are not in this build.</p>
 </section>"""
@@ -78,7 +78,7 @@ s3 = """
 <p class="lead">Primary: <b>Autonomous &amp; Adaptive AI</b>. Also: <b>Deep Domain AI</b>.</p>
 <div class="cols2">
 <div class="dir"><h4>Autonomous &amp; Adaptive AI</h4><p>An operations agent that runs a rescue from tap to context card without a dispatcher. It adapts to silence, a restart or a low-confidence answer, a policy guard keeps its actions inside hard limits, and it escalates when it should not act alone.</p></div>
-<div class="dir"><h4>Deep Domain AI</h4><p>Alodi reflects how last-mile work actually runs: courier outcomes as the trigger, route cut-offs, Shopee’s 2–3 contacts within 5 days, permitted calling hours, and the line between asking a buyer and labelling one.</p></div>
+<div class="dir"><h4>Deep Domain AI</h4><p>Alodi reflects how last-mile work actually runs: shipper outcomes as the trigger, route cut-offs, Shopee’s 2–3 contacts within 5 days, permitted calling hours, and the line between asking a buyer and labelling one.</p></div>
 </div>
 </section>"""
 

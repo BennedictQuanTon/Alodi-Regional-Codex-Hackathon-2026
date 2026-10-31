@@ -1,6 +1,6 @@
 # Alodi — Design system
 
-The single source of truth for rebuilding every Alodi surface pixel-for-pixel: **landing page**, **demo** (courier app, buyer phone, operations panel, stage) and **CS dashboard**. Nothing here is abbreviated; the appendices contain the complete production stylesheet and the motion/brand components verbatim.
+The single source of truth for rebuilding every Alodi surface pixel-for-pixel: **landing page**, **demo** (shipper app, buyer phone, operations panel, stage) and **CS dashboard**. Nothing here is abbreviated; the appendices contain the complete production stylesheet and the motion/brand components verbatim.
 
 Companion files:
 - Original references, copied unedited: `references/LANDING-monad-DESIGN.md` (monad.com), `references/DEMO-UI-shadcn-DESIGN.md` (shadcn/ui), `references/DASHBOARD-ember-DESIGN.md` (Ember Studio).
@@ -170,7 +170,7 @@ Text colours: headlines `--color-navy`; leads `--color-graphite`; meta `--color-
 | Display numbers (“4 s to context”) | 48px / 600 | −0.05em |
 | Headings (`ui-h`) | 18–26px / 600 | −0.025em, line height 1.15 |
 | Body | 14px / 400 | 0, line height 1.43 |
-| Buttons | 14px / 500 (16px on the courier’s big buttons) | 0 |
+| Buttons | 14px / 500 (16px on the shipper’s big buttons) | 0 |
 | Labels (`ui-label`) | 12px / 500 UPPERCASE | +0.05em, colour `--ui-muted` |
 | Badges | 12px / 500 | 0 |
 | OpenType | `"ss01" on, "cv11" on` | |
@@ -353,10 +353,10 @@ Container with 1px ash top and bottom borders, `py 36px`; grid `220px | 1fr`: ey
 - Grid `1.1fr | 1fr`: eyebrow + H1 left, lead 20px right (bottom-aligned).
 - **Architecture diagram — rebuild it from `../02-technical/diagrams/alodi-architecture.pdf`** (three columns, eight numbered steps), as an HTML/SVG component in a paper/70 card (16px radius, ash border, padding 24px):
   - **Column headers** (centred, 15px semibold, 2px underline): “SPX systems and data” (navy underline) · “Processing flow · orchestrated by the Alodi Agent” (orange) · “External services” (purple `#9B3FB5`).
-  - **Left column** boxes (navy 1.5px border, 10px radius, white): Route planner SPX · OMS / Order DB SPX · Courier app · Timers + job queue · Recording storage · Alodi DB · CS dashboard (red border `#C0392B`). Each box: title 14px semibold, step tag top-right (`step 3 · 4 · 7`, coloured like its edge), then two rows **Demo** (orange-deep label) / **Production** (blue `#3F5FAE` label), optional grey note line.
+  - **Left column** boxes (navy 1.5px border, 10px radius, white): Route planner SPX · OMS / Order DB SPX · Shipper app · Timers + job queue · Recording storage · Alodi DB · CS dashboard (red border `#C0392B`). Each box: title 14px semibold, step tag top-right (`step 3 · 4 · 7`, coloured like its edge), then two rows **Demo** (orange-deep label) / **Production** (blue `#3F5FAE` label), optional grey note line.
   - **Centre column**: eight step cards with a numbered orange circle (step 8 = red), peach fill `#FFF4EC` and orange border; step 4 is blue `#EAF0FB`; decision diamonds in grey `#F3F4F6` (“Buyer replied before cut-off?”, “Delivery result?”, “Redelivered twice?”); the three morning outcomes as small cards; “Done” in green; “2-minute undo” in blue; “Button C” small red card.
   - **Right column** boxes (purple or teal border): OpenAI LLM · Shopee Chat / Zalo OA · AI call centre + TTS · ASR · AssemblyAI · PII masking · JSON extraction; a “Buyer” person node on the far right linked to chat and call.
-  - **Edges** with the diagram’s legend colours: dark navy = processing flow / SPX, blue = courier app and Alodi data, purple = contact channels + LLM, teal = speech + extraction, red = CS. Animate a small dot along the main vertical flow (1 → 8) on a 6 s loop; highlight edges on hover of a box.
+  - **Edges** with the diagram’s legend colours: dark navy = processing flow / SPX, blue = shipper app and Alodi data, purple = contact channels + LLM, teal = speech + extraction, red = CS. Animate a small dot along the main vertical flow (1 → 8) on a 6 s loop; highlight edges on hover of a box.
   - Footer note: *Demo = what we build for competition day on fake data. Production = when plugged into SPX. “step” in a box’s corner lists the flow steps that use it.*
   - Mobile: collapse to the eight centre steps as a vertical list; each step expands to show its Demo/Production components.
 - The current site still shows the earlier C4 layer view (one agent + tools). Its agent block is accurate; the layer layout is superseded by this three-column diagram.
@@ -422,7 +422,7 @@ Screenshots: `screenshots/demo-*.png`.
 ### 8.2 Phone frame
 340×704, outer radius 52px, bezel `#0F1424` 9px, inner radius 44px white; status bar 48px (time from the demo clock, centred 98×28 island, “5G” + battery), dark text or white text when the call screen is up; shadow `0 40px 80px -40px rgba(18,26,44,.55)`.
 
-### 8.3 Courier app
+### 8.3 Shipper app
 Header: initials avatar, name + route, day badge, orange progress bar with “7/24”. Screens cross-fade (`y 14 → 0`, blur 4 → 0, 0.35s):
 - **Route** — three stop cards (current one with navy border, done ones at 45%); on day 2 the current stop shows the dark context card and a full-width “Delivered” primary button.
 - **Failed attempt** — order card (name, “COD” badge, address, red “No answer, twice”), then three 56px buttons at the bottom: **No answer** (accent), **Rescheduled** (primary), **Refused** (outline); they stagger in.
@@ -444,8 +444,8 @@ White `.ui-card`: tracking number 12px muted, buyer name 22px / 600, stage badge
 - **Order context · vN** accordion with the JSON in Geist Mono on `#121A2C`.
 
 ### 8.6 Stage and chrome
-- **Nav** (64px): wordmark 24px + “Demo” outline badge; centred segmented tabs (Stage · Courier · Buyer · Ops) in a `#ECECEC` 18px container with a sliding white active pill (`layoutId`, spring 420/34); right: “Dashboard” outline, “Script” ghost.
-- **Stage**: three columns (courier phone, buyer phone, ops panel) labelled 13px muted, scaled to fit (`useFit`, base 1720×880), entrance staggered 0.12s from blur 10px, `y 40`.
+- **Nav** (64px): wordmark 24px + “Demo” outline badge; centred segmented tabs (Stage · Shipper · Buyer · Ops) in a `#ECECEC` 18px container with a sliding white active pill (`layoutId`, spring 420/34); right: “Dashboard” outline, “Script” ghost.
+- **Stage**: three columns (shipper phone, buyer phone, ops panel) labelled 13px muted, scaled to fit (`useFit`, base 1720×880), entrance staggered 0.12s from blur 10px, `y 40`.
 - **Dock** (floating, bottom centre, 24px radius, white/90 blur, shadow): scenario select, Reset (ghost), **Play/Pause/Replay** (accent, 96px min), Next → (ghost), clock 20px / 600 + day + “fast-forward” badge, Options (outline) opening a card with switches Auto-tap · Sound · Captions and speed 1× / 1.5× / 2×. Above the dock a dark caption pill shows the current step or the waiting hint with a blinking dot.
 - Keyboard: Space play/pause, → next step, R reset, H hides chrome on single views.
 - Single views (`/demo/shipper|buyer|console`) centre one element with the same chrome. In the current build tabs sync via `BroadcastChannel("alodi-demo")` (one browser only); the live three-device demo replaces this with server WebSockets — see §8A.
@@ -457,7 +457,7 @@ Runs once per area per session (`demo`, `dash`): navy full-screen layer; the ora
 
 ## 8A. Live demo — three devices
 
-The stage demo runs on real hardware: **phone** = courier app, **iPad** = carrier ops dashboard, **laptop** = buyer phone. Setup: `../02-technical/PRD.md` §19. All three use the demo UI tokens (§1.6) except the iPad, which uses the dashboard system (§1.7, §9) because it plays “the carrier’s dashboard”.
+The stage demo runs on real hardware: **phone** = shipper app, **iPad** = carrier ops dashboard, **laptop** = buyer phone. Setup: `../02-technical/PRD.md` §19. All three use the demo UI tokens (§1.6) except the iPad, which uses the dashboard system (§1.7, §9) because it plays “the carrier’s dashboard”.
 
 ### 8A.1 Phone · `/courier` (portrait, full-screen PWA)
 - No phone frame: the real device is the frame. Respect safe areas (`env(safe-area-inset-*)`), `100dvh`, `viewport-fit=cover`, theme colour white.
@@ -466,7 +466,7 @@ The stage demo runs on real hardware: **phone** = courier app, **iPad** = carrie
 - Memo: press-and-hold record button 96px; waveform; upload progress; transcript bubble.
 - Context card arrival: slide up from the bottom (spring), light haptic-style scale pulse, card stays pinned on the stop.
 - Header shows a small connection dot (green = live, amber = reconnecting).
-- Manifest: name “Alodi Courier”, `display: standalone`, `orientation: portrait`, icon = orange app icon.
+- Manifest: name “Alodi Shipper”, `display: standalone`, `orientation: portrait`, icon = orange app icon.
 
 ### 8A.2 iPad · `/ops` (landscape 1180 × 820 base, scales to 1366 × 1024)
 Dashboard tokens (§1.7), light theme by default (projector-friendly), dark available.
@@ -475,7 +475,7 @@ Dashboard tokens (§1.7), light theme by default (projector-friendly), dark avai
 - **Right 60% — stacked live cards** (12px radius, each slides in from the right as it happens):
   1. **Conversation** — chat messages and, during a call, the live transcript lines with speaker labels and an audio level meter.
   2. **Extraction** — fields fill one by one with confidence bars (green ≥ 0.85, amber below) and the decision chip (“Auto-applied” / “Confirm in chat” / “Needs CS”).
-  3. **Context card** — the exact card pushed to the courier, with “Pushed 11:05 · attempt 1 of 2”.
+  3. **Context card** — the exact card pushed to the shipper, with “Pushed 11:05 · attempt 1 of 2”.
   4. **CS queue** (step 8) — when a case escalates: reason, suggested label, large touch buttons **Approve return** / **Call buyer** / **Claim** (48px).
 - **Bottom strip**: today’s KPIs (orders loaded, windows asked, rescues in progress, cases with CS).
 - Touch-first: no hover-only information; all targets ≥ 44px; swipe-free (Guided Access).
@@ -500,7 +500,7 @@ When an event happens, the **same moment** should be visible on every screen: ph
 Screenshots: `screenshots/dashboard-*-light.png`, `-dark.png`.
 
 - **Shell**: sidebar 256px (`--d-side`, right border): wordmark 28px, “Operations · Binh Thanh depot”, nav items 15px (active: primary-soft bg, primary text, 3px right accent bar), bottom: full-width primary “Open live demo”, Settings, Support. Header 72px: search pill (300px), theme toggle (Light/Dark segmented, active = primary), amber “23 to review” chip, 36px initials avatar. Content max 1240px.
-- **Overview**: italic title 40–52px + 16px subline; **4 KPI tiles** (`--d-tint`, 12px radius): label, chip (neutral / primary “Live” / good / warn), number 40px with `CountUp`, 7-day spark bars (today solid, older faded); **Rescue rate over time** card (smooth line, area wash, baseline line at 25%, Daily/Weekly chips, hover crosshair + tooltip); **Failure reasons** tint card (donut with 2px gaps, centre number, hover enlarges a segment, legend rows); **Live exception queue** card: underline tabs (All, Needs a person, Agent rescuing, Card ready, Closed + counts), table (tracking ID, buyer name in Playfair 17px + district, reason, status chip, courier avatar + name, italic time, 4px progress bar + %), rows stagger in (0.035s), selected row has a 2px left primary bar; the live demo case is pinned first with a blinking dot.
+- **Overview**: italic title 40–52px + 16px subline; **4 KPI tiles** (`--d-tint`, 12px radius): label, chip (neutral / primary “Live” / good / warn), number 40px with `CountUp`, 7-day spark bars (today solid, older faded); **Rescue rate over time** card (smooth line, area wash, baseline line at 25%, Daily/Weekly chips, hover crosshair + tooltip); **Failure reasons** tint card (donut with 2px gaps, centre number, hover enlarges a segment, legend rows); **Live exception queue** card: underline tabs (All, Needs a person, Agent rescuing, Card ready, Closed + counts), table (tracking ID, buyer name in Playfair 17px + district, reason, status chip, shipper avatar + name, italic time, 4px progress bar + %), rows stagger in (0.035s), selected row has a 2px left primary bar; the live demo case is pinned first with a blinking dot.
 - **Case slide-over**: 460px from the right (spring 320/34) over a blurred 20% black backdrop: status chip, italic name 28px, meta line, six-step rail, guard chips, warn action box, dark context card, Time-to-context tiles, extraction table, JSON block, audit log.
 - **Metrics**: same shell; 4 tiles (Time-to-context, Extraction F1, Safe autonomy, Boundary breaches); cards *Extraction accuracy* (paired bars v0 vs v6), *Optimisation curve* (two lines, crosshair), *Time-to-context* (three tiles + F1 by source table), *Safe autonomy* (six rows), *Money* (five sliders + net figure on tint, assumptions note), each with a Measured/Projected chip.
 - **Floating action**: 56px orange circle bottom-right linking to the demo.
@@ -1445,7 +1445,7 @@ const logo = Be_Vietnam_Pro({
 export const metadata: Metadata = {
   title: "Alodi · Make the second drop land",
   description:
-    "Alodi rescues failed deliveries. The courier taps one button; the agent messages and calls the buyer, then hands back structured context for the next attempt.",
+    "Alodi rescues failed deliveries. The shipper taps one button; the agent messages and calls the buyer, then hands back structured context for the next attempt.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

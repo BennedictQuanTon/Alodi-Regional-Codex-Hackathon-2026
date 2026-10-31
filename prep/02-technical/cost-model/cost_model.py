@@ -1,4 +1,4 @@
-"""Alodi cost vs loss model for one area / hub (20 couriers, 4,000 orders a day).
+"""Alodi cost vs loss model for one area / hub (20 shippers, 4,000 orders a day).
 
 Compares two ways to run Alodi in production:
   * local_first  — one on-prem server per hub (one-time purchase), open-weight models run locally
@@ -17,13 +17,13 @@ DAYS = 30              # days per month
 HOURS = 730            # hours per month
 
 # ------------------------------------------------------------------ the hub
-ORDERS_PER_DAY = 4_000                     # estimate (team sizing: one area, 20 couriers)
+ORDERS_PER_DAY = 4_000                     # estimate (team sizing: one area, 20 shippers)
 FAIL_RATE = 0.08                           # sourced: VECOM 8–12% (Nguoi Lao Dong, 19 Jul 2025) — low end
 BASELINE_RESCUE = 0.25                     # vendor: Shipsy, industry rescue 20–30%
 RETURN_FEE = 40_000                        # sourced: Shopee Return & Refund Policy §7.1 (11 Mar 2026)
 EXTRA_ATTEMPTS = 1.5                       # estimate inside Shopee's 2–3 contact attempts (Help Center 79569)
-COURIER_PAY_PER_ATTEMPT = (6_000, 8_000)   # sourced: GHN blog, courier earns ₫6–8k per order
-COURIER_INCOME_MONTH = (8_000_000, 15_000_000)  # sourced: Glints VN, full-time courier ₫8–15M/month
+COURIER_PAY_PER_ATTEMPT = (6_000, 8_000)   # sourced: GHN blog, shipper earns ₫6–8k per order
+COURIER_INCOME_MONTH = (8_000_000, 15_000_000)  # sourced: Glints VN, full-time shipper ₫8–15M/month
 COURIER_HOURS_MONTH = 26 * 9               # estimate: 26 days × 9 h
 DOOR_MIN_PER_FAIL = 5                      # estimate: two calls + waiting at the door
 CS_CALLS_PER_FAIL = 2                      # estimate (STATS §4: 2 calls × 4 min)
@@ -97,8 +97,8 @@ def loss_month():
     hourly = tuple(i / COURIER_HOURS_MONTH for i in COURIER_INCOME_MONTH)
     items = {
         "Return fees paid by sellers": (returned * RETURN_FEE * DAYS,) * 2,
-        "Courier pay for redelivery attempts": tuple(failed * EXTRA_ATTEMPTS * p * DAYS for p in COURIER_PAY_PER_ATTEMPT),
-        "Courier time lost when the buyer doesn't answer": tuple(failed * DOOR_MIN_PER_FAIL / 60 * h * DAYS for h in hourly),
+        "Shipper pay for redelivery attempts": tuple(failed * EXTRA_ATTEMPTS * p * DAYS for p in COURIER_PAY_PER_ATTEMPT),
+        "Shipper time lost when the buyer doesn't answer": tuple(failed * DOOR_MIN_PER_FAIL / 60 * h * DAYS for h in hourly),
         "Hub / CS staff calling buyers back": (failed * CS_CALLS_PER_FAIL * CS_MIN_PER_CALL / 60 * CS_COST_HOUR * DAYS,) * 2,
     }
     total = (sum(v[0] for v in items.values()), sum(v[1] for v in items.values()))
@@ -112,7 +112,7 @@ def savings_month(s):
     items = {
         "Return fees avoided": failed * s["extra_rescue_pts"] * RETURN_FEE * DAYS,
         "Redelivery attempts avoided": attempts_saved * sum(COURIER_PAY_PER_ATTEMPT) / 2 * DAYS,
-        "Courier door time saved": attempts_saved * DOOR_MIN_PER_FAIL / 60 * hourly_mid * DAYS,
+        "Shipper door time saved": attempts_saved * DOOR_MIN_PER_FAIL / 60 * hourly_mid * DAYS,
         "CS calls handled by the agent": failed * CS_CALLS_PER_FAIL * CS_MIN_PER_CALL / 60 * CS_COST_HOUR * s["auto_share"] * DAYS,
     }
     return {"items": items, "total": sum(items.values())}

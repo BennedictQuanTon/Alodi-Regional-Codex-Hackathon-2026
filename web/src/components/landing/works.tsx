@@ -27,7 +27,7 @@ function useTicker(count: number, ms: number) {
 /* ---------- 1 · agent block pipeline (the "blocks" card) ----------------- */
 
 const BLOCKS = [
-  { title: "Courier tap", tag: "Trigger · A", kind: "dot" as const },
+  { title: "Shipper tap", tag: "Trigger · A", kind: "dot" as const },
   { link: "Always" },
   { title: "Rescue chat", tag: "Agent", kind: "dot" as const },
   { link: "Silent 60 min" },
@@ -287,7 +287,7 @@ export function HowItWorks() {
                 <Mark kind="dot" size={30} className="text-navy" />
                 <h3 className="t-h4 mt-6">One-Tap Rescue Pipeline</h3>
                 <p className="t-body-sans mt-4 text-[16px] leading-[1.4] text-graphite">
-                  One agent with four tools runs as a state machine per order. The courier’s tap starts it; the policy guard decides
+                  One agent with four tools runs as a state machine per order. The shipper’s tap starts it; the policy guard decides
                   when it stops.
                 </p>
               </div>
@@ -302,7 +302,7 @@ export function HowItWorks() {
             <WideCard
               mark="square"
               title="In-Flight Context Extraction"
-              body="Turn a 74-second call into four typed fields before the courier reaches the next stop. Every field carries its own confidence."
+              body="Turn a 74-second call into four typed fields before the shipper reaches the next stop. Every field carries its own confidence."
               wash="radial-gradient(circle, rgba(167,252,205,0.9), rgba(160,181,235,0.6) 45%, transparent 70%)"
             >
               <ExtractionArt />

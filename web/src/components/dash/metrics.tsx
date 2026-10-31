@@ -82,14 +82,14 @@ function Money() {
   const rows: [string, string][] = [
     ["Return fees avoided", `+${m(fee)}`],
     ["Redelivery attempts avoided", `+${m(redelivery)}`],
-    ["Courier door time saved", `+${m(door)}`],
+    ["Shipper door time saved", `+${m(door)}`],
     [`CS calls by the agent (${csHours.toFixed(0)} h)`, `+${m(csSave)}`],
     ["Running cost", `−${m(cost)}`],
   ];
   return (
     <div className="grid gap-8 md:grid-cols-2">
       <div className="space-y-5">
-        <Slider label="Orders per day (one area, 20 couriers)" value={orders} set={setOrders} min={1000} max={12000} step={500} fmt={(n) => n.toLocaleString("en-US")} />
+        <Slider label="Orders per day (one area, 20 shippers)" value={orders} set={setOrders} min={1000} max={12000} step={500} fmt={(n) => n.toLocaleString("en-US")} />
         <Slider label="First-attempt failure rate" value={failRate} set={setFailRate} min={4} max={20} step={1} fmt={(n) => `${n}%`} />
         <Slider label="Extra rescue over today’s 25% (assumed)" value={uplift} set={setUplift} min={0} max={40} step={5} fmt={(n) => `${n} pts`} />
         <Slider label="Cases handled by the agent" value={auto} set={setAuto} min={20} max={90} step={5} fmt={(n) => `${n}%`} />
@@ -112,7 +112,7 @@ function Money() {
           ))}
         </dl>
         <p className="mt-5 text-[12px] leading-[1.5] d-muted">
-          ₫40,000 return fee per Shopee policy; ₫7,000 courier pay per attempt (GHN); 2 calls × 4 min at ₫35,000 per CS hour and the running cost are team estimates. Defaults are the best-in-class case (25% → 65%, Shipsy vendor range). Projected, not measured.
+          ₫40,000 return fee per Shopee policy; ₫7,000 shipper pay per attempt (GHN); 2 calls × 4 min at ₫35,000 per CS hour and the running cost are team estimates. Defaults are the best-in-class case (25% → 65%, Shipsy vendor range). Projected, not measured.
         </p>
       </div>
     </div>

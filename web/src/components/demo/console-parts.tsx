@@ -88,7 +88,7 @@ function nowLine(s: DemoState): { title: string; big?: string; unit?: string } {
     case "pre":
       return { title: "Waiting for the route" };
     case "delivering":
-      return { title: "Courier on the way" };
+      return { title: "Shipper on the way" };
     case "chat":
       return { title: "Message sent to the buyer" };
     case "call1":

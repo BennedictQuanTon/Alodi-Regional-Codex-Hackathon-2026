@@ -12,7 +12,7 @@ import { Wordmark } from "@/components/site/brand";
 
 const TABS = [
   { href: "/demo", label: "Stage" },
-  { href: "/demo/shipper", label: "Courier" },
+  { href: "/demo/shipper", label: "Shipper" },
   { href: "/demo/buyer", label: "Buyer" },
   { href: "/demo/console", label: "Ops" },
 ];

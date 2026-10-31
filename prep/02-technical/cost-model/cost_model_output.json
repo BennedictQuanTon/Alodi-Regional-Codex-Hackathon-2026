@@ -7,11 +7,11 @@
         288000000.0,
         288000000.0
       ],
-      "Courier pay for redelivery attempts": [
+      "Shipper pay for redelivery attempts": [
         86400000.0,
         115200000.0
       ],
-      "Courier time lost when the buyer doesn't answer": [
+      "Shipper time lost when the buyer doesn't answer": [
         27350427.350427352,
         51282051.28205129
       ],
@@ -52,7 +52,7 @@
       "saving_items": {
         "Return fees avoided": 57600000.0,
         "Redelivery attempts avoided": 0.0,
-        "Courier door time saved": 0.0,
+        "Shipper door time saved": 0.0,
         "CS calls handled by the agent": 17920000.0
       },
       "gross_month": 75520000.0,
@@ -83,7 +83,7 @@
       "saving_items": {
         "Return fees avoided": 76800000.0,
         "Redelivery attempts avoided": 10079999.999999994,
-        "Courier door time saved": 5897435.897435894,
+        "Shipper door time saved": 5897435.897435894,
         "CS calls handled by the agent": 26879999.999999996
       },
       "gross_month": 119657435.89743589,
@@ -114,7 +114,7 @@
       "saving_items": {
         "Return fees avoided": 153600000.0,
         "Redelivery attempts avoided": 20160000.000000004,
-        "Courier door time saved": 11794871.794871798,
+        "Shipper door time saved": 11794871.794871798,
         "CS calls handled by the agent": 29120000.0
       },
       "gross_month": 214674871.7948718,
@@ -145,7 +145,7 @@
       "saving_items": {
         "Return fees avoided": 57600000.0,
         "Redelivery attempts avoided": 0.0,
-        "Courier door time saved": 0.0,
+        "Shipper door time saved": 0.0,
         "CS calls handled by the agent": 17920000.0
       },
       "gross_month": 75520000.0,
@@ -176,7 +176,7 @@
       "saving_items": {
         "Return fees avoided": 76800000.0,
         "Redelivery attempts avoided": 10079999.999999994,
-        "Courier door time saved": 5897435.897435894,
+        "Shipper door time saved": 5897435.897435894,
         "CS calls handled by the agent": 26879999.999999996
       },
       "gross_month": 119657435.89743589,
@@ -207,7 +207,7 @@
       "saving_items": {
         "Return fees avoided": 153600000.0,
         "Redelivery attempts avoided": 20160000.000000004,
-        "Courier door time saved": 11794871.794871798,
+        "Shipper door time saved": 11794871.794871798,
         "CS calls handled by the agent": 29120000.0
       },
       "gross_month": 214674871.7948718,
@@ -231,7 +231,7 @@
       "saving_items": {
         "Return fees avoided": 57600000.0,
         "Redelivery attempts avoided": 0.0,
-        "Courier door time saved": 0.0,
+        "Shipper door time saved": 0.0,
         "CS calls handled by the agent": 17920000.0
       },
       "gross_month": 75520000.0,
@@ -255,7 +255,7 @@
       "saving_items": {
         "Return fees avoided": 76800000.0,
         "Redelivery attempts avoided": 10079999.999999994,
-        "Courier door time saved": 5897435.897435894,
+        "Shipper door time saved": 5897435.897435894,
         "CS calls handled by the agent": 26879999.999999996
       },
       "gross_month": 119657435.89743589,
@@ -279,7 +279,7 @@
       "saving_items": {
         "Return fees avoided": 153600000.0,
         "Redelivery attempts avoided": 20160000.000000004,
-        "Courier door time saved": 11794871.794871798,
+        "Shipper door time saved": 11794871.794871798,
         "CS calls handled by the agent": 29120000.0
       },
       "gross_month": 214674871.7948718,
@@ -303,7 +303,7 @@
       "saving_items": {
         "Return fees avoided": 57600000.0,
         "Redelivery attempts avoided": 0.0,
-        "Courier door time saved": 0.0,
+        "Shipper door time saved": 0.0,
         "CS calls handled by the agent": 17920000.0
       },
       "gross_month": 75520000.0,
@@ -327,7 +327,7 @@
       "saving_items": {
         "Return fees avoided": 76800000.0,
         "Redelivery attempts avoided": 10079999.999999994,
-        "Courier door time saved": 5897435.897435894,
+        "Shipper door time saved": 5897435.897435894,
         "CS calls handled by the agent": 26879999.999999996
       },
       "gross_month": 119657435.89743589,
@@ -351,7 +351,7 @@
       "saving_items": {
         "Return fees avoided": 153600000.0,
         "Redelivery attempts avoided": 20160000.000000004,
-        "Courier door time saved": 11794871.794871798,
+        "Shipper door time saved": 11794871.794871798,
         "CS calls handled by the agent": 29120000.0
       },
       "gross_month": 214674871.7948718,

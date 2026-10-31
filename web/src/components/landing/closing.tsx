@@ -14,7 +14,7 @@ export function Competitors() {
         <Reveal>
           <div className="t-eyebrow">Competitive landscape</div>
           </Reveal>
-          <RevealText text="AI delivery rescue exists in India. Nobody builds it for Vietnamese buyers, starting from one courier tap." className="t-h1 mt-6 max-w-[1080px]" stagger={0.03} />
+          <RevealText text="AI delivery rescue exists in India. Nobody builds it for Vietnamese buyers, starting from one shipper tap." className="t-h1 mt-6 max-w-[1080px]" stagger={0.03} />
         <Reveal className="mt-14">
           <div className="overflow-x-auto scrollbar-thin rounded-[16px] border border-ash">
             <table className="w-full min-w-[1120px] border-collapse text-left text-[14px]">
@@ -104,10 +104,10 @@ export function ClosingCta() {
           <RevealText text="Make the second drop land." className="t-display mx-auto max-w-[900px]" stagger={0.07} />
           <Reveal delay={0.2}>
           <p className="mx-auto mt-8 max-w-[600px] text-[20px] leading-[1.35] text-graphite">
-            One courier tap, one well-timed conversation, one context card for the next attempt.
+            One shipper tap, one well-timed conversation, one context card for the next attempt.
           </p>
           <div className="mt-11 flex flex-wrap justify-center gap-4">
-            <Link href="/demo" className="btn btn-dark">
+            <Link href="/start" className="btn btn-dark">
               Watch the demo
             </Link>
             <Link href="/console" className="btn btn-primary">

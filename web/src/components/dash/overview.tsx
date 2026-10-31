@@ -27,10 +27,10 @@ const TABS: { k: string; label: string; match: (s: CaseStage) => boolean }[] = [
 
 const TRIGGER: Record<string, string> = { NO_ANSWER: "No answer", RESCHEDULE: "Rescheduled", REFUSED: "Refused", PRE_DELIVERY: "Pre-delivery" };
 
-type Row = { id: string; buyer: string; district: string; trigger: string; stage: CaseStage; courier: string; updated: string; live?: boolean };
+type Row = { id: string; buyer: string; district: string; trigger: string; stage: CaseStage; shipper: string; updated: string; live?: boolean };
 
 function liveRow(s: DemoState): Row {
-  return { id: ORDER.tracking, buyer: ORDER.buyer, district: "Binh Thanh", trigger: s.oco.trigger, stage: s.stage, courier: ORDER.shipper, updated: fmtClock(s.clock), live: true };
+  return { id: ORDER.tracking, buyer: ORDER.buyer, district: "Binh Thanh", trigger: s.oco.trigger, stage: s.stage, shipper: ORDER.shipper, updated: fmtClock(s.clock), live: true };
 }
 
 function Card({ title, sub, right, children, className = "", id }: { title: string; sub?: string; right?: React.ReactNode; children: React.ReactNode; className?: string; id?: string }) {
@@ -103,7 +103,7 @@ const STAGES: { step: string; title: string; total: number; segs: Seg[] }[] = [
   },
   {
     step: "4",
-    title: "Courier taps after a failed attempt",
+    title: "Shipper taps after a failed attempt",
     total: failed,
     segs: [
       { label: "A · No answer", n: DAY.failed_first_attempt.A, tone: "primary" },
@@ -249,7 +249,7 @@ const GUARD = [
   { k: "AI calls placed", v: fmt(DAY.calls_placed) },
   { k: "Answered call minutes", v: `${DAY.call_minutes_answered}` },
   { k: "Messages sent", v: fmt(DAY.messages_sent) },
-  { k: "Courier memo audio", v: `${Math.round(DAY.memo_seconds / 60)} min` },
+  { k: "Shipper memo audio", v: `${Math.round(DAY.memo_seconds / 60)} min` },
 ];
 
 function Guard() {
@@ -299,7 +299,7 @@ function Routes() {
         <table className="w-full min-w-[760px] text-left text-[13px]">
           <thead className="sticky top-0 bg-[var(--d-surface)]">
             <tr className="border-b border-[var(--d-border)]">
-              {["Route", "Courier", "Ward", "Orders", "Delivered", "No ans.", "Resched.", "Refused", "Rescued", "CS", "Fail rate"].map((h, i) => (
+              {["Route", "Shipper", "Ward", "Orders", "Delivered", "No ans.", "Resched.", "Refused", "Rescued", "CS", "Fail rate"].map((h, i) => (
                 <th key={h} className={`px-3 py-2.5 d-overline first:pl-5 last:pr-5 md:first:pl-6 md:last:pr-6 ${i >= 3 ? "text-right" : ""}`}>
                   {h}
                 </th>
@@ -312,7 +312,7 @@ function Routes() {
               return (
                 <tr key={r.route} className="border-b border-[var(--d-border)] last:border-0 hover:bg-[var(--d-raised)]">
                   <td className="px-3 py-2.5 pl-5 font-medium md:pl-6">{r.route.replace("HCM-BTH-", "")}</td>
-                  <td className="px-3 py-2.5">{r.courier}</td>
+                  <td className="px-3 py-2.5">{r.shipper}</td>
                   <td className="px-3 py-2.5 d-text2">{r.ward}</td>
                   <td className="px-3 py-2.5 text-right">{r.orders}</td>
                   <td className="px-3 py-2.5 text-right">{r.delivered}</td>
@@ -361,7 +361,7 @@ function CsBacklog() {
         <table className="w-full min-w-[760px] text-left text-[13px]">
           <thead>
             <tr className="border-b border-[var(--d-border)]">
-              {["Tracking ID", "Buyer", "Item", "COD", "Courier", "Tap", "Reason", "At"].map((h) => (
+              {["Tracking ID", "Buyer", "Item", "COD", "Shipper", "Tap", "Reason", "At"].map((h) => (
                 <th key={h} className="px-3 py-2.5 d-overline first:pl-5 last:pr-5 md:first:pl-6 md:last:pr-6">
                   {h}
                 </th>
@@ -378,7 +378,7 @@ function CsBacklog() {
                 </td>
                 <td className="px-3 py-2.5 d-text2">{q.item}</td>
                 <td className="px-3 py-2.5 tabular-nums">{fmt(q.cod)}</td>
-                <td className="px-3 py-2.5 d-text2">{q.courier}</td>
+                <td className="px-3 py-2.5 d-text2">{q.shipper}</td>
                 <td className="px-3 py-2.5 d-text2">{q.tap}</td>
                 <td className="px-3 py-2.5">
                   <span className={`d-chip ${q.reason === "Low confidence" ? "d-chip-neutral" : "d-chip-warn"}`}>{q.reason}</span>
@@ -415,7 +415,7 @@ export function Overview() {
         district: c.district,
         trigger: c.trigger,
         stage: (resolved[c.id] ? "closed" : c.stage) as CaseStage,
-        courier: c.courier,
+        shipper: c.shipper,
         updated: c.updated,
       })),
     ],
@@ -435,7 +435,7 @@ export function Overview() {
             </div>
             <h1 className="d-title mt-1 text-[28px] leading-[1.15] md:text-[32px]">{HUB.name}</h1>
             <p className="mt-1 text-[14px] d-text2">
-              {HUB.couriers} couriers · {HUB.wards.join(", ")} · morning run {HUB.morningRun}, route cut-off {HUB.cutoff} · calls {HUB.callHours}
+              {HUB.shippers} shippers · {HUB.wards.join(", ")} · morning run {HUB.morningRun}, route cut-off {HUB.cutoff} · calls {HUB.callHours}
             </p>
           </div>
           <span className="d-chip d-chip-neutral">Mock data · simulated day</span>
@@ -450,7 +450,7 @@ export function Overview() {
             <Pipeline />
           </Card>
           <div className="grid gap-4">
-            <Card title="Failures by hour" sub="First-attempt failures, by courier tap">
+            <Card title="Failures by hour" sub="First-attempt failures, by shipper tap">
               <FailsByHour />
             </Card>
             <Card title="Policy guard" sub="Hard rules, checked before every action">
@@ -496,7 +496,7 @@ export function Overview() {
             <table className="w-full min-w-[880px] text-left text-[13px]">
               <thead>
                 <tr className="border-b border-[var(--d-border)]">
-                  {["Tracking ID", "Buyer", "Reason", "Status", "Courier", "Updated", "Progress"].map((h) => (
+                  {["Tracking ID", "Buyer", "Reason", "Status", "Shipper", "Updated", "Progress"].map((h) => (
                     <th key={h} className="px-5 py-2.5 d-overline md:px-6">
                       {h}
                     </th>
@@ -529,7 +529,7 @@ export function Overview() {
                       <td className="px-5 py-3 md:px-6">
                         <span className={`d-chip ${stageChip(r.stage)}`}>{STAGE_LABEL[r.stage]}</span>
                       </td>
-                      <td className="px-5 py-3 d-text2 md:px-6">{r.courier}</td>
+                      <td className="px-5 py-3 d-text2 md:px-6">{r.shipper}</td>
                       <td className="px-5 py-3 tabular-nums d-muted md:px-6">{r.updated}</td>
                       <td className="px-5 py-3 md:px-6">
                         <div className="flex items-center gap-2">

@@ -6,7 +6,7 @@
 | Version | 2.0 · 30 October 2026 |
 | Team | Develarper — Nomura Yoshio (team lead, presenter) · Long Quan Ton (AI engineer, solution architect) · Khanh Tuong Huynh (AI engineer, deployment) · Thanh Loi Tran (data engineer, backend) |
 | Release | MVP live demo on **31 October 2026** (mock data, cloud APIs) → shadow-mode pilot at one hub → production inside a carrier (SPX) |
-| Sizing basis | One area (hub) = **20 couriers, 4,000 orders a day** (team estimate) |
+| Sizing basis | One area (hub) = **20 shippers, 4,000 orders a day** (team estimate) |
 | Source of truth | [`diagrams/alodi-architecture.pdf`](diagrams/alodi-architecture.pdf) · [`diagrams/alodi-flow.pdf`](diagrams/alodi-flow.pdf) |
 | Companion files | [`mock-data/`](mock-data/) (test data) · [`requirements.txt`](requirements.txt) · [`package.json.example`](package.json.example) · [`.env.example`](.env.example) |
 
@@ -67,7 +67,7 @@ This is the only technical document. It replaces the earlier `ARCHITECTURE`, `FL
 
 ## 1. Problem and opportunity
 
-**Problem statement.** When a delivery fails, the fix is usually a small piece of information: *“after five”*, *“leave it with security in Tower B”*, *“call my wife”*. Today the courier and the buyer exchange it on the phone and it is lost. Shopee buyers cannot choose a delivery time at all, so the order is retried blindly or sent back to the seller.
+**Problem statement.** When a delivery fails, the fix is usually a small piece of information: *“after five”*, *“leave it with security in Tower B”*, *“call my wife”*. Today the shipper and the buyer exchange it on the phone and it is lost. Shopee buyers cannot choose a delivery time at all, so the order is retried blindly or sent back to the seller.
 
 | Fact | Figure | Source line |
 | --- | --- | --- |
@@ -75,14 +75,14 @@ This is the only technical document. It replaces the earlier `ARCHITECTURE`, `FL
 | Orders refused nationwide | 8–12% (up to 20% remote, 25–30% in sale season) | VECOM; Tran Anh Tung (UEF), Nguoi Lao Dong, Jul 2025 |
 | Delivery windows a buyer can choose | 0 | Shopee Help Center, article 79559 |
 | Shopee redelivery frame | 2–3 contacts, reschedule within 5 days | Shopee Help Center, article 79569 |
-| Monthly loss, one area (20 couriers, 4,000 orders a day) | ₫447–499M (modelled) | §18.8 |
+| Monthly loss, one area (20 shippers, 4,000 orders a day) | ₫447–499M (modelled) | §18.8 |
 | People needed to phone 800 buyers a day | ≈ 13 (estimate) | 800 × 2 calls × 4 min |
 
-**At the size of one area (20 couriers, 4,000 orders a day)** the mock simulation in §20 gives 350 failed first attempts a day (9.2%). Each one is a possible ₫40,000 return fee and about two manual phone calls.
+**At the size of one area (20 shippers, 4,000 orders a day)** the mock simulation in §20 gives 350 failed first attempts a day (9.2%). Each one is a possible ₫40,000 return fee and about two manual phone calls.
 
-**Opportunity.** An autonomous agent can run the redelivery conversation at scale, inside rules the marketplace already defines, and hand the result to the next courier as structured data, while people keep every decision that affects money or a buyer’s record.
+**Opportunity.** An autonomous agent can run the redelivery conversation at scale, inside rules the marketplace already defines, and hand the result to the next shipper as structured data, while people keep every decision that affects money or a buyer’s record.
 
-**Vision.** *Make the second drop land.* One courier tap, one well-timed conversation, one context card for the next attempt.
+**Vision.** *Make the second drop land.* One shipper tap, one well-timed conversation, one context card for the next attempt.
 
 ## 2. Goals, non-goals and success metrics
 
@@ -91,14 +91,14 @@ This is the only technical document. It replaces the earlier `ARCHITECTURE`, `FL
 | ID | Goal |
 | --- | --- |
 | G1 | Capture the buyer’s availability **before** the first attempt (morning window question). |
-| G2 | Turn a failed attempt into **structured context** (window, drop-off, backup receiver, address fix) for the next attempt, with no typing by the courier. |
+| G2 | Turn a failed attempt into **structured context** (window, drop-off, backup receiver, address fix) for the next attempt, with no typing by the shipper. |
 | G3 | Run the rescue conversation **autonomously** inside hard rules (hours, contact caps, Shopee’s 5-day frame). |
 | G4 | Keep **people in control** of refusals, labels, returns and ambiguous answers. |
 | G5 | Make every decision **measurable and auditable**. |
 
 ### 2.2 Non-goals (this release)
 
-- Replacing the carrier’s route planner, courier app or CS tools. Alodi plugs into them.
+- Replacing the carrier’s route planner, shipper app or CS tools. Alodi plugs into them.
 - Dialling real phone numbers or sending real Shopee or Zalo messages in the demo.
 - Labelling buyers (“suspected bomb”) or returning goods automatically.
 - Payments, refunds, map-based address validation.
@@ -108,7 +108,7 @@ This is the only technical document. It replaces the earlier `ARCHITECTURE`, `FL
 
 | Metric | Definition | Target | Type |
 | --- | --- | --- | --- |
-| **Time-to-context** | Buyer’s answer (or courier tap) → context card visible on the courier app and the ops dashboard | median < 10 s on the chat path | Measured |
+| **Time-to-context** | Buyer’s answer (or shipper tap) → context card visible on the shipper app and the ops dashboard | median < 10 s on the chat path | Measured |
 | **Extraction accuracy** | Per-field F1 on a hand-written held-out set (chat, call transcript, memo) | ≥ 0.90 | Measured |
 | **Safe autonomy** | % of cases resolved without a person; error rate inside that group; high-stakes actions without approval; calls outside hours | report %; < 2%; **0**; **0** | Measured |
 | **Money** | Return fees avoided + CS hours saved − agent cost per case | positive per case | Projected |
@@ -124,7 +124,7 @@ This is the only technical document. It replaces the earlier `ARCHITECTURE`, `FL
 | Seller | No ₫40,000 return fee, no lost sale |
 | Marketplace (Shopee) | Buyer experience, policy compliance |
 | Buyer | Parcel at a convenient time and place; no spam; no wrong label |
-| Courier | Fewer failed stops, no typing |
+| Shipper | Fewer failed stops, no typing |
 | Customer service (CS) | Only the cases that need a person, with the whole story |
 | Competition judges | Real autonomy, measurable results, honest claims |
 
@@ -132,7 +132,7 @@ This is the only technical document. It replaces the earlier `ARCHITECTURE`, `FL
 
 | Actor | Kind | Role |
 | --- | --- | --- |
-| **Courier** | Primary, person | Delivers; taps Delivered / A / B / C; records a voice memo |
+| **Shipper** | Primary, person | Delivers; taps Delivered / A / B / C; records a voice memo |
 | **Buyer** | Primary, person | Answers the window question, chats, answers AI calls |
 | **CS agent** | Primary, person | Handles escalations, approves labels and returns, takes hotline call-backs |
 | **Dispatcher / ops viewer** | Secondary, person | Watches the live ops dashboard |
@@ -150,9 +150,9 @@ This is the only technical document. It replaces the earlier `ARCHITECTURE`, `FL
 
 | Persona | Snapshot | Needs | Frustrations |
 | --- | --- | --- | --- |
-| **Tuan Nguyen, courier**, 28, route R07 of the Binh Thanh hub, 200 stops a day | Rides with the phone on the handlebar | One-tap outcomes; the right time and place before arriving | Calling the same buyer three times; typing notes on a bike |
-| **Minh Hoang, buyer**, 34, office worker | Away 08:00–18:00; his wife is home some days | Choose when; leave it with security; no spam | Unknown numbers; couriers arriving at noon |
-| **Lan, CS agent**, hub hotline | Handles escalations | Only real exceptions, with the full story | Re-asking buyers what couriers already heard |
+| **Tuan Nguyen, shipper**, 28, route R07 of the Binh Thanh hub, 200 stops a day | Rides with the phone on the handlebar | One-tap outcomes; the right time and place before arriving | Calling the same buyer three times; typing notes on a bike |
+| **Minh Hoang, buyer**, 34, office worker | Away 08:00–18:00; his wife is home some days | Choose when; leave it with security; no spam | Unknown numbers; shippers arriving at noon |
+| **Lan, CS agent**, hub hotline | Handles escalations | Only real exceptions, with the full story | Re-asking buyers what shippers already heard |
 | **Hub manager** | Owns cost and SLA | Rescue rate, cost per case | No view of why orders fail |
 
 ## 4. Scope
@@ -160,7 +160,7 @@ This is the only technical document. It replaces the earlier `ARCHITECTURE`, `FL
 ### 4.1 In scope — MVP demo (31 October)
 
 - Morning load of orders + 4 fixed windows; window question to every buyer in the area.
-- Courier app: stops, window notes, A / B / C / Delivered with a 2-minute undo, 10-second voice memo, context card.
+- Shipper app: stops, window notes, A / B / C / Delivered with a 2-minute undo, 10-second voice memo, context card.
 - Flow A (chat → AI call 1 → AI call 2 → CS), Flow B (memo → ASR → extraction), button C (straight to CS).
 - Extraction with per-field confidence; auto-apply at ≥ 0.85; confirm in chat; CS review.
 - Policy guard; redelivery counter (max 2); 5-day horizon.
@@ -168,7 +168,7 @@ This is the only technical document. It replaces the earlier `ARCHITECTURE`, `FL
 - Buyer phone on the laptop: chat and an in-browser AI call.
 - Demo control: scenarios, fast-forward clock, device status, offline and auto-buyer modes.
 - Event log and the four metrics.
-- Mock data pack for one area (20 couriers, 4,000 orders) and 20 scripted test cases (§20).
+- Mock data pack for one area (20 shippers, 4,000 orders) and 20 scripted test cases (§20).
 
 ### 4.2 Out of scope — MVP
 
@@ -182,7 +182,7 @@ Pilot: shadow mode at one hub. Production: SPX routing and order APIs, Shopee Ch
 
 ![Alodi flow](diagrams/alodi-flow.png)
 
-Legend in the diagram: **orange** = Alodi Agent · **blue** = courier · **red** = CS · **green** = done · **grey** = decision or do nothing.
+Legend in the diagram: **orange** = Alodi Agent · **blue** = shipper · **red** = CS · **green** = done · **grey** = decision or do nothing.
 
 ### 5.1 The eight steps
 
@@ -191,14 +191,14 @@ Legend in the diagram: **orange** = Alodi Agent · **blue** = courier · **red**
 | 1 | **Load today’s orders + windows** | Every morning, for the whole delivery area: pull today’s orders and the feasible windows | Route planner, OMS |
 | 2 | **Ask the buyer for a window** | Message the buyer: pick **≥ 2 windows**, or “can’t receive today” + a reason | LLM (writes the message), Shopee Chat / Zalo |
 | — | *Did the buyer reply before the route cut-off?* | Three outcomes → | |
-| 3 | **Picked ≥ 2 windows** | Write a window note for the courier | Courier app |
+| 3 | **Picked ≥ 2 windows** | Write a window note for the shipper | Shipper app |
 | — | **Can’t receive today** | Save the reason, move the order to tomorrow | Alodi DB |
 | — | **No reply** | Deliver as planned, no note | — |
-| 4 | **Courier delivers and calls the buyer** | The courier sees any note; on failure taps **A / B / C** → **2-minute undo**: the event is *pending* and nothing is sent | Courier app, timers |
+| 4 | **Shipper delivers and calls the buyer** | The shipper sees any note; on failure taps **A / B / C** → **2-minute undo**: the event is *pending* and nothing is sent | Shipper app, timers |
 | — | **C · Refused** | Straight to CS (step 8), no buyer contact | CS dashboard |
 | 5 | **Flow A · No answer** | Chat after the undo window → 60 min no reply → **AI call 1** → +2 h → **AI call 2** (08:00–20:30 only) → two calls fail → CS. A reply or call-back mid-way cancels the pending call | Chat, AI call + TTS, ASR, extraction, timers |
-| 6 | **Flow B · Answered but rescheduled** | 10-second courier memo (demo) or call recording (production) → ASR → mask PII → extract; missing fields → confirm in chat | File storage, ASR, PII masking, extraction |
-| 7 | **Save the new appointment + note** | Store `rescue_result`, push the context card to the courier app | Alodi DB, courier app |
+| 6 | **Flow B · Answered but rescheduled** | 10-second shipper memo (demo) or call recording (production) → ASR → mask PII → extract; missing fields → confirm in chat | File storage, ASR, PII masking, extraction |
+| 7 | **Save the new appointment + note** | Store `rescue_result`, push the context card to the shipper app | Alodi DB, shipper app |
 | — | *Redelivered twice already?* | No → back to step 4 on the new appointment. Yes, and the 3rd attempt failed → step 8 | |
 | 8 | **CS handles and labels (a person)** | Stop delivery; CS decides the label and the return | CS dashboard, hotline |
 
@@ -208,26 +208,26 @@ Legend in the diagram: **orange** = Alodi Agent · **blue** = courier · **red**
 flowchart TD
   L["Load today’s orders for the area<br/>from Order DB"]:::agent --> Q["Send window question<br/>via Shopee Chat / Zalo"]:::agent
   Q --> R{"Buyer replied<br/>before route cut-off?"}:::dec
-  R -- "Picked ≥ 2 windows" --> N["Window note for the courier"]:::agent
+  R -- "Picked ≥ 2 windows" --> N["Window note for the shipper"]:::agent
   R -- "Can’t receive today + reason" --> M["Move order to tomorrow,<br/>save the reason"]:::agent
   R -- "No reply" --> P["Deliver as planned,<br/>no note"]:::dec
-  N --> D["Courier delivers, calls the buyer"]:::courier
+  N --> D["Shipper delivers, calls the buyer"]:::shipper
   P --> D
   D --> K{"Result"}:::dec
   K -- "Delivered" --> OK(["Done"]):::done
-  K -- "Failed: tap A / B / C" --> U["2-minute undo<br/>nothing sent to the buyer yet"]:::courier
+  K -- "Failed: tap A / B / C" --> U["2-minute undo<br/>nothing sent to the buyer yet"]:::shipper
   U -- "C · Refused" --> CS1["CS handles"]:::cs
   U -- "A · No answer" --> FA["Flow A<br/>chat, then AI call up to 2 times<br/>buyer replies mid-way: cancel pending call"]:::agent
   U -- "B · Answered, rescheduled" --> FB["Flow B<br/>transcript, extract, note"]:::agent
   FA -- "Unreachable" --> CS1
-  FA -- "Rescheduled" --> S["Save new appointment<br/>+ note for the next courier"]:::agent
+  FA -- "Rescheduled" --> S["Save new appointment<br/>+ note for the next shipper"]:::agent
   FB --> S
   S --> T{"Redelivered<br/>twice already?"}:::dec
   T -- "No" --> D
   T -- "Yes, 3rd attempt failed" --> STOP["Stop delivery<br/>CS labels the order"]:::cs
 
   classDef agent fill:#fff4ec,stroke:#f05a00,color:#1f2a44
-  classDef courier fill:#eaf0fb,stroke:#3f5fae,color:#1f2a44
+  classDef shipper fill:#eaf0fb,stroke:#3f5fae,color:#1f2a44
   classDef cs fill:#fdecee,stroke:#c0392b,color:#1f2a44
   classDef done fill:#e9f7ee,stroke:#15803d,color:#1f2a44
   classDef dec fill:#f3f4f6,stroke:#6b7183,color:#1f2a44
@@ -245,8 +245,8 @@ flowchart TD
 | 11:04 | 60 min of silence → **AI call 1** (policy guard: inside 08:00–20:30, call 1 of 2) |
 | 11:04–11:05 | 74-second call: consent → “Tomorrow after five… Tower B security… or call my wife” → read-back → confirmed |
 | 11:05 | Extraction: window 1 Nov 17:00–20:00 (0.94), drop-off Tower B security (0.88), backup receiver wife (0.91) → auto-applied |
-| 11:05 | Context card on the courier app; confirmation chat to the buyer |
-| Sun 1 Nov 17:22 | Courier arrives with the card → **Delivered** on attempt 2 |
+| 11:05 | Context card on the shipper app; confirmation chat to the buyer |
+| Sun 1 Nov 17:22 | Shipper arrives with the card → **Delivered** on attempt 2 |
 
 ## 6. Business rules and timings
 
@@ -294,15 +294,15 @@ Priority: **M** = must for the demo, **S** = should, **C** = could / later.
 | FR-04 | The system shall accept a reply of ≥ 2 windows and store it in `availability_reply`. | M |
 | FR-05 | The system shall accept “can’t receive today” with a free-text reason, move the order to the next day and store the reason. | M |
 | FR-06 | At the route cut-off, orders without a reply shall be marked “deliver as planned”. | M |
-| FR-07 | For orders with chosen windows, the system shall push a window note to the courier’s stop. | M |
+| FR-07 | For orders with chosen windows, the system shall push a window note to the shipper’s stop. | M |
 | FR-08 | Production may limit the window question to risky orders (high COD, earlier failures) by configuration, to save message cost. | C |
 
-### 7.2 Courier app
+### 7.2 Shipper app
 
 | ID | Requirement | Priority |
 | --- | --- | --- |
-| FR-10 | The courier app shall list today’s stops in route order with any window note or context card. | M |
-| FR-11 | On a stop the courier shall record the outcome with one tap: **Delivered**, **A · No answer**, **B · Answered, rescheduled**, **C · Refused**. | M |
+| FR-10 | The shipper app shall list today’s stops in route order with any window note or context card. | M |
+| FR-11 | On a stop the shipper shall record the outcome with one tap: **Delivered**, **A · No answer**, **B · Answered, rescheduled**, **C · Refused**. | M |
 | FR-12 | A failed outcome shall be created as *pending* with a visible 2-minute countdown and an **Undo** action. | M |
 | FR-13 | For B the app shall record a voice memo of up to 10 seconds and upload it. | M |
 | FR-14 | The app shall show a context card in real time when the agent saves a new appointment. | M |
@@ -348,7 +348,7 @@ Priority: **M** = must for the demo, **S** = should, **C** = could / later.
 | ID | Requirement | Priority |
 | --- | --- | --- |
 | FR-50 | The ops dashboard shall show a live timeline of the eight steps for each case, including pending events, timers and policy checks. | M |
-| FR-51 | It shall show the conversation and live transcript, extracted fields with confidence, and the card pushed to the courier. | M |
+| FR-51 | It shall show the conversation and live transcript, extracted fields with confidence, and the card pushed to the shipper. | M |
 | FR-52 | It shall list cases that need a person (low confidence, two missed calls, refused, 3rd failure) with the reason and the agent’s suggestion. | M |
 | FR-53 | A CS agent shall be able to apply an appointment, approve a label or return, or claim a case; the action is logged with their name. | M |
 | FR-54 | It shall show hub KPIs and the four output metrics from the event log. | S |
@@ -391,7 +391,7 @@ Priority: **M** = must for the demo, **S** = should, **C** = could / later.
 | NFR-12 | Compliance | Recording consent on every call; opt-out honoured; Shopee 5-day frame; Vietnam’s Personal Data Protection Law (§18.6) | Test cases + legal review |
 | NFR-13 | Security | HTTPS / WSS everywhere; secrets in environment variables; no keys in the browser | Review |
 | NFR-14 | Auditability | Every context change versioned with actor and timestamp | 100% |
-| NFR-15 | Usability | Courier: one tap per outcome, targets ≥ 48 px, one-handed; iPad: targets ≥ 44 px, nothing hover-only | Review |
+| NFR-15 | Usability | Shipper: one tap per outcome, targets ≥ 48 px, one-handed; iPad: targets ≥ 44 px, nothing hover-only | Review |
 | NFR-16 | Accessibility | Text contrast AA; `prefers-reduced-motion` respected; charts carry text labels | Review |
 | NFR-17 | Localisation | Buyer-facing language Vietnamese; product UI English; Vietnamese ASR and TTS in production | Demo + pilot |
 | NFR-18 | Portability | Same interfaces in demo and production (SQLite → PostgreSQL, demo scheduler → Temporal, cloud API → self-hosted model) | Architecture |
@@ -399,7 +399,7 @@ Priority: **M** = must for the demo, **S** = should, **C** = could / later.
 | NFR-20 | Cost | Agent cost per case measured; monthly cost and net saving per hub reported (§18.8) | Report |
 | NFR-21 | Observability | Event log, metrics, traces; production: Prometheus + Grafana + OpenTelemetry | — |
 | NFR-22 | Compatibility | iPhone Safari (iOS 17+), iPadOS Safari, desktop Chrome | Device test |
-| NFR-23 | Availability (production) | 99.9% for courier events and the agent during 06:00–21:00; RPO ≤ 5 min; RTO ≤ 1 h | §18.5 |
+| NFR-23 | Availability (production) | 99.9% for shipper events and the agent during 06:00–21:00; RPO ≤ 5 min; RTO ≤ 1 h | §18.5 |
 
 ## 9. Use cases
 
@@ -411,12 +411,12 @@ Priority: **M** = must for the demo, **S** = should, **C** = could / later.
 | UC-02 | Ask the buyer for delivery windows | Alodi Agent | M |
 | UC-03 | Answer the window question | Buyer | M |
 | UC-04 | Add window notes to the route | Alodi Agent | M |
-| UC-05 | Record the delivery outcome (Delivered / A / B / C) | Courier | M |
-| UC-06 | Undo an outcome within 2 minutes | Courier | M |
+| UC-05 | Record the delivery outcome (Delivered / A / B / C) | Shipper | M |
+| UC-06 | Undo an outcome within 2 minutes | Shipper | M |
 | UC-07 | Rescue an unanswered delivery (Flow A) | Alodi Agent | M |
 | UC-08 | Conduct an AI call | Alodi Agent | M |
 | UC-09 | Answer the AI call | Buyer | M |
-| UC-10 | Reschedule from a voice memo (Flow B) | Courier | M |
+| UC-10 | Reschedule from a voice memo (Flow B) | Shipper | M |
 | UC-11 | Extract delivery context | Alodi Agent | M |
 | UC-12 | Confirm unclear details in chat | Alodi Agent | M |
 | UC-13 | Save the appointment and push the context card | Alodi Agent | M |
@@ -461,23 +461,23 @@ Priority: **M** = must for the demo, **S** = should, **C** = could / later.
 #### UC-04 · Add window notes to the route
 | | |
 | --- | --- |
-| Main flow | 1. For each order with `answer_type = windows`, build a note (“Prefers 14:00–17:00 or 17:00–20:00”). 2. Push it to the courier app on the stop. 3. Log `note_pushed`. |
+| Main flow | 1. For each order with `answer_type = windows`, build a note (“Prefers 14:00–17:00 or 17:00–20:00”). 2. Push it to the shipper app on the stop. 3. Log `note_pushed`. |
 
 #### UC-05 · Record the delivery outcome
 | | |
 | --- | --- |
-| Actor | Courier |
-| Preconditions | Courier is at the stop and has called the buyer |
-| Main flow | 1. Courier taps an outcome. 2. Delivered → order closed. 3. A / B / C → `shipper_event` created as **pending**, `commit_at = now + 2 min`; the ops dashboard shows it. 4. At commit time the scheduler reloads the state (BR-22) and commits. 5. A → UC-07; B → UC-10; C → UC-14 with a suggested label. |
-| Alternative | 3a. Courier undoes (UC-06) → event `undone`, nothing sent. |
+| Actor | Shipper |
+| Preconditions | Shipper is at the stop and has called the buyer |
+| Main flow | 1. Shipper taps an outcome. 2. Delivered → order closed. 3. A / B / C → `shipper_event` created as **pending**, `commit_at = now + 2 min`; the ops dashboard shows it. 4. At commit time the scheduler reloads the state (BR-22) and commits. 5. A → UC-07; B → UC-10; C → UC-14 with a suggested label. |
+| Alternative | 3a. Shipper undoes (UC-06) → event `undone`, nothing sent. |
 | Postconditions | Rescue started or order closed |
 | Rules | BR-06, BR-07 |
 
 #### UC-06 · Undo an outcome
 | | |
 | --- | --- |
-| Main flow | 1. Courier taps Undo before `commit_at`. 2. Event status `undone`; the commit job is cancelled. 3. Stop returns to “out for delivery”. |
-| Alternative | 1a. After `commit_at` → Undo is gone; the courier contacts CS. |
+| Main flow | 1. Shipper taps Undo before `commit_at`. 2. Event status `undone`; the commit job is cancelled. 3. Stop returns to “out for delivery”. |
+| Alternative | 1a. After `commit_at` → Undo is gone; the shipper contacts CS. |
 
 #### UC-07 · Rescue an unanswered delivery (Flow A)
 | | |
@@ -505,9 +505,9 @@ UC-08 from the buyer’s side: Answer or Decline; speak; confirm or correct the 
 #### UC-10 · Reschedule from a voice memo (Flow B)
 | | |
 | --- | --- |
-| Actor | Courier |
+| Actor | Shipper |
 | Preconditions | Event B tapped |
-| Main flow | 1. Courier holds Record and repeats what the buyer said (≤ 10 s). 2. Upload. 3. ASR → transcript → mask PII. 4. UC-11. |
+| Main flow | 1. Shipper holds Record and repeats what the buyer said (≤ 10 s). 2. Upload. 3. ASR → transcript → mask PII. 4. UC-11. |
 | Alternative | 3a. ASR fails → ask the buyer in chat (UC-12). |
 | Postconditions | Context extracted |
 
@@ -530,7 +530,7 @@ UC-08 from the buyer’s side: Answer or Decline; speak; confirm or correct the 
 #### UC-13 · Save the appointment and push the context card
 | | |
 | --- | --- |
-| Main flow | 1. Save `rescue_result` (version +1, actor). 2. Increment the attempt counter. 3. Push the card to the courier app and the ops dashboard. 4. Send a confirmation to the buyer. 5. Log `card_pushed`. |
+| Main flow | 1. Save `rescue_result` (version +1, actor). 2. Increment the attempt counter. 3. Push the card to the shipper app and the ops dashboard. 4. Send a confirmation to the buyer. 5. Log `card_pushed`. |
 | Alternative | 2a. The counter would pass 2 → UC-14 (stop delivery). |
 | Rules | BR-17, BR-24 |
 
@@ -539,7 +539,7 @@ UC-08 from the buyer’s side: Answer or Decline; speak; confirm or correct the 
 | --- | --- |
 | Actor | CS agent |
 | Triggers | Refused (C); two missed calls; low confidence; address outside the area; 3rd failure |
-| Main flow | 1. Case appears in the CS queue with the reason, transcript, extraction and the agent’s suggestion. 2. CS reviews and may call the buyer from the hotline. 3. CS applies an appointment, claims the case, or goes to UC-15. 4. Action logged with the CS agent’s name; courier and ops updated. |
+| Main flow | 1. Case appears in the CS queue with the reason, transcript, extraction and the agent’s suggestion. 2. CS reviews and may call the buyer from the hotline. 3. CS applies an appointment, claims the case, or goes to UC-15. 4. Action logged with the CS agent’s name; shipper and ops updated. |
 
 #### UC-15 · Approve a label or return
 | | |
@@ -565,7 +565,7 @@ UC-08 from the buyer’s side: Answer or Decline; speak; confirm or correct the 
 | | |
 | --- | --- |
 | Actor | Demo operator |
-| Main flow | 1. Open `/control`; check three device dots. 2. Choose a scenario; Reset (reloads the mock data pack). 3. Set clock speed; start. 4. Courier, buyer and ops act; the operator jumps the clock when needed. 5. Reset between scenarios. |
+| Main flow | 1. Open `/control`; check three device dots. 2. Choose a scenario; Reset (reloads the mock data pack). 3. Set clock speed; start. 4. Shipper, buyer and ops act; the operator jumps the clock when needed. 5. Reset between scenarios. |
 | Alternatives | A device disconnects → it recovers from `GET /state`. API failure → offline mode. Noisy room → auto-buyer. |
 
 #### UC-19 · Review metrics
@@ -578,7 +578,7 @@ UC-08 from the buyer’s side: Answer or Decline; speak; confirm or correct the 
 
 ```mermaid
 flowchart LR
-  courier(["Courier"])
+  shipper(["Shipper"])
   buyer(["Buyer"])
   cs(["CS agent"])
   ops(["Dispatcher"])
@@ -611,15 +611,15 @@ flowchart LR
   uc01 -. include .-> uc02
   buyer --> uc03
   uc03 -. extend .-> uc04
-  courier --> uc05
-  courier --> uc06
+  shipper --> uc05
+  shipper --> uc06
   uc06 -. extend .-> uc05
   uc05 -. include .-> uc07
   uc05 -. include .-> uc10
   uc05 -. include .-> uc14
   uc07 -. include .-> uc08
   buyer --> uc08
-  courier --> uc10
+  shipper --> uc10
   uc08 -. include .-> uc11
   uc10 -. include .-> uc11
   uc11 -. extend .-> uc12
@@ -665,7 +665,7 @@ classDiagram
     +close()
   }
 
-  class Courier {
+  class Shipper {
     +string courierId
     +string name
     +string routeId
@@ -792,7 +792,7 @@ classDiagram
     +snapshot(view) State
   }
 
-  Courier "1" --> "0..*" Order : route
+  Shipper "1" --> "0..*" Order : route
   Order "1" --> "0..*" AvailabilityReply
   Order "1" --> "0..*" ShipperEvent
   Order "1" --> "0..2" RescueCase : cycles
@@ -810,7 +810,7 @@ classDiagram
   Scheduler ..> DemoClock : time source
 ```
 
-Enumerations: `OrderStatus` {scheduled, out_for_delivery, delivered, moved, with_cs, labelled} · `AnswerType` {windows, cannot_today, no_reply} · `Button` {A, B, C, DELIVERED} · `EventStatus` {pending, committed, undone} · `Trigger` {NO_ANSWER, RESCHEDULE, REFUSED} · `Source` {chat, ai_call, shipper_memo, cs} · `Decision` {auto_applied, needs_review, escalated_cs, cs_applied} · `Actor` {agent, buyer, courier, cs, system} · `Kind` {call, memo}.
+Enumerations: `OrderStatus` {scheduled, out_for_delivery, delivered, moved, with_cs, labelled} · `AnswerType` {windows, cannot_today, no_reply} · `Button` {A, B, C, DELIVERED} · `EventStatus` {pending, committed, undone} · `Trigger` {NO_ANSWER, RESCHEDULE, REFUSED} · `Source` {chat, ai_call, shipper_memo, cs} · `Decision` {auto_applied, needs_review, escalated_cs, cs_applied} · `Actor` {agent, buyer, shipper, cs, system} · `Kind` {call, memo}.
 
 ## 12. Data model — ERD and tables
 
@@ -820,7 +820,7 @@ Demo: SQLite (one file). Production: PostgreSQL. Same tables; JSON columns becom
 
 ```mermaid
 erDiagram
-  COURIERS ||--o{ ORDERS : "route"
+  SHIPPERS ||--o{ ORDERS : "route"
   ORDERS ||--o{ AVAILABILITY_REPLY : "asked"
   ORDERS ||--o{ SHIPPER_EVENT : "outcomes"
   ORDERS ||--o{ RESCUE_CASE : "rescue cycles"
@@ -829,7 +829,7 @@ erDiagram
   ORDERS ||--o{ EVENTS : "audit log"
   SHIPPER_EVENT |o--o| RESCUE_CASE : "starts"
 
-  COURIERS {
+  SHIPPERS {
     text courier_id PK
     text name
     text route_id
@@ -915,7 +915,7 @@ erDiagram
 
 ### 12.2 Tables
 
-#### `couriers` (seed in the demo, SPX staff directory in production)
+#### `shippers` (seed in the demo, SPX staff directory in production)
 
 | Column | Type | Notes |
 | --- | --- | --- |
@@ -1004,7 +1004,7 @@ erDiagram
 | `id` | integer PK | |
 | `tracking_id` | text | |
 | `at` | timestamp | demo clock time |
-| `actor` | text | `agent · buyer · courier · cs · system` |
+| `actor` | text | `agent · buyer · shipper · cs · system` |
 | `type` | text | `orders_loaded · slots_sent · reply · note_pushed · event_pending · event_undone · event_committed · chat_sent · call_1 · call_2 · call_cancelled · transcript · extracted · confirm_asked · card_pushed · policy_block · escalated · cs_decision · delivered · opt_out` |
 | `payload` | json | details, durations, confidences |
 | `version` | integer | order-context version after this event |
@@ -1056,7 +1056,7 @@ Every metric in §23 is computed from `events`.
 | `trigger` | `PRE_DELIVERY · NO_ANSWER · RESCHEDULE · REFUSED` |
 | `channel` | `chat_shopee · zalo · ai_call · shipper_memo` |
 | `decision` | `pending · auto_applied · needs_review · escalated_cs · cs_applied` |
-| `updated_by` | `agent · buyer · courier · cs · system` |
+| `updated_by` | `agent · buyer · shipper · cs · system` |
 | `raw_ref` | pointer to the raw audio or transcript in the trusted store, never the content |
 
 ### 12.4 Extraction schema (Structured Outputs, strict)
@@ -1127,7 +1127,7 @@ Every metric in §23 is computed from `events`.
 
 **Decision rule.** Every non-null field with `confidence ≥ 0.85` and no conflict with earlier answers → `auto_applied`; otherwise ask the buyer in chat; still unclear → `needs_review` (CS). An address correction with `same_district = false` always needs a person.
 
-### 12.5 Context card (pushed to the courier)
+### 12.5 Context card (pushed to the shipper)
 
 ```json
 {
@@ -1193,7 +1193,7 @@ sequenceDiagram
   participant PG as Policy guard
   participant CH as Chat gateway
   participant B as Buyer
-  participant C as Courier app
+  participant C as Shipper app
 
   S->>API: morning run (06:30)
   API->>OMS: today's orders for the hub
@@ -1225,7 +1225,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  participant C as Courier app (phone)
+  participant C as Shipper app (phone)
   participant API as Alodi API
   participant S as Scheduler + demo clock
   participant AG as Alodi Agent
@@ -1290,7 +1290,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  participant C as Courier app
+  participant C as Shipper app
   participant API as Alodi API
   participant F as Recordings store
   participant ASR as ASR
@@ -1317,7 +1317,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  participant C as Courier app
+  participant C as Shipper app
   participant API as Alodi API
   participant AG as Alodi Agent
   participant PG as Policy guard
@@ -1347,7 +1347,7 @@ sequenceDiagram
   participant L as Laptop /buyer
   participant K as /control
 
-  P->>WS: connect view=courier
+  P->>WS: connect view=shipper
   I->>WS: connect view=ops
   L->>WS: connect view=buyer
   K->>WS: connect view=control
@@ -1359,7 +1359,7 @@ sequenceDiagram
   WS-->>I: event_pending
   WS-->>L: chat_message (after commit)
   Note over P,WS: phone drops off the hotspot
-  P->>WS: reconnect + GET /state?view=courier
+  P->>WS: reconnect + GET /state?view=shipper
   WS-->>P: full snapshot
 ```
 
@@ -1372,24 +1372,24 @@ FastAPI service (`api`), JSON over HTTPS, plus WebSockets for live updates. All 
 | Method | Path | Caller | Purpose |
 | --- | --- | --- | --- |
 | `POST` | `/jobs/morning-load` | scheduler | Step 1: load today’s orders + windows for a hub |
-| `GET` | `/orders?route_id=&date=` | courier app, dashboard | Today’s stops with any window note or context card |
+| `GET` | `/orders?route_id=&date=` | shipper app, dashboard | Today’s stops with any window note or context card |
 | `GET` | `/orders/{tracking_id}` | dashboard | Order + Order Context Object + events |
-| `POST` | `/orders/{tracking_id}/events` | courier app | `{ "button": "A" \| "B" \| "C" \| "DELIVERED" }` → `pending` event (2-min undo) |
-| `POST` | `/events/{id}/undo` | courier app | Undo within 2 minutes |
-| `POST` | `/orders/{tracking_id}/memo` | courier app | 10-second memo (multipart; `audio/mp4` from iPhone Safari, `audio/webm` from Chrome/Android) |
+| `POST` | `/orders/{tracking_id}/events` | shipper app | `{ "button": "A" \| "B" \| "C" \| "DELIVERED" }` → `pending` event (2-min undo) |
+| `POST` | `/events/{id}/undo` | shipper app | Undo within 2 minutes |
+| `POST` | `/orders/{tracking_id}/memo` | shipper app | 10-second memo (multipart; `audio/mp4` from iPhone Safari, `audio/webm` from Chrome/Android) |
 | `POST` | `/webhooks/chat` | chat gateway | Buyer reply: free text or quick-reply payload |
 | `POST` | `/webhooks/call` | call gateway | Call status, audio or transcript chunks, end of call |
 | `GET` | `/cases?state=review,with_cs` | dashboard | CS queue |
 | `POST` | `/cases/{id}/decision` | dashboard (CS) | `{ "action": "apply" \| "approve_label" \| "return" \| "claim", "payload": {…}, "by": "cs:lan" }` |
 | `GET` | `/metrics` | dashboard | The four output metrics from `events` |
-| `GET` | `/state?view=courier\|ops\|buyer\|control` | every device | Full snapshot for that screen, on load and after every reconnect |
+| `GET` | `/state?view=shipper\|ops\|buyer\|control` | every device | Full snapshot for that screen, on load and after every reconnect |
 | `GET` / `POST` | `/demo/clock` | `/control` | Read or set the clock: `{ "speed": 600, "paused": false }`, `{ "jump": "next_timer" \| "2026-11-01T17:20" }` |
 | `POST` | `/demo/scenario` | `/control` | Reset DB + clock to a scenario: `A_main · B_memo · REFUSE · A_lowconf · A_noanswer · A_midway · CANT_TODAY` |
 | `POST` | `/demo/simulate` | `/control` | `{ "speed": 600 }` — replay `mock-data/day-plan.json` so hub counters move like a real day |
 | `POST` | `/demo/mode` | `/control` | `{ "auto_buyer": true, "offline": false }` |
 | `GET` | `/demo/devices` | `/control` | Connected devices and last ping per view |
 
-Example — courier taps A:
+Example — shipper taps A:
 
 ```http
 POST /orders/SPXVN0123456789/events
@@ -1399,13 +1399,13 @@ POST /orders/SPXVN0123456789/events
 { "event_id": 41, "status": "pending", "commit_at": "2026-10-31T10:04:00+07:00" }
 ```
 
-### 15.2 WebSocket — `/ws?view=courier|ops|buyer|control&device=<id>`
+### 15.2 WebSocket — `/ws?view=shipper|ops|buyer|control&device=<id>`
 
 One socket per device. The server sends only what that view needs, plus `clock` ticks to everyone. Clients send `{ "type": "ping" }` every 5 s; on reconnect they call `GET /state` and replay nothing.
 
 | View | Receives |
 | --- | --- |
-| `courier` (phone) | `route`, `note`, `event_pending`, `event_committed`, `context_card`, `clock` |
+| `shipper` (phone) | `route`, `note`, `event_pending`, `event_committed`, `context_card`, `clock` |
 | `ops` (iPad) | everything: `case_update`, `timer`, `policy_check`, `chat_message`, `call_state`, `transcript`, `extraction`, `context_card`, `case_escalated`, `clock` |
 | `buyer` (laptop) | `chat_message`, `call_state`, `clock` |
 | `control` | `devices`, `clock`, `case_update` |
@@ -1455,7 +1455,7 @@ The policy guard wraps every tool call: a call outside 08:00–20:30, a third ca
 | --- | --- | --- |
 | SPX order API | SPX → Alodi | Today’s orders per hub; to be agreed with the carrier |
 | SPX routing API | SPX ↔ Alodi | Feasible windows; route updates for moved orders |
-| Courier app SDK / deep link | Alodi ↔ SPX driver app | Taps, memo upload, card display |
+| Shipper app SDK / deep link | Alodi ↔ SPX driver app | Taps, memo upload, card display |
 | Shopee Chat API | Alodi ↔ Shopee | Window question, rescue chat, replies by webhook |
 | Zalo ZNS | Alodi → Zalo | Approved templates; fallback channel |
 | SIP trunk with brand name | Alodi ↔ telco | Outbound AI calls, call-backs to the hotline |
@@ -1476,7 +1476,7 @@ The policy guard wraps every tool call: a call outside 08:00–20:30, a third ca
 | Edge colour | Meaning |
 | --- | --- |
 | Dark navy | Processing flow, SPX systems |
-| Blue | Courier app and Alodi data |
+| Blue | Shipper app and Alodi data |
 | Purple | Contact channels + LLM |
 | Teal | Speech processing, extraction |
 | Red | Customer service |
@@ -1484,12 +1484,12 @@ The policy guard wraps every tool call: a call outside 08:00–20:30, a third ca
 ### 16.2 Principles
 
 1. **One agent, many tools.** A single Alodi Agent runs a state machine per order and calls tools (ask for a window, send chat, AI call, extract, escalate). The policy guard is code, not a model.
-2. **Replace nothing.** Alodi reads SPX orders, routes and courier events and writes context back. Windows come from the route planner, so the agent never promises what dispatch can’t keep.
+2. **Replace nothing.** Alodi reads SPX orders, routes and shipper events and writes context back. Windows come from the route planner, so the agent never promises what dispatch can’t keep.
 3. **People own high-stakes decisions.** Refusals, labels, returns and ambiguous answers go to CS.
 4. **Every scheduled action re-checks the world.** Before any timer fires, the job reloads the order and runs the policy guard.
 5. **PII stays in.** Raw audio and transcripts are stored encrypted with a 30-day TTL; only masked text reaches an LLM; only extracted JSON leaves.
 6. **Same shape in demo and production.** Implementations swap behind the same interfaces (cloud API → self-hosted model, SQLite → PostgreSQL, demo scheduler → Temporal).
-7. **Fail open.** If Alodi is down, the courier app and CS work exactly as they do today; Alodi only adds context.
+7. **Fail open.** If Alodi is down, the shipper app and CS work exactly as they do today; Alodi only adds context.
 
 ### 16.3 Components — demo vs production
 
@@ -1499,7 +1499,7 @@ The policy guard wraps every tool call: a call outside 08:00–20:30, a third ca
 | --- | --- | --- | --- | --- |
 | **Route planner SPX** | 1 | `mock-data/windows.json` (4 fixed windows) | SPX routing API | Feasible windows |
 | **OMS / Order DB SPX** | 1 | `mock-data/orders.json` (4,000 orders) | SPX internal order API | Today’s orders, COD, address |
-| **Courier app** | 3 · 4 · 7 | Next.js PWA on a **real phone** (`/courier`) | Inside the SPX driver app | Gets the note card; sends A / B / C (undo 2′) via REST + WebSocket |
+| **Shipper app** | 3 · 4 · 7 | Next.js PWA on a **real phone** (`/courier`) | Inside the SPX driver app | Gets the note card; sends A / B / C (undo 2′) via REST + WebSocket |
 | **Timers + job queue** | 4 · 5 | In-process scheduler on the fast-forward demo clock | Redis + Temporal (durable timers) | Before every job: reload order + policy guard |
 | **Recording storage** | 6 | `data/recordings/` on the server | Object storage (S3 / MinIO), encrypted | Memo and call audio, 30-day TTL |
 | **Alodi database** | 2–8 | SQLite | PostgreSQL (HA) | Tables in §12 |
@@ -1535,7 +1535,7 @@ The policy guard wraps every tool call: a call outside 08:00–20:30, a third ca
 ```mermaid
 flowchart TB
   subgraph Clients
-    P["Courier app<br/>Next.js PWA (phone)"]
+    P["Shipper app<br/>Next.js PWA (phone)"]
     I["Ops / CS dashboard<br/>Next.js (iPad)"]
     L["Buyer view<br/>Next.js (laptop), demo only"]
     K["Demo control<br/>Next.js"]
@@ -1555,7 +1555,7 @@ flowchart TB
   subgraph SPX["Carrier systems"]
     RP["Route planner"]
     OMS["OMS / Order DB"]
-    CB["Courier app backend"]
+    CB["Shipper app backend"]
     HL["CS ticketing + hotline"]
   end
   subgraph Ext["External services"]
@@ -1594,7 +1594,7 @@ flowchart TB
 - Recording consent in the pre-recorded opening of every call; refusal ends the call and continues by chat or CS.
 - Phone numbers, addresses and names masked before any text reaches a model (GPT-6.1 Terra, the Decisions API or the local fallback); raw audio and transcripts encrypted with a 30-day TTL.
 - AI calls run on GPT-Live-1 in the OpenAI cloud only after the buyer hears the recording notice; call audio cannot be masked, so this path needs the transfer impact assessment in §18.6 before production.
-- Every write to an order’s context is versioned with an actor (agent, buyer, courier, CS) and a timestamp.
+- Every write to an order’s context is versioned with an actor (agent, buyer, shipper, CS) and a timestamp.
 - Opt-out checked before every job.
 - No real number is dialled in the demo; demo phones are `TEST-0001` … `TEST-2000`.
 
@@ -1604,7 +1604,7 @@ The production agent runs on three OpenAI services, each doing the job it is bui
 
 1. **GPT-Live-1** talks to the buyer. A full-duplex voice model that listens while it speaks and hands reasoning and tool use to a backend agent; it runs on the Live endpoint (`v1/live/sessions`), not the Realtime API.
 2. **The Decisions API on GPT-6 Luna** sorts every incoming signal first: which case it is (no answer, rescheduled, refused, opt-out), which window the buyer chose, and how confident that is. It answers predicate, choice and score questions with probabilities, which map directly onto the 0.85 threshold.
-3. **GPT-6.1 Terra** orchestrates the cases triage escalates: it runs the agent loop across the buyer, the courier and the carrier’s systems, applies company policy through the guard, and writes the context card with Structured Outputs, so the buyer and the courier exchange as few messages as possible.
+3. **GPT-6.1 Terra** orchestrates the cases triage escalates: it runs the agent loop across the buyer, the shipper and the carrier’s systems, applies company policy through the guard, and writes the context card with Structured Outputs, so the buyer and the shipper exchange as few messages as possible.
 
 | Component | Role in Alodi | Runs where | Demo (31 Oct) | Production |
 | --- | --- | --- | --- | --- |
@@ -1627,7 +1627,7 @@ The production agent runs on three OpenAI services, each doing the job it is bui
 ```mermaid
 flowchart LR
   B(["Buyer"])
-  C(["Courier"])
+  C(["Shipper"])
   CS(["CS agent"])
   RP(["Route planner"])
   OMS(["OMS"])
@@ -1648,7 +1648,7 @@ flowchart LR
 ```mermaid
 flowchart TB
   B(["Buyer"])
-  C(["Courier"])
+  C(["Shipper"])
   CS(["CS agent"])
   EXT(["SPX: OMS + route planner"])
 
@@ -1698,12 +1698,12 @@ flowchart TB
 | Raw call and memo audio | Personal, sensitive | Recordings store | 30 days | No |
 | Raw transcript | Personal | Recordings store | 30 days | No |
 | Masked transcript | Pseudonymised | `recordings.transcript_masked` | 30 days | To the LLM (demo: cloud; production: self-hosted) |
-| Extracted JSON, context card | Operational | `rescue_result` | Order lifetime | Yes, to the courier app and SPX |
+| Extracted JSON, context card | Operational | `rescue_result` | Order lifetime | Yes, to the shipper app and SPX |
 | Event log | Operational | `events` | Kept for metrics (monthly partitions) | Aggregates only |
 
 ## 18. Production architecture on cloud
 
-Sized for the team’s estimate of **one area (hub) = 20 couriers and 4,000 orders a day**, and checked for growth to **100 areas (400,000 orders a day)**. Prices and the cost model are in §18.8.
+Sized for the team’s estimate of **one area (hub) = 20 shippers and 4,000 orders a day**, and checked for growth to **100 areas (400,000 orders a day)**. Prices and the cost model are in §18.8.
 
 ### 18.1 Load model
 
@@ -1715,7 +1715,7 @@ Daily numbers for one area come from the mock simulation (§20.4, fixed seed); t
 | Window questions sent | 3,993 (all orders) or ~550 (risky orders only, FR-08) | ~399,300 | 06:30–07:00 → ~2.2 msg/s per area, ~220 msg/s total (gateway quota) |
 | Buyer replies in the morning | 1,633 | ~163,300 | ~2 replies/s total |
 | Messages sent (all kinds) | 6,110 | ~611,000 | |
-| Courier taps | ~4,150 | ~415,000 | 20 couriers × 1 stop per ~3.3 min → ~6/min per area, ~600/min total |
+| Shipper taps | ~4,150 | ~415,000 | 20 shippers × 1 stop per ~3.3 min → ~6/min per area, ~600/min total |
 | Failed first attempts (rescue cases) | 350 (9.2%) | ~35,000 | |
 | AI calls placed / answered | 187 / 67 | ~18,700 / ~6,700 | Busiest hour ≈ 15% of calls → ~60–90 concurrent calls total |
 | Answered call minutes | ~89 | ~8,900 | 100 ASR streams + 100 SIP channels |
@@ -1733,7 +1733,7 @@ One area is a small workload. The design questions are data residency, telephony
 ```mermaid
 flowchart TB
   subgraph Users
-    CA["Courier app<br/>(SPX driver app)"]
+    CA["Shipper app<br/>(SPX driver app)"]
     CSD["CS / ops dashboard<br/>(SPX console)"]
   end
   subgraph Telco["Channels"]
@@ -1798,7 +1798,7 @@ flowchart TB
 
 | Service | What it does | Runs as | Scale unit | One hub | 100 hubs |
 | --- | --- | --- | --- | --- | --- |
-| `web` | Ops / CS screens (and courier web view if not embedded) | Next.js container | Stateless pods | 2 pods | 3–4 pods |
+| `web` | Ops / CS screens (and shipper web view if not embedded) | Next.js container | Stateless pods | 2 pods | 3–4 pods |
 | `api` | REST, webhooks, auth | FastAPI + Uvicorn | Stateless pods | 2 pods | 4–6 pods |
 | `realtime` | WebSocket fan-out per view, `/state` snapshots | FastAPI or a small Go/Node service + Redis pub/sub | Connections | 2 pods | 3 pods |
 | `agent-workers` | State machine, tool calls, policy guard | Temporal workers (Python SDK) | Task queue lag | 2 pods | 6–10 pods |
@@ -1828,12 +1828,12 @@ Recommendation: **pilot on option 1**, keep raw audio, transcripts and phone num
 
 | Concern | Design |
 | --- | --- |
-| Availability target | 99.9% for courier events and the agent during operating hours (06:00–21:00) |
+| Availability target | 99.9% for shipper events and the agent during operating hours (06:00–21:00) |
 | Durable timers | Temporal workflows hold every 2-min, 60-min and 2-h timer; a pod or node loss does not lose a timer |
 | Idempotency | Every tap, webhook and tool call carries an idempotency key; workers can retry safely |
 | Re-check before act | Each timer re-reads the order and runs the policy guard (BR-22), so late or duplicate timers do nothing harmful |
 | Database | Primary + synchronous replica in another zone; WAL archived to object storage → **RPO ≤ 5 min**, **RTO ≤ 1 h** |
-| Degraded modes | LLM down → template messages + regex extraction, everything goes to CS · SIP down → chat only · Shopee Chat down → Zalo ZNS · Alodi down → couriers and CS work as today (fail open) |
+| Degraded modes | LLM down → template messages + regex extraction, everything goes to CS · SIP down → chat only · Shopee Chat down → Zalo ZNS · Alodi down → shippers and CS work as today (fail open) |
 | Releases | Blue-green for `api` and `web`; workflow versioning in Temporal so in-flight cases finish on the old code |
 | Backups and drills | Daily snapshot, monthly restore test, quarterly zone-failure game day |
 
@@ -1841,7 +1841,7 @@ Recommendation: **pilot on option 1**, keep raw audio, transcripts and phone num
 
 | Area | Control |
 | --- | --- |
-| Identity | CS and ops log in with the carrier’s SSO (OIDC); roles: `courier`, `cs`, `ops`, `admin`; courier tokens issued by the driver app |
+| Identity | CS and ops log in with the carrier’s SSO (OIDC); roles: `shipper`, `cs`, `ops`, `admin`; shipper tokens issued by the driver app |
 | Network | Private subnets; only the load balancer is public; service-to-service mTLS; egress allow-list (chat, SIP, model APIs) |
 | Encryption | TLS 1.2+ everywhere; KMS envelope encryption for `buyer_phone`, audio and raw transcripts; keys rotated yearly |
 | Secrets | Secrets manager or sealed secrets; nothing in images or the browser |
@@ -1866,7 +1866,7 @@ Recommendation: **pilot on option 1**, keep raw audio, transcripts and phone num
 
 ### 18.8 Cost, loss and savings for one area (estimate)
 
-All numbers come from [`cost-model/cost_model.py`](cost-model/cost_model.py) (`python3 -I cost_model.py`; output in `cost_model_output.json`). One area = 20 couriers, 4,000 orders a day, 30 days a month, ₫26,000 = $1. Prices were checked on 30 October 2026. Every input is typed: **Sourced** (public document) · **Vendor** (company claim) · **Listed price** (shop or provider price list) · **Estimate** (team assumption). Savings are **projected**. The headline uses the **best-in-class** rescue rate published by Shipsy (vendor) until the pilot measures Alodi’s own.
+All numbers come from [`cost-model/cost_model.py`](cost-model/cost_model.py) (`python3 -I cost_model.py`; output in `cost_model_output.json`). One area = 20 shippers, 4,000 orders a day, 30 days a month, ₫26,000 = $1. Prices were checked on 30 October 2026. Every input is typed: **Sourced** (public document) · **Vendor** (company claim) · **Listed price** (shop or provider price list) · **Estimate** (team assumption). Savings are **projected**. The headline uses the **best-in-class** rescue rate published by Shipsy (vendor) until the pilot measures Alodi’s own.
 
 **Headline (best-in-class, OpenAI stack + one area server):** the area loses **₫473M a month**. Alodi costs **₫75–98M once** and **₫27M a month** to run (5.8% of the loss), and cuts **40% of the loss: ≈ ₫187M a month, ≈ ₫2.25B a year**.
 
@@ -1875,8 +1875,8 @@ All numbers come from [`cost-model/cost_model.py`](cost-model/cost_model.py) (`p
 | Loss item | Formula | Per month | Inputs and sources |
 | --- | --- | --- | --- |
 | Return fees paid by sellers | 4,000 × 8% failed = 320/day; 75% not rescued = 240/day; × ₫40,000 × 30 | **₫288.0M** | Fee: Shopee Return & Refund Policy §7.1 (Sourced). Fail rate: VECOM 8–12%, low end (Sourced). Rescue 25%: Shipsy industry 20–30% (Vendor) |
-| Courier pay for redelivery attempts | 320 × 1.5 extra attempts × ₫6,000–8,000 × 30 | **₫86.4–115.2M** | Pay per order: GHN blog (Sourced, not an official Shopee figure). 1.5 attempts inside Shopee’s 2–3 contact attempts, Help Center 79569 (Estimate) |
-| Courier time lost when the buyer doesn’t answer | 320 × 5 min (two calls + waiting) × courier hourly cost × 30 | **₫27.4–51.3M** | Courier income ₫8–15M a month, Glints Vietnam (Sourced, job-market article); 26 days × 9 h; 5 min per failed stop (Estimate) |
+| Shipper pay for redelivery attempts | 320 × 1.5 extra attempts × ₫6,000–8,000 × 30 | **₫86.4–115.2M** | Pay per order: GHN blog (Sourced, not an official Shopee figure). 1.5 attempts inside Shopee’s 2–3 contact attempts, Help Center 79569 (Estimate) |
+| Shipper time lost when the buyer doesn’t answer | 320 × 5 min (two calls + waiting) × shipper hourly cost × 30 | **₫27.4–51.3M** | Shipper income ₫8–15M a month, Glints Vietnam (Sourced, job-market article); 26 days × 9 h; 5 min per failed stop (Estimate) |
 | Hub / CS staff calling buyers back | 320 × 2 calls × 4 min × ₫35,000/h × 30 | **₫44.8M** | Calls and minutes: 2 calls × 4 min per failed order, as in §1 (Estimate); ₫35,000/h (Estimate) |
 | **Total** | | **₫447–499M a month** (midpoint **₫473M**) | |
 | **Per year** | × 12 | **≈ ₫5.7B** | |
@@ -1908,7 +1908,7 @@ flowchart LR
     G2["GPU 2 · RTX 5060 Ti 16 GB<br/>PhoWhisper + Piper TTS"]
     DB[("PostgreSQL · Redis · Temporal · MinIO<br/>RAID 1 NVMe")]
   end
-  CA["Courier app / CS dashboard"] -->|HTTPS| APP
+  CA["Shipper app / CS dashboard"] -->|HTTPS| APP
   APP --> G1
   APP --> G2
   APP --> DB
@@ -1958,7 +1958,7 @@ With the window question sent to **all** 4,000 buyers by ZNS, the total is **₫
 | Rescue rate after a failed attempt (today 25%) | 40% (+15 pts) | 45% (+20 pts) | **65% (+40 pts)** |
 | Return fees avoided | ₫57.6M | ₫76.8M | **₫153.6M** |
 | Redelivery attempts avoided (1.5 → 1.35 → 1.2 per failed order) | ₫0 | ₫10.1M | **₫20.2M** |
-| Courier door time saved | ₫0 | ₫5.9M | **₫11.8M** |
+| Shipper door time saved | ₫0 | ₫5.9M | **₫11.8M** |
 | CS calls handled by the agent (40% / 60% / 65% of cases) | ₫17.9M | ₫26.9M | **₫29.1M** |
 | **Gross saving / month** | ₫75.5M | ₫119.7M | **₫214.7M** |
 | Gross as % of the monthly loss (₫473M) | 16.0% | 25.3% | **45.4%** |
@@ -1972,7 +1972,7 @@ Where the best-in-class figure comes from: Shipsy reports an industry-average re
 
 #### 18.8.6 What to say
 
-1. **One area loses about ₫473M a month (≈ ₫5.7B a year)** from failed deliveries: ₫288M of it is return fees, the rest is redelivery, courier time and CS calls.
+1. **One area loses about ₫473M a month (≈ ₫5.7B a year)** from failed deliveries: ₫288M of it is return fees, the rest is redelivery, shipper time and CS calls.
 2. **Alodi costs ₫75–98M once and ₫27M a month (about 6% of what is lost).**
 3. **At best-in-class rescue it cuts 40% of the loss: ≈ ₫187M a month, ≈ ₫2.25B a year.** The base case is 20% (≈ ₫92M a month).
 4. It is about 60% cheaper to run than the AWS-managed design: the Decisions API triages cheaply, so only escalated cases pay for GPT-6.1 Terra.
@@ -1982,7 +1982,7 @@ Where the best-in-class figure comes from: Shipsy reports an industry-average re
 
 - **Quality:** gpt-oss-20b and PhoWhisper must pass the same eval (§23) as the cloud models before they replace them; the 10% cloud fallback covers low-confidence cases.
 - **Real-time calls:** PhoWhisper is a Whisper-style model, so it transcribes each buyer turn after a short pause rather than word by word. Expect 1–2 s per turn on a 16 GB card.
-- **Availability:** one box is a single point of failure. The UPS, RAID 1, 4G failover and nightly S3 backup cover most of it. If the box is down, couriers and CS work as they do today, because Alodi fails open (§16.2).
+- **Availability:** one box is a single point of failure. The UPS, RAID 1, 4G failover and nightly S3 backup cover most of it. If the box is down, shippers and CS work as they do today, because Alodi fails open (§16.2).
 - **Scale:** at 4,000 orders a day the GPUs are still mostly idle. One server can serve 2–3 nearby areas over the network.
 
 ### 18.9 Growing from one hub to many
@@ -2004,7 +2004,7 @@ Where the best-in-class figure comes from: Shipsy reports an industry-average re
 
 Three real devices on stage, all live and in sync:
 
-- The presenter taps on a **phone**, as the courier.
+- The presenter taps on a **phone**, as the shipper.
 - The agent runs on the server.
 - An **iPad**, the carrier’s ops dashboard, and a **laptop**, the buyer’s phone on the projector, update by themselves.
 
@@ -2020,7 +2020,7 @@ If the fast path (§19.3 B) is used, we add: *“the buyer’s answers and the A
 
 | Device | Held by | Route | Shows | Inputs |
 | --- | --- | --- | --- | --- |
-| **Phone** (portrait) | Presenter, as courier Tuan (route R07) | `/courier` | Today’s 200 stops, window notes, **A / B / C** with the 2-minute undo ring, 10-second memo recorder, context card, Delivered | Taps, voice memo |
+| **Phone** (portrait) | Presenter, as shipper Tuan (route R07) | `/courier` | Today’s 200 stops, window notes, **A / B / C** with the 2-minute undo ring, 10-second memo recorder, context card, Delivered | Taps, voice memo |
 | **iPad** (landscape, on a stand) | Nobody; a teammate acts as CS when needed | `/ops` | Carrier ops dashboard: hub KPIs (4,000 orders), live case timeline over steps 1–8, agent actions, timers on the demo clock, policy checks, transcript, extracted fields with confidence, card pushed, CS queue with Approve / Claim | Touch, CS actions only |
 | **Laptop** (projected) | Teammate, as buyer Minh (headset mic) | `/buyer` | The buyer’s phone in a frame: chat with window buttons, incoming AI call, live transcript line | Taps, typing, **speaking during the call** |
 | Laptop, second display | Presenter’s assistant | `/control` | Scenario picker, Reset, clock speed / pause / jump, device dots, QR codes, auto-buyer, offline mode | Clicks, keys |
@@ -2089,7 +2089,7 @@ flowchart LR
 | --- | --- | --- | --- |
 | 1 | Relay server (§21.4 L) on the VM behind Caddy | 2–3 h | Khanh |
 | 2 | `RelayChannel` drop-in for `BroadcastChannel` in `engine.ts` (§21.4 L) | 2–3 h | Long Quan |
-| 3 | Device routes: `/courier` = existing courier screen full-screen; `/buyer` = existing buyer phone in its frame; `/ops` = dashboard case view laid out for iPad landscape; `/control` = controls + QR | 4–6 h | Nomura + Long Quan |
+| 3 | Device routes: `/courier` = existing shipper screen full-screen; `/buyer` = existing buyer phone in its frame; `/ops` = dashboard case view laid out for iPad landscape; `/control` = controls + QR | 4–6 h | Nomura + Long Quan |
 | 4 | Audio: pre-generate every assistant line with OpenAI TTS into MP3s, played on the laptop instead of `speechSynthesis` | 2 h | Khanh |
 | 5 | New-flow details in `scenarios.ts`: 4 windows and ≥ 2 picks, 2-minute undo, mid-way reply cancels the call, redelivery counter, 4,000-order area numbers | 3–4 h | Thanh Loi |
 | 6 | Rehearse on the real phone, iPad and laptop over the hotspot | 2 h | all |
@@ -2108,9 +2108,9 @@ flowchart LR
 
 ### 19.5 What each screen shows, step by step (scenario A_main)
 
-| Flow step | Phone (courier) | iPad (ops) | Laptop (buyer) |
+| Flow step | Phone (shipper) | iPad (ops) | Laptop (buyer) |
 | --- | --- | --- | --- |
-| 1 · 06:30 load | Route R07 appears (200 stops) | “4,000 orders loaded · 20 couriers · 4 windows from the route planner” | — |
+| 1 · 06:30 load | Route R07 appears (200 stops) | “4,000 orders loaded · 20 shippers · 4 windows from the route planner” | — |
 | 2 · window question | — | Case card: “Window question sent” | Chat bubble with **4 window buttons** + “Can’t receive today” |
 | — branch | — | Shows the branch: ≥ 2 windows / can’t today / no reply | Buyer ignores the message |
 | 08:00 cut-off | — | “No reply · deliver as planned” | — |
@@ -2154,7 +2154,7 @@ Keyboard: Space = pause / resume, → = next timer, R = reset, 1–7 = scenario.
 | --- | --- |
 | AI call, assistant speaking | API → OpenAI TTS (PCM 24 kHz) → `/ws/call` → laptop plays it with Web Audio. Fixed phrases (greeting, consent, goodbye) are pre-recorded files served by `web` |
 | AI call, buyer speaking | Laptop mic (`getUserMedia`, echo cancellation on) → AudioWorklet → PCM16 16 kHz frames → `/ws/call` → API → AssemblyAI streaming (English) → transcript |
-| Courier memo | Phone `MediaRecorder` (iOS records `audio/mp4`) → `POST /orders/{id}/memo` → file transcription with `language_code = "vi"` |
+| Shipper memo | Phone `MediaRecorder` (iOS records `audio/mp4`) → `POST /orders/{id}/memo` → file transcription with `language_code = "vi"` |
 | Fast path | Pre-generated MP3 for every assistant line; buyer lines are spoken by the teammate but the transcript shown is scripted |
 
 Equipment: a headset or lavalier mic for the buyer actor, so the AI voice does not echo into the ASR; laptop audio out to the venue PA.
@@ -2191,7 +2191,7 @@ The full table with every line, speaker and screen is in [`../01-pitch/1-LIVE-DE
 | 1:05 | Undo ends, chat goes out | Laptop chat; iPad timer |
 | 1:15 | 60 min later, the call | Laptop rings; buyer speaks |
 | 1:50 | Three fields, all ≥ 0.85, auto-applied | iPad fields |
-| 2:05 | Card on the courier’s phone | Phone card |
+| 2:05 | Card on the shipper’s phone | Phone card |
 | 2:15 | Next day, Delivered | Phone, iPad |
 | 2:25 | Refusal: no contact, a person approves | Phone C → iPad CS approve |
 | 2:45 | What we measure; tagline | iPad metrics; laptop lockup |
@@ -2202,7 +2202,7 @@ The full table with every line, speaker and screen is in [`../01-pitch/1-LIVE-DE
 | --- | --- | --- |
 | T − 24 h | Khanh | VM up, domain resolves, certificate issued; Cloudflare Tunnel backup tested |
 | T − 24 h | all | Full rehearsal ×3 on the real devices over the hotspot; record the backup video |
-| T − 2 h | Thanh Loi | `POST /demo/scenario A_main`; check seed counts (4,000 orders, 20 couriers) |
+| T − 2 h | Thanh Loi | `POST /demo/scenario A_main`; check seed counts (4,000 orders, 20 shippers) |
 | T − 1 h | Nomura | Devices charged, PWAs installed, Guided Access on, mic permissions granted |
 | T − 30 min | Long Quan | Run TC-01, TC-03, TC-07, TC-09 from §20.8; then Reset |
 | T − 5 min | assistant | `/control`: three green dots, scenario A_main, clock Sat 06:28, speed 600× |
@@ -2216,10 +2216,10 @@ Everything is fictional: people, addresses, phone numbers and the hub. Tracking 
 | File | Content | Used by |
 | --- | --- | --- |
 | [`hub.json`](mock-data/hub.json) | Hub `HCM-BTH-01`, four wards, date, cut-off, call hours | Seed, `/ops` header |
-| [`couriers.json`](mock-data/couriers.json) | 20 couriers `C01`–`C20`, routes `HCM-BTH-R01`–`R20` | Seed, `/ops` |
+| [`couriers.json`](mock-data/couriers.json) | 20 shippers `C01`–`C20`, routes `HCM-BTH-R01`–`R20` | Seed, `/ops` |
 | [`windows.json`](mock-data/windows.json) | The 4 route-planner windows | `ask_window` |
 | [`orders.json`](mock-data/orders.json) / [`orders.csv`](mock-data/orders.csv) | 4,000 orders in the `orders` schema (§12.2), 200 stops per route | Seed, morning load |
-| [`day-plan.json`](mock-data/day-plan.json) | How each simulated buyer and courier behaves through the day | Simulator, load test, `/ops` background activity |
+| [`day-plan.json`](mock-data/day-plan.json) | How each simulated buyer and shipper behaves through the day | Simulator, load test, `/ops` background activity |
 | [`expected-day-summary.json`](mock-data/expected-day-summary.json) | Totals the simulator must reproduce | Test TC-01, §18.1 |
 | [`demo-cases.json`](mock-data/demo-cases.json) | The 7 scripted stage scenarios with clock times and expected events | `/demo/scenario`, rehearsal |
 | [`utterances.json`](mock-data/utterances.json) | Buyer lines (English for the stage, Vietnamese for tests), gold labels, agent message templates | Auto-buyer, offline mode, prompts |
@@ -2227,15 +2227,15 @@ Everything is fictional: people, addresses, phone numbers and the hub. Tracking 
 | [`test-cases.json`](mock-data/test-cases.json) | 20 test cases TC-01 … TC-20 | pytest, rehearsal |
 | [`generate.py`](mock-data/generate.py) | The generator | `python3 -I generate.py .` inside `mock-data/` |
 
-### 20.2 Hub, couriers, windows
+### 20.2 Hub, shippers, windows
 
 | Item | Value |
 | --- | --- |
 | Hub | `HCM-BTH-01` · Binh Thanh hub (fictional) · Ho Chi Minh City |
 | Service area (wards) | Binh Thanh · Gia Dinh · Thanh My Tay · Binh Loi Trung |
 | Date | Saturday 31 October 2026 |
-| Couriers | 20 (`C01`–`C20`), one route each, 200 stops per route, motorbike, shift 08:00–20:30 |
-| Demo courier | `C07` **Tuan Nguyen**, route `HCM-BTH-R07` (the phone on stage) |
+| Shippers | 20 (`C01`–`C20`), one route each, 200 stops per route, motorbike, shift 08:00–20:30 |
+| Demo shipper | `C07` **Tuan Nguyen**, route `HCM-BTH-R07` (the phone on stage) |
 | Windows | W1 08:00–10:00 · W2 10:00–12:00 · W3 14:00–17:00 · W4 17:00–20:00 |
 | Morning run / cut-off | 06:30 / 08:00 |
 
@@ -2340,7 +2340,7 @@ Agent lines (templates in `utterances.json`):
 | window_question | “Hi {first_name}, your {item} arrives today. Pick at least two windows that work, or tell us you can’t receive today.” |
 | rescue_chat | “We just missed you. When and where should we come back?” |
 | call_greeting (pre-recorded) | “Hello, this is the automated delivery assistant calling about your {item}. This call is recorded so we get the delivery right — is that okay?” |
-| call_ask | “Our courier missed you this morning. Tomorrow we have 8 to 10, 10 to 12, 2 to 5, or 5 to 8 in the evening. Which works for you?” |
+| call_ask | “Our shipper missed you this morning. Tomorrow we have 8 to 10, 10 to 12, 2 to 5, or 5 to 8 in the evening. Which works for you?” |
 | call_confirm | “Confirming: {window}, {drop}{alt}. Is that right?” |
 | confirm_in_chat | “Just to be sure — which works better: {w1} or {w2}?” |
 | confirmation | “Got it: {window}, {drop}. Reply “change” anytime.” |
@@ -2407,7 +2407,7 @@ Example row:
 
 | Action | How |
 | --- | --- |
-| Seed the database | `python -m app.db.seed --pack ../prep/02-technical/mock-data` (loader in §21.4 J): truncates tables, inserts couriers and orders, sets the clock to `2026-10-31T06:28:00+07:00` |
+| Seed the database | `python -m app.db.seed --pack ../prep/02-technical/mock-data` (loader in §21.4 J): truncates tables, inserts shippers and orders, sets the clock to `2026-10-31T06:28:00+07:00` |
 | Load a scenario | `POST /demo/scenario {"name": "A_main"}`: seed + put the scripted order’s steps on the demo timeline |
 | Run the simulated day | `POST /demo/simulate {"speed": 600}`: replays `day-plan.json` in the background so the iPad counters move like a real hub |
 | Regenerate the pack | `cd prep/02-technical/mock-data && python3 -I generate.py .` (same seed → same files) |
@@ -2529,7 +2529,7 @@ import asyncio, json, time
 from fastapi import WebSocket
 
 VIEW_TOPICS = {
-    "courier": {"route", "note", "event_pending", "event_committed", "context_card", "clock"},
+    "shipper": {"route", "note", "event_pending", "event_committed", "context_card", "clock"},
     "buyer": {"chat_message", "call_state", "clock"},
     "control": {"devices", "clock", "case_update"},
     "ops": None,  # everything
@@ -2841,7 +2841,7 @@ async def stream_call(mic_frames, on_turn) -> None:
         await sender
 ```
 
-Courier memo (Vietnamese) — file transcription:
+Shipper memo (Vietnamese) — file transcription:
 
 ```python
 import assemblyai as aai
@@ -2914,20 +2914,20 @@ import argparse, asyncio, json
 from pathlib import Path
 from sqlalchemy import delete
 from .session import engine, Session
-from .models import Base, Courier, Order, Event
+from .models import Base, Shipper, Order, Event
 
 async def main(pack: Path) -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-    couriers = json.loads((pack / "couriers.json").read_text())
+    shippers = json.loads((pack / "couriers.json").read_text())
     orders = json.loads((pack / "orders.json").read_text())
     async with Session() as s:
-        s.add_all(Courier(**{k: c[k] for k in ("courier_id", "name", "route_id", "ward")}) for c in couriers)
+        s.add_all(Shipper(**{k: c[k] for k in ("courier_id", "name", "route_id", "ward")}) for c in shippers)
         s.add_all(Order(**{k: v for k, v in o.items() if k != "buyer_phone_masked"}) for o in orders)
         s.add(Event(tracking_id="*", actor="system", type="seeded", payload={"orders": len(orders)}, version=0))
         await s.commit()
-    print(f"seeded {len(couriers)} couriers, {len(orders)} orders")
+    print(f"seeded {len(shippers)} shippers, {len(orders)} orders")
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(); p.add_argument("--pack", type=Path, required=True)
@@ -2939,7 +2939,7 @@ if __name__ == "__main__":
 Live client — `web/src/lib/live.ts`:
 
 ```ts
-type View = "courier" | "ops" | "buyer" | "control";
+type View = "shipper" | "ops" | "buyer" | "control";
 type Msg = { type: string; [k: string]: unknown };
 
 const API = process.env.NEXT_PUBLIC_API_URL!;
@@ -2981,7 +2981,7 @@ Per-route PWA — `web/src/app/courier/layout.tsx`:
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
-  title: "Alodi Courier",
+  title: "Alodi Shipper",
   manifest: "/courier.webmanifest",       // { "display": "standalone", "orientation": "portrait", "start_url": "/courier", ... }
   appleWebApp: { capable: true, title: "Alodi", statusBarStyle: "black-translucent" },
 };
@@ -3065,7 +3065,7 @@ QR codes on `/control`:
 ```tsx
 import QRCode from "qrcode";
 const src = await QRCode.toDataURL(`https://${domain}/courier`, { margin: 1, color: { dark: "#1f2a44" } });
-// <img src={src} alt="Open the courier app" width={160} height={160} />
+// <img src={src} alt="Open the shipper app" width={160} height={160} />
 ```
 
 #### L. Fast path: relay + drop-in channel
@@ -3128,7 +3128,7 @@ The engine already handles `hello`, `takeover` and `state` messages, so nothing 
 
 | Component | Technology | Logo |
 | --- | --- | --- |
-| Route planner, orders, courier app, CS | SPX routing API, order API, driver app, SPX console + hotline | — |
+| Route planner, orders, shipper app, CS | SPX routing API, order API, driver app, SPX console + hotline | — |
 | Container platform | **Kubernetes** with Argo CD | `kubernetes.svg` |
 | Durable timers and workflows | **Temporal** + **Redis** | `temporal.svg`, `redis.svg` |
 | Database | **PostgreSQL** (HA, PITR) | `postgresql.svg` |
@@ -3157,7 +3157,7 @@ The engine already handles `hello`, `takeover` and `state` messages, so nothing 
 | Font | Where |
 | --- | --- |
 | Source Serif 4, Geist Mono, Geist | Landing |
-| Geist | Courier phone, buyer phone |
+| Geist | Shipper phone, buyer phone |
 | Playfair Display, Source Sans 3 | iPad ops dashboard (`/ops`), `/console`, `/metrics` |
 | Be Vietnam Pro | Wordmark, taglines (`../04-brand/fonts/`) |
 
@@ -3173,7 +3173,7 @@ alodi/
 ├── web/                        Next.js 16 · React 19 · Tailwind v4
 │   ├── src/app/
 │   │   ├── page.tsx            landing
-│   │   ├── courier/            PHONE — courier app (PWA, portrait)
+│   │   ├── courier/            PHONE — shipper app (PWA, portrait)
 │   │   ├── ops/                IPAD — carrier ops dashboard (PWA, landscape)
 │   │   ├── buyer/              LAPTOP — buyer phone (chat + AI call)
 │   │   ├── control/            presenter control: scenario, clock, devices, QR
@@ -3215,14 +3215,14 @@ alodi/
 | M0 | **Skeleton + hosting** | `https://<domain>` served by Compose (`caddy`, `web`, `api`); tokens, fonts, favicon in place | Khanh |
 | M1 | **Data + clock** | Tables from §12; seed from `mock-data/`; virtual clock with pause and jump | Thanh Loi |
 | M2 | **Live hub** | `/ws?view=…`, device registry, `/state` snapshots; two devices show the same clock | Thanh Loi |
-| M3 | **Courier events** | Pending event, undo within 2 min, commit job on the demo clock | Thanh Loi |
+| M3 | **Shipper events** | Pending event, undo within 2 min, commit job on the demo clock | Thanh Loi |
 | M4 | **Agent loop + policy guard** | State machine from §13; every tool call guarded; `policy_block` logged; `test_policy.py` green | Long Quan |
 | M5 | **Morning flow** | Steps 1–3: 4 windows, ≥ 2 picks / can’t today + reason / no reply | Long Quan |
 | M6 | **Chat channel (simulated)** | Buyer chat on `/buyer`; quick replies and free text back through the API | Long Quan |
 | M7 | **Call audio** | `/ws/call`: laptop mic → ASR; TTS + pre-recorded phrases back; echo-free with a headset | Khanh |
 | M8 | **Extraction** | Strict schema; confidence per field; ≥ 0.85 auto-apply; else confirm in chat, then CS | Khanh |
 | M9 | **Flow B memo** | Phone `MediaRecorder` → upload → ASR → extract → card | Khanh |
-| M10 | **Courier UI** `/courier` | Full-screen mobile layout per `../03-design/DESIGN.md` §8A.1; installable; works on iPhone Safari | Long Quan |
+| M10 | **Shipper UI** `/courier` | Full-screen mobile layout per `../03-design/DESIGN.md` §8A.1; installable; works on iPhone Safari | Long Quan |
 | M11 | **Ops UI** `/ops` | iPad landscape dashboard per §8A.2; every step live; CS actions by touch | Nomura + Long Quan |
 | M12 | **Buyer UI** `/buyer` + `/control` | Chat + call screen per §8A.3; control panel with scenarios, clock, device dots, QR | Nomura |
 | M13 | **Landing page** | All sections per `DESIGN.md` §7 with `../03-design/LANDING_CONTENT.md` | Nomura |
@@ -3248,7 +3248,7 @@ Critical path: `M0 → M1 → M2 → M3 → M4 → (M5 ∥ M6 ∥ M7) → M8 →
 
 | Current build | New flow |
 | --- | --- |
-| Courier tap applies immediately | **2-minute undo**, event `pending` until committed |
+| Shipper tap applies immediately | **2-minute undo**, event `pending` until committed |
 | Morning question with 2 options to risky orders | **4 windows to every order**, pick ≥ 2 or “can’t receive today” + reason |
 | Buyer reply mid-way not modelled | **Cancel the pending call** when the buyer replies or calls back |
 | Missing fields → CS review | **Confirm in chat** first, then CS |
@@ -3256,7 +3256,7 @@ Critical path: `M0 → M1 → M2 → M3 → M4 → (M5 ∥ M6 ∥ M7) → M8 →
 | Scenario engine in the browser | Server engine (full build) or relayed engine (fast path) |
 | One browser, three panels, `BroadcastChannel` | **Three devices** over WebSockets |
 | Browser `speechSynthesis` voice | OpenAI TTS + pre-recorded phrases |
-| Small mock case list | **Mock hub pack**: 20 couriers, 4,000 orders, 7 scripted scenarios, 20 test cases |
+| Small mock case list | **Mock hub pack**: 20 shippers, 4,000 orders, 7 scripted scenarios, 20 test cases |
 
 ---
 
@@ -3268,7 +3268,7 @@ Four output metrics, one per problem number, so the story closes the loop. Two a
 
 | Problem number | Output metric | How we measure | Type |
 | --- | --- | --- | --- |
-| 0 windows: context lives outside the system | **Time-to-context**: buyer’s answer (or tap) → card on the courier app and the dashboard | Timestamps in `events`; chat and call paths separately; median + p90 | Measured |
+| 0 windows: context lives outside the system | **Time-to-context**: buyer’s answer (or tap) → card on the shipper app and the dashboard | Timestamps in `events`; chat and call paths separately; median + p90 | Measured |
 | 8–12% refused: context lost in phone calls | **Extraction accuracy**: per-field F1 on chat, call transcript and memo; hand-written held-out set | Eval set; v0 vs after the optimisation loop | Measured |
 | Scale beyond people (≈ 13 callers per depot) | **Safe autonomy**: % handled alone, error rate in that group, 0 high-stakes actions without approval, 0 calls out of hours | Whole eval set through the agent on the demo clock | Measured |
 | ₫40,000 per order | **Money**: return fees avoided + CS hours saved − agent cost | Agent cost measured; extra rescue rate assumed | Projected |
@@ -3334,7 +3334,7 @@ The numbers on today’s `/metrics` page and dashboard (F1 0.88, 64% autonomy, 4
 
 **AC-02 Fewer than two windows.** Given the buyer picked one window, then the agent asks for at least one more and creates no note yet.
 
-**AC-03 Undo.** Given the courier tapped A at 10:02, when Undo is tapped before 10:04, then the event is `undone` and nothing is sent to the buyer.
+**AC-03 Undo.** Given the shipper tapped A at 10:02, when Undo is tapped before 10:04, then the event is `undone` and nothing is sent to the buyer.
 
 **AC-04 Call timing.** Given a rescue chat at 10:04 and no reply, then AI call 1 is placed at 11:04, and AI call 2 (if call 1 is missed) at 13:04.
 
@@ -3342,11 +3342,11 @@ The numbers on today’s `/metrics` page and dashboard (F1 0.88, 64% autonomy, 4
 
 **AC-06 Mid-way reply.** Given call 1 is pending, when the buyer replies in chat, then call 1 is cancelled and extraction runs on the reply.
 
-**AC-07 Auto-apply.** Given an extraction with time_window 0.94, drop_location 0.88, alt_receiver 0.91, then the decision is `auto_applied`, the attempt counter goes up by one and the courier app shows the card within 10 s.
+**AC-07 Auto-apply.** Given an extraction with time_window 0.94, drop_location 0.88, alt_receiver 0.91, then the decision is `auto_applied`, the attempt counter goes up by one and the shipper app shows the card within 10 s.
 
 **AC-08 Low confidence.** Given any field below 0.85, then the agent asks the buyer to confirm in chat; if still unclear, the case appears in the CS queue with reason `low_confidence`.
 
-**AC-09 Refused.** Given the courier tapped C, then no message or call reaches the buyer, and the case appears in the CS queue with a suggested label that is not applied.
+**AC-09 Refused.** Given the shipper tapped C, then no message or call reaches the buyer, and the case appears in the CS queue with a suggested label that is not applied.
 
 **AC-10 Label approval.** Given a suggested “suspected bomb” label, when a CS agent approves it, then the label is set with the CS agent’s name in the audit log.
 
@@ -3385,7 +3385,7 @@ The numbers on today’s `/metrics` page and dashboard (F1 0.88, 64% autonomy, 4
 
 | Type | Item |
 | --- | --- |
-| Assumption | One area = 20 couriers, 4,000 orders a day, 200 stops per courier (team estimate; above the usual 80–150, to be checked in courier interviews) |
+| Assumption | One area = 20 shippers, 4,000 orders a day, 200 stops per shipper (team estimate; above the usual 80–150, to be checked in shipper interviews) |
 | Assumption | Buyer behaviour rates in §20.4 (answer rates, failure split) until the pilot measures them |
 | Assumption | Buyers answer in Vietnamese; some accept automated calls when the caller is identified |
 | Assumption | The route planner can provide feasible windows per stop |
@@ -3411,7 +3411,7 @@ The numbers on today’s `/metrics` page and dashboard (F1 0.88, 64% autonomy, 4
 | ASR mishears Vietnamese addresses (production) | Medium | High | Read-back confirmation; 0.85 threshold; PhoWhisper fine-tuning in the pilot |
 | No Vietnamese real-time ASR from the demo vendor | Certain | Medium | English stage call; turn-by-turn file ASR or PhoWhisper for Vietnamese |
 | Buyers ignore unknown callers | High | Medium | Chat first; verified brand name; call only after silence |
-| Wrong auto-applied appointment | Low | High | Threshold + calibration check; courier can still call; audit log |
+| Wrong auto-applied appointment | Low | High | Threshold + calibration check; shipper can still call; audit log |
 | Wrong label harms a buyer | Low | High | Labels only by a person (BR-19) |
 | Message cost or spam perception | Medium | Medium | Opt-out; ask only risky orders (FR-08); Shopee Chat before ZNS |
 | Cross-border transfer of personal data | Medium | High | PII stays in Vietnam; masked text only to model APIs; transfer impact assessment filed; self-hosted models at scale |
@@ -3423,7 +3423,7 @@ The numbers on today’s `/metrics` page and dashboard (F1 0.88, 64% autonomy, 4
 | --- | --- | --- | --- |
 | MVP demo | 31 Oct 2026 | Fast path (or full build) on mock data, three devices | AC-01 … AC-15 pass in rehearsal; DoD §22.4 |
 | Full build | Nov 2026 | Server engine, real call audio, eval ≥ 200 samples | M0–M16 done; measured metrics on `/metrics` |
-| Shadow mode | Q1 2027 | One area (20 couriers, 4,000 orders/day), real events, no buyer contact | Agent decisions vs CS decisions compared; thresholds tuned; DPIA done |
+| Shadow mode | Q1 2027 | One area (20 shippers, 4,000 orders/day), real events, no buyer contact | Agent decisions vs CS decisions compared; thresholds tuned; DPIA done |
 | Controlled channels | Q2 2027 | Real chat and calls for risky orders at the pilot hub | NFR-09 = 0 violations; complaints tracked; rescue rate measured |
 | Region | H2 2027 | 5–20 hubs; Vietnamese ASR and TTS self-hosted | Cost per case and latency within targets |
 | National | 2028 | 20–100 hubs; GPU pool; second region | Break-even reached; 99.9% availability |
@@ -3435,14 +3435,14 @@ The numbers on today’s `/metrics` page and dashboard (F1 0.88, 64% autonomy, 4
 | **Alodi Agent** | The single AI agent that runs the per-order state machine and calls tools |
 | **Attempt / redelivery** | One delivery visit; at most 2 redeliveries after the first attempt |
 | **Bomb (đơn bom)** | A buyer refusing a COD order at the door |
-| **Context card** | What the next courier sees: window, drop-off, backup receiver, source |
+| **Context card** | What the next shipper sees: window, drop-off, backup receiver, source |
 | **COD** | Cash on delivery |
 | **CS** | Customer service (carrier) |
 | **Cut-off** | Time after which today’s route is locked (~08:00) |
 | **Demo clock** | Server-side fast-forward clock (60 min ≈ 6 s at 600×) |
 | **Fast path** | Demo build that relays the existing browser engine over WebSockets (§19.3 B) |
 | **Flow A / Flow B** | Rescue after “no answer” / after “answered but rescheduled” |
-| **Hub / area** | One delivery station and its area; here 20 couriers and 4,000 orders a day |
+| **Hub / area** | One delivery station and its area; here 20 shippers and 4,000 orders a day |
 | **Mock pack** | The fictional data set in `mock-data/` |
 | **NDR** | Non-delivery report (term used by competitors) |
 | **Order Context Object** | Versioned JSON with everything known about an order’s rescue |
@@ -3453,7 +3453,7 @@ The numbers on today’s `/metrics` page and dashboard (F1 0.88, 64% autonomy, 4
 | **Shadow mode** | Agent runs on real events but never contacts buyers |
 | **SPX** | Shopee Express, the target carrier |
 | **TTS / ASR** | Text to speech / automatic speech recognition |
-| **Undo window** | 2 minutes after a courier tap during which nothing is sent |
+| **Undo window** | 2 minutes after a shipper tap during which nothing is sent |
 | **Window** | A delivery time slot from the route planner |
 
 ## 30. Sources
@@ -3477,8 +3477,8 @@ Sources used for the loss and running-cost model in §18.8 (checked 30 October 2
 - Refusal rate 8–12% (VECOM) — Nguoi Lao Dong, 19 Jul 2025: https://tuoitre.vn/nld/nhuc-nhoi-nan-bom-hang-19625071822023801.htm
 - Industry rescue rate 20–30% and +15–30 points from autonomous outreach (vendor) — Shipsy: https://shipsy.ai/insights/what-is-ndr-non-delivery-report-management
 - Redelivery frame, 2–3 contact attempts within 5 days — Shopee Help Center 79569: https://help.shopee.vn/portal/4/article/79569
-- Courier pay ₫6,000–8,000 per order — GHN: https://ghn.vn/blogs/tip-ban-hang/mot-don-hang-shipper-shopee-duoc-bao-nhieu-tien
-- Courier income ₫8–15M a month — Glints Vietnam: https://glints.com/vn/blog/muc-luong-shipper/
+- Shipper pay ₫6,000–8,000 per order — GHN: https://ghn.vn/blogs/tip-ban-hang/mot-don-hang-shipper-shopee-duoc-bao-nhieu-tien
+- Shipper income ₫8–15M a month — Glints Vietnam: https://glints.com/vn/blog/muc-luong-shipper/
 - RTX 5060 Ti 16 GB ₫16.4–21.0M and RTX 5090 ≈ ₫115–119M — Phong Vu: https://phongvu.vn/c/vga-rtx-5060-ti · https://phongvu.vn/c/vga-rtx-5090
 - gpt-oss-20b runs in ~16 GB (MXFP4) — Semaphore guide: https://semaphore.io/blog/gpt-oss · RTX 4080 16 GB benchmark: https://glukhov.org/llm-performance/benchmarks/choosing-best-llm-for-ollama-on-16gb-vram-gpu/
 - Piper Vietnamese voice `vi_VN-vais1000-medium` — https://huggingface.co/rhasspy/piper-voices/tree/refs%2Fpr%2F6/vi/vi_VN/vais1000/medium

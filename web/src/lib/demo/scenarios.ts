@@ -139,7 +139,7 @@ function bumpOco(n: DemoState, by: OrderContext["updated_by"], fn: (o: OrderCont
 }
 
 // ---------------------------------------------------------------------------
-// Shared prefix: from 06:30 until the courier taps a button
+// Shared prefix: from 06:30 until the shipper taps a button
 // ---------------------------------------------------------------------------
 
 const PREFIX: Step[] = [
@@ -187,7 +187,7 @@ const PREFIX: Step[] = [
     id: "p_arrive",
     to: t(10, 2),
     ms: 2600,
-    caption: "10:02 · The courier arrives and calls — no answer",
+    caption: "10:02 · The shipper arrives and calls — no answer",
     apply: mut((n) => {
       n.shipper.screen = "calling";
       bumpOco(n, "shipper", (o) => {
@@ -199,8 +199,8 @@ const PREFIX: Step[] = [
   {
     id: "p_choose",
     ms: 2400,
-    caption: "No typing. The courier taps one button",
-    wait: { action: "shipper:choose", hint: "Tap a button in the courier app", autoMs: 2600 },
+    caption: "No typing. The shipper taps one button",
+    wait: { action: "shipper:choose", hint: "Tap a button in the shipper app", autoMs: 2600 },
     apply: mut(() => {}),
   },
 ];
@@ -317,7 +317,7 @@ function applyGood(source: "ai_call" | "shipper_memo", sourceLabel: string): Ste
       o.decision = "auto_applied";
     });
     log(n, "agent", "Auto-applied · every field ≥ 0.85 threshold", "good");
-    log(n, "system", "Context written to courier app backend and dispatcher queue");
+    log(n, "system", "Context written to shipper app backend and dispatcher queue");
   });
 }
 
@@ -380,7 +380,7 @@ function callScript(): Step[] {
       caption: "Dynamic part via TTS · windows come from the route planner",
       apply: line(
         "ai",
-        "Our courier missed you this morning. Tomorrow we have 8 to 12, or 5 to 8 in the evening. Which works for you?",
+        "Our shipper missed you this morning. Tomorrow we have 8 to 12, or 5 to 8 in the evening. Which works for you?",
         "tts",
       ),
     },
@@ -419,7 +419,7 @@ const goodCall: Step[] = [
 ];
 
 const NODE_RING_1: Step[] = [
-  { id: "a_press", ms: 300, caption: "T0 · Courier taps A. The agent takes over", apply: onPressA },
+  { id: "a_press", ms: 300, caption: "T0 · Shipper taps A. The agent takes over", apply: onPressA },
   {
     id: "a_chat",
     ms: 1600,
@@ -458,7 +458,7 @@ const BRANCHES: Record<ScenarioId, Step[]> = {
       id: "a_apply",
       ms: 1600,
       dt: 0.07,
-      caption: "Confident enough: the context card appears for courier and dispatcher",
+      caption: "Confident enough: the context card appears for shipper and dispatcher",
       apply: applyGood("ai_call", "AI call 1 · 11:02"),
     },
     { id: "a_confirm", ms: 1800, apply: confirmToBuyer },
@@ -472,7 +472,7 @@ const BRANCHES: Record<ScenarioId, Step[]> = {
     {
       id: "a_deliver",
       ms: 1800,
-      caption: "The courier reads the card: right time, right place",
+      caption: "The shipper reads the card: right time, right place",
       wait: { action: "shipper:delivered", hint: "Tap Delivered", autoMs: 2800 },
       apply: delivered,
     },
@@ -625,7 +625,7 @@ const BRANCHES: Record<ScenarioId, Step[]> = {
     {
       id: "b_press",
       ms: 300,
-      caption: "Courier taps B · the buyer rescheduled on the phone",
+      caption: "Shipper taps B · the buyer rescheduled on the phone",
       apply: mut((n) => {
         n.shipper.screen = "memo";
         n.stage = "chat";
@@ -640,8 +640,8 @@ const BRANCHES: Record<ScenarioId, Step[]> = {
     {
       id: "b_rec",
       ms: 1400,
-      caption: "Ten-second voice memo: the courier repeats what the buyer said, no typing",
-      wait: { action: "shipper:memo", hint: "Hold the mic button in the courier app", autoMs: 2000 },
+      caption: "Ten-second voice memo: the shipper repeats what the buyer said, no typing",
+      wait: { action: "shipper:memo", hint: "Hold the mic button in the shipper app", autoMs: 2000 },
       apply: mut((n) => {
         n.memo = { status: "recording", seconds: 0 };
       }),
@@ -663,7 +663,7 @@ const BRANCHES: Record<ScenarioId, Step[]> = {
     {
       id: "b_extract",
       ms: 1400,
-      caption: "ASR, then the extractor: the courier’s words become the same schema",
+      caption: "ASR, then the extractor: the shipper’s words become the same schema",
       apply: startExtract("shipper_memo", GOOD_FIELDS),
     },
     { id: "b_reveal", ms: 2200, apply: revealAll },
@@ -671,8 +671,8 @@ const BRANCHES: Record<ScenarioId, Step[]> = {
       id: "b_apply",
       ms: 1400,
       dt: 0.05,
-      caption: "The context card is ready seconds after the courier finishes speaking",
-      apply: applyGood("shipper_memo", "Courier voice memo · 10:02"),
+      caption: "The context card is ready seconds after the shipper finishes speaking",
+      apply: applyGood("shipper_memo", "Shipper voice memo · 10:02"),
     },
     { id: "b_confirm", ms: 1800, caption: "The agent confirms back to the buyer", apply: confirmToBuyer },
     { id: "b_nextday", to: t(17, 22, 1), ms: 4000, caption: "Next day · evening shift", apply: nextDay },
@@ -729,7 +729,7 @@ const BRANCHES: Record<ScenarioId, Step[]> = {
 
 export const SCENARIOS: { id: ScenarioId; key: ChoiceKey; title: string; desc: string }[] = [
   { id: "A_main", key: "A", title: "A · No answer", desc: "Chat → AI call → context card → delivered" },
-  { id: "B_memo", key: "B", title: "B · Rescheduled", desc: "Courier’s 10-second voice memo → context card" },
+  { id: "B_memo", key: "B", title: "B · Rescheduled", desc: "Shipper’s 10-second voice memo → context card" },
   { id: "REFUSE", key: "REFUSE", title: "Refused", desc: "No buyer contact, CS cuts losses" },
   { id: "A_lowconf", key: "A", title: "A · Low confidence", desc: "Vague answer → human review" },
   { id: "A_noanswer", key: "A", title: "A · Two missed calls", desc: "2 missed calls → hand to CS" },
