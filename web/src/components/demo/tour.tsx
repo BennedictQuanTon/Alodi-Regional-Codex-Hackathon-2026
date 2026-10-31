@@ -5,12 +5,13 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { useDemo } from "@/lib/demo/engine";
 import { fmtClock, fmtDay } from "@/lib/demo/scenarios";
 import { CHAPTERS, TOUR_STEPS, TourAudio, currentChapter, focusOf, useTourEffects } from "@/lib/demo/tour";
-import { Wordmark } from "@/components/site/brand";
+import { DropRing, Wordmark } from "@/components/site/brand";
 import { BuyerPhone } from "./buyer-phone";
-import { ConsolePanel } from "./console-parts";
+import { Person } from "./cast";
 import { PhoneFrame } from "./phone";
 import { ShipperApp } from "./shipper-app";
 import { useFit } from "./stage";
+import { TourAgent, TourDashboard } from "./tour-surfaces";
 
 const NARROW = "(max-width: 900px)";
 const watchNarrow = (notify: () => void) => {
@@ -19,14 +20,35 @@ const watchNarrow = (notify: () => void) => {
   return () => query.removeEventListener("change", notify);
 };
 
-function Panel({ label, active, width, children }: { label: string; active: boolean; width?: number; children: React.ReactNode }) {
+type View = "all" | "shipper" | "buyer" | "ops" | "agent";
+const VIEWS: { id: View; label: string }[] = [
+  { id: "all", label: "All screens" },
+  { id: "shipper", label: "Shipper" },
+  { id: "buyer", label: "Customer" },
+  { id: "ops", label: "SPX" },
+  { id: "agent", label: "Agent" },
+];
+
+function Panel({ active, width, head, children }: { active: boolean; width?: number; head: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className={`transition-opacity duration-500 ${active ? "opacity-100" : "opacity-55"} ${width ? "shrink-0" : "min-w-0 flex-1"}`} style={width ? { width } : undefined}>
-      <div className={`mb-3 text-center text-[13px] font-medium ${active ? "text-[var(--ui-accent)]" : "text-[var(--ui-muted)]"}`}>{label}</div>
+    <div className={`min-w-0 transition-opacity duration-300 ${active ? "opacity-100" : "opacity-70"} ${width ? "shrink-0" : "flex-1"}`} style={width ? { width } : undefined}>
+      {head}
       {children}
     </div>
   );
 }
+
+const AGENT_HEAD = (
+  <div className="mb-3 flex h-[64px] items-center justify-center gap-3">
+    <span className="grid size-[60px] place-items-center rounded-full bg-white shadow-[0_0_0_2px_#fff,0_6px_16px_-8px_rgba(18,26,44,0.5)]">
+      <DropRing size={40} />
+    </span>
+    <div className="text-left">
+      <div className="text-[13px] font-medium ui-muted">Alodi · AI agent</div>
+      <div className="text-[17px] font-medium leading-tight">Handling this rescue.</div>
+    </div>
+  </div>
+);
 
 /** One screen, no setup: press Start and watch a failed delivery get rescued, with sound. */
 export function DemoTour() {
@@ -36,8 +58,10 @@ export function DemoTour() {
   const [muted, setMuted] = useState(false);
   const [subtitle, setSubtitle] = useState("");
   const narrow = useSyncExternalStore(watchNarrow, () => window.matchMedia(NARROW).matches, () => false);
-  const baseW = narrow ? 390 : 1720;
-  const baseH = narrow ? 760 : 790;
+  const [view, setView] = useState<View>("all");
+  const single = narrow || view !== "all";
+  const baseW = narrow ? 390 : single ? (view === "ops" ? 1000 : view === "agent" ? 620 : 420) : 1760;
+  const baseH = narrow ? 800 : 800;
   const { ref, scale } = useFit(baseW, baseH);
   useTourEffects(s, audio);
 
@@ -63,22 +87,33 @@ export function DemoTour() {
   const toggleMute = () => { audio.setMuted(!muted); setMuted(!muted); };
 
   const finished = started && s.step >= TOUR_STEPS.length;
-  const focus = focusOf(s);
+  const base = focusOf(s);
+  const focus = base === "ops" ? "agent" : s.stage === "ready" || s.stage === "closed" ? "ops" : base;
+  const showing = view === "all" ? focus : view;
   const chapter = currentChapter(s.step);
-  const shipper = <Panel key="shipper" label="Shipper" active={focus === "shipper"} width={340}><PhoneFrame clock={s.clock}><ShipperApp state={s} engine={engine} /></PhoneFrame></Panel>;
-  const buyer = <Panel key="buyer" label="Buyer" active={focus === "buyer"} width={340}><PhoneFrame clock={s.clock} dark={s.call.status === "ringing" || s.call.status === "connected"}><BuyerPhone state={s} engine={engine} /></PhoneFrame></Panel>;
-  const ops = <Panel key="ops" label="Hub dashboard" active={focus === "ops"} width={narrow ? 360 : undefined}><div className="h-[704px]"><ConsolePanel state={s} engine={engine} minimal /></div></Panel>;
+  const shipper = <Panel key="shipper" active={focus === "shipper" || single} width={340} head={<Person who="shipper" state={s} />}><PhoneFrame clock={s.clock}><ShipperApp state={s} engine={engine} /></PhoneFrame></Panel>;
+  const buyer = <Panel key="buyer" active={focus === "buyer" || single} width={340} head={<Person who="buyer" state={s} />}><PhoneFrame clock={s.clock} dark={s.call.status === "ringing" || s.call.status === "connected"}><BuyerPhone state={s} engine={engine} /></PhoneFrame></Panel>;
+  const ops = <Panel key="ops" active={focus === "ops" || single} width={narrow ? 360 : single ? 920 : undefined} head={<Person who="ops" state={s} />}><div className="h-[704px]"><TourDashboard state={s} /></div></Panel>;
+  const agent = <Panel key="agent" active={focus === "agent" || single} width={narrow ? 360 : single ? 540 : 360} head={AGENT_HEAD}><div className="h-[704px]"><TourAgent state={s} /></div></Panel>;
+  const surfaces = { shipper, buyer, ops, agent };
 
   return (
     <div className="ui flex h-dvh flex-col overflow-hidden">
       <header className="flex h-14 shrink-0 items-center justify-between gap-4 px-6">
         <Link href="/" aria-label="Alodi home"><Wordmark className="text-[24px]" /></Link>
+        <nav className="hidden items-center gap-1 rounded-[18px] bg-[#ececec] p-1 md:flex" aria-label="Demo screens">
+          {VIEWS.map((v) => (
+            <button key={v.id} aria-pressed={view === v.id} onClick={() => setView(v.id)} className={`rounded-[14px] px-3.5 py-1.5 text-[13px] font-medium transition-colors ${view === v.id ? "bg-white text-[var(--ui-ink)] shadow-[var(--ui-shadow)]" : "ui-muted"}`}>
+              {v.label}
+            </button>
+          ))}
+        </nav>
         {started && <div className="flex items-baseline gap-1.5 tabular-nums"><span className="text-[18px] font-semibold">{fmtClock(s.clock)}</span><span className="text-[12px] ui-muted">{fmtDay(s.clock).weekday}</span>{s.animTo != null && <span className="ui-badge ui-badge-accent ml-1">fast-forward</span>}</div>}
       </header>
 
       <div ref={ref} className="relative flex-1 overflow-hidden">
         <div className="absolute left-1/2 top-1/2 flex items-start justify-center gap-8 px-6" style={{ width: baseW, height: baseH, transform: `translate(-50%, -50%) scale(${scale})` }}>
-          {narrow ? (focus === "shipper" ? shipper : focus === "buyer" ? buyer : ops) : [shipper, buyer, ops]}
+          {single ? surfaces[showing as keyof typeof surfaces] : [shipper, buyer, ops, agent]}
         </div>
 
         {(!started || finished) && (
