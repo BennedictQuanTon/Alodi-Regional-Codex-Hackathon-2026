@@ -1,0 +1,20 @@
+[
+ ["n01","af_heart",0.9,"It's ten oh two. Minh is in a meeting. And the phone? On silent."],
+ ["n02","af_heart",0.92,"At the door, Tuan is waiting, air fryer in hand. One call. Two calls... Nothing."],
+ ["n03","af_heart",0.9,"Seventeen more stops are waiting. So the parcel goes back on the bike. And all that's left, is two sad little words. No answer."],
+ ["n04","af_heart",0.92,"We've all been Minh. And we've all felt a little bad for Tuan."],
+ ["n05","af_heart",0.92,"So we built Alodi. An AI agent that rescues failed deliveries, so the second try actually lands."],
+ ["n06","af_heart",0.95,"Here's how it works. Tuan taps one button. No typing. No calling back. And off to the next stop."],
+ ["n07","af_heart",0.92,"From here, Alodi takes over. First, a friendly message to Minh, right away."],
+ ["n08","af_heart",0.92,"An hour later? Still quiet. So Alodi does something lovely. It picks up the phone."],
+ ["a01","af_bella",1.0,"Hi Minh! This is Alodi, your delivery assistant. This call is recorded. When's a good time?"],
+ ["m01","am_puck",1.0,"Oh, sorry! Tomorrow after five, please. Leave it with security in Tower B. Or call my wife."],
+ ["n09","af_heart",0.92,"Did you catch all that? Alodi did. When. Where. Who. All in one neat little card."],
+ ["n10","af_heart",0.94,"It checks the rules, then sends the card straight to the next shipper's phone."],
+ ["n11","af_heart",0.9,"And the next evening? No calls. No guessing. Just... delivered."],
+ ["n12","af_heart",0.92,"Minh gets the parcel. The shipper saves a trip. The seller keeps the sale."],
+ ["n13","af_heart",0.95,"Already agreed a new time at the door? Tuan holds the button and says it, in ten seconds. Alodi writes the same card."],
+ ["n14","af_heart",0.92,"And when an answer isn't clear, or a buyer says no? Alodi stops, and asks a person. Because some calls should stay human."],
+ ["n15","af_heart",0.95,"Meanwhile, the hub sees every rescue, live, on one dashboard."],
+ ["n16","af_heart",0.88,"Alodi. Make the second drop land."]
+]

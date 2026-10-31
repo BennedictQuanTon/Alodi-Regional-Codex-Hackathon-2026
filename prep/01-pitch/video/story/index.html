@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Alodi story</title>
+<style>
+@font-face{font-family:"Geist";src:url("assets/fonts/Geist.ttf");font-weight:100 900}
+@font-face{font-family:"BVPX";src:url("assets/fonts/BeVietnamPro-ExtraBold.ttf")}
+@font-face{font-family:"BVP";src:url("assets/fonts/BeVietnamPro-Medium.ttf")}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#f6f3f1}
+#stage{background:#f6f3f1;position:relative;width:1920px;height:1080px;overflow:hidden;font-family:"Geist",sans-serif;color:#1f2a44;-webkit-font-smoothing:antialiased}
+.sc{position:absolute;inset:0;visibility:hidden;overflow:hidden}
+.day{background:radial-gradient(90% 90% at 50% 45%,#fff 0%,#f6f3f1 70%)}
+.night{background:radial-gradient(80% 90% at 50% 45%,#1f2a44 0%,#121a2c 75%);color:#f6f3f1}
+.a{position:absolute}
+.big{font-size:104px;font-weight:600;letter-spacing:-.035em;line-height:1.04}
+.mid{font-size:60px;font-weight:600;letter-spacing:-.03em;line-height:1.12}
+.ph{position:absolute;width:400px;height:820px;border-radius:60px;background:#0f1424;padding:12px;box-shadow:0 60px 120px -40px rgba(18,26,44,.55)}
+.scr{position:relative;width:100%;height:100%;border-radius:49px;background:#fff;overflow:hidden;color:#1f2a44}
+.isl{position:absolute;left:50%;top:13px;width:112px;height:32px;margin-left:-56px;border-radius:18px;background:#0f1424;z-index:5}
+.lock{background:linear-gradient(170deg,#2b3858,#121a2c);color:#f6f3f1}
+.note{position:absolute;left:16px;right:16px;background:rgba(255,255,255,.95);color:#1f2a44;border-radius:24px;padding:15px 18px;font-size:20px;display:flex;gap:12px;align-items:center}
+.note b{display:block;font-weight:600}.note img{width:52px;height:52px;border-radius:50%}
+.av{position:absolute;border-radius:50%;box-shadow:0 0 0 8px #fff,0 30px 60px -24px rgba(31,42,68,.5)}
+.pill{position:absolute;display:inline-flex;align-items:center;justify-content:center;height:80px;padding:0 38px;border-radius:40px;font-size:34px;font-weight:600;background:#fff;box-shadow:0 20px 50px -24px rgba(31,42,68,.45);white-space:nowrap;color:#1f2a44}
+.btn{position:absolute;left:22px;right:22px;height:100px;border-radius:28px;border:2px solid #dcdfe6;display:flex;align-items:center;padding-left:28px;font-size:31px;font-weight:600;background:#fff}
+.bub{position:absolute;padding:18px 24px;border-radius:26px;background:#f1f2f5;font-size:24px;line-height:1.25;color:#1f2a44}
+.chip{position:absolute;padding:11px 20px;border-radius:22px;border:2px solid #f05a00;color:#c94b00;font-size:22px;font-weight:600}
+.card{position:absolute;background:#fff;border-radius:34px;box-shadow:0 50px 110px -40px rgba(18,26,44,.5);color:#1f2a44}
+.row{display:flex;justify-content:space-between;align-items:center;border-top:2px solid #e8e9ee;font-size:40px;padding:26px 0}
+.row span{color:#4a556e}.row b{font-weight:600}
+.wave{display:flex;gap:6px;align-items:center;height:110px}.wave i{display:block;width:10px;border-radius:5px;background:#f05a00;height:30%}
+.hl{color:#f05a00}
+.box{position:absolute;border-radius:16px;background:#d3a577;box-shadow:inset 0 16% 0 #bc8c5e}
+.box:before{content:"";position:absolute;left:0;right:0;top:0;height:22%;background:#bc8c5e;border-radius:16px 16px 0 0}
+.box .e{position:absolute;top:42%;width:12%;height:15%;border-radius:50%;background:#1f2a44}.box .e.l{left:27%}.box .e.r{right:27%}
+.box svg{position:absolute;left:30%;top:60%;width:40%;height:26%;overflow:visible}
+#capbox{position:absolute;left:0;right:0;bottom:38px;height:84px;z-index:80}
+.cap{position:absolute;left:50%;bottom:0;transform:translateX(-50%);opacity:0;white-space:nowrap;font-size:40px;font-weight:500;letter-spacing:-.012em;padding:14px 32px;border-radius:22px;background:rgba(255,255,255,.96);color:#1f2a44;box-shadow:0 14px 40px -18px rgba(18,26,44,.55)}
+.st{position:absolute;left:50%;top:26px;display:flex;gap:12px;align-items:center;height:56px;padding:0 24px 0 12px;border-radius:28px;background:#fff;color:#1f2a44;font-size:26px;font-weight:600;opacity:0;white-space:nowrap;z-index:70;box-shadow:0 14px 34px -16px rgba(18,26,44,.5)}
+.st svg{width:36px;height:36px}
+#shut i{display:block;flex:1;height:100%;background:#1f2a44;margin-right:-1px}
+#drop{position:absolute;left:0;top:0;width:1920px;height:1080px;background:#f05a00;z-index:61;transform:translateY(100%)}
+.pre{position:absolute;width:1px;height:1px;opacity:.01}
+.drip{position:absolute;width:30px;height:42px;background:#7fb2e5;border-radius:50% 50% 50% 50%/62% 62% 40% 40%}
+.q{position:absolute;font-weight:700;color:#f05a00}
+</style></head><body><div id="stage">
+
+<!-- phone on silent -->
+<section class="sc night" id="s1">
+  <div class="ph" id="p1" style="left:760px;top:90px"><div class="scr lock"><div class="isl"></div>
+    <div class="a" style="left:0;right:0;top:100px;text-align:center;font-size:96px;font-weight:600;letter-spacing:-.03em">10:02</div>
+    <div class="a" style="left:0;right:0;top:210px;text-align:center;font-size:23px;opacity:.85">Saturday · Silent</div>
+    <div class="note" id="n1" style="top:300px"><img src="assets/people/shipper.svg"><div><b>Tuan · Shipper</b>Missed call</div></div>
+    <div class="note" id="n2" style="top:406px"><img src="assets/people/shipper.svg"><div><b>Tuan · Shipper</b>Missed call (2)</div></div>
+  </div></div>
+  <img class="av" id="minh1" src="assets/people/buyer.svg" style="left:260px;top:360px;width:280px;height:280px;box-shadow:0 0 0 6px #f6f3f1">
+  <div class="pill" style="left:286px;top:680px">In a meeting</div>
+</section>
+
+<!-- at the door -->
+<section class="sc day" id="s2">
+  <div class="a" style="left:1320px;top:90px;width:400px;height:800px;border-radius:18px;background:#e4dfdb"><div class="a" style="left:40px;top:400px;width:26px;height:26px;border-radius:50%;background:#1f2a44"></div></div>
+  <div class="a rg" style="left:520px;top:210px;width:460px;height:460px;border-radius:50%;border:4px solid #f05a00"></div><div class="a rg" style="left:520px;top:210px;width:460px;height:460px;border-radius:50%;border:4px solid #f05a00"></div>
+  <img class="av" id="tuan" src="assets/people/shipper.svg" style="left:560px;top:250px;width:380px;height:380px">
+  <div class="drip" id="drip" style="left:940px;top:230px"></div>
+  <div class="box" id="box2" style="left:930px;top:520px;width:240px;height:190px"><i class="e l"></i><i class="e r"></i><svg viewBox="0 0 40 20"><path class="mh" d="M6 14 Q20 2 34 14" fill="none" stroke="#1f2a44" stroke-width="3.4" stroke-linecap="round"/></svg></div>
+  <div class="pill" id="c1" style="left:140px;top:250px">Calling Minh…</div>
+  <div class="pill" id="c2" style="left:140px;top:350px">Calling again…</div>
+  <div class="pill" id="st" style="left:140px;top:560px;background:#1f2a44;color:#fff">17 more stops</div>
+  <div class="a big" id="na" style="left:0;right:0;top:370px;text-align:center;font-size:190px;color:#e25400;z-index:4">No answer.</div>
+  <div class="a" id="naBg" style="inset:0;background:rgba(246,243,241,.93);z-index:3"></div>
+</section>
+
+<!-- we have all been there -->
+<section class="sc day" id="s3">
+  <div class="a" style="left:0;top:0;width:960px;height:100%;background:#e9eef8"></div>
+  <div class="a" style="left:960px;top:0;width:960px;height:100%;background:#fff1e7"></div>
+  <img class="av" id="m3" src="assets/people/buyer-oh.svg" style="left:290px;top:230px;width:380px;height:380px">
+  <img class="av" id="t3" src="assets/people/shipper-sad.svg" style="left:1250px;top:230px;width:380px;height:380px">
+  <div class="pill" id="ml" style="left:372px;top:660px">Oh no…</div><div class="pill" id="tl" style="left:1316px;top:660px">Next stop…</div>
+</section>
+
+<!-- Alodi -->
+<section class="sc night" id="s4">
+  <div class="a" id="bw" style="left:0;right:0;top:300px;display:flex;justify-content:center;align-items:baseline;font-family:BVPX;font-size:260px;line-height:1;letter-spacing:-.03em;color:#fff"><span id="bal">al</span><span style="position:relative;display:inline-block;width:.66em;margin:0 .02em;align-self:center;transform:translateY(.07em)"><svg viewBox="0 0 24 24" style="display:block;width:100%;overflow:visible"><circle id="br" cx="12" cy="12" r="8.6" fill="none" stroke="#f05a00" stroke-width="5.4" transform="rotate(-90 12 12)"/><g fill="#fff"><rect class="bb" x="8.55" y="10.25" width="1.5" height="3.5" rx=".75"/><rect class="bb" x="11.25" y="8.9" width="1.5" height="6.2" rx=".75"/><rect class="bb" x="13.95" y="10.25" width="1.5" height="3.5" rx=".75"/></g></svg></span><span id="bdi">di</span></div>
+  <div class="a mid" id="t4" style="left:0;right:0;top:720px;text-align:center;font-size:52px">The AI agent that rescues failed deliveries</div>
+</section>
+
+<!-- one tap -->
+<section class="sc day" id="s5">
+  <div class="ph" id="p5" style="left:760px;top:60px"><div class="scr"><div class="isl"></div>
+    <div class="a" style="left:28px;top:84px;right:28px"><div style="font-size:21px;color:#4a556e">Stop 8 of 24</div><div style="font-size:44px;font-weight:600;margin-top:6px">Minh Hoang</div><div style="font-size:23px;color:#4a556e;margin-top:6px">6L air fryer</div></div>
+    <div class="btn" id="bA" style="top:300px">No answer</div><div class="btn" style="top:415px">Rescheduled</div><div class="btn" style="top:530px">Refused</div>
+    <div class="a" id="touch" style="left:136px;top:306px;width:88px;height:88px;border-radius:50%;background:rgba(31,42,68,.28)"></div>
+  </div></div>
+  <img class="av" id="ride" src="assets/people/shipper-sad.svg" style="left:240px;top:320px;width:300px;height:300px">
+  <div class="pill q1" style="left:1270px;top:280px">No typing</div>
+  <div class="pill q1" style="left:1270px;top:400px">No calling back</div>
+  <div class="pill q1" style="left:1270px;top:520px;background:#1f2a44;color:#fff">One tap</div>
+</section>
+
+<!-- agent to buyer -->
+<section class="sc night" id="s6">
+  <svg class="a" id="ag" viewBox="0 0 512 512" style="left:300px;top:320px;width:340px;height:340px;overflow:visible"><circle cx="256" cy="256" r="184" fill="none" stroke="#f05a00" stroke-width="104"/><rect class="live" x="187" y="215" width="26" height="82" rx="13" fill="#fff"/><rect class="live" x="243" y="182" width="26" height="148" rx="13" fill="#fff"/><rect class="live" x="298" y="215" width="26" height="82" rx="13" fill="#fff"/></svg>
+  <svg class="a" style="left:0;top:0" width="1920" height="1080"><path id="flow1" d="M660 490 C840 390 900 610 1140 440" fill="none" stroke="#f05a00" stroke-width="5" stroke-linecap="round"/><path id="flow2" d="M660 490 C840 610 900 380 1140 520" fill="none" stroke="#f6f3f1" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"/></svg>
+  <div class="ph" id="p6" style="left:1150px;top:88px"><div class="scr"><div class="isl"></div>
+    <div class="a" style="left:0;right:0;top:60px;padding:0 0 16px;text-align:center;font-size:25px;font-weight:600;border-bottom:2px solid #eee">Delivery Assistant</div>
+    <div class="bub" id="m1" style="left:20px;right:30px;top:130px">Hi Minh, sorry we missed you. When suits you?</div>
+    <div class="chip" id="k1" style="left:20px;top:290px">Tomorrow evening</div>
+    <div class="chip" id="k2" style="left:20px;top:356px">Another time</div>
+    <div class="a" id="zz" style="left:0;right:0;top:520px;text-align:center;font-size:30px;font-weight:600;color:#4a556e">Unread · 1 hour</div>
+  </div></div>
+</section>
+
+<!-- the call -->
+<section class="sc night" id="s8">
+  <div class="ph" id="p8" style="left:180px;top:88px"><div class="scr lock"><div class="isl"></div>
+    <div class="a" style="left:0;right:0;top:120px;text-align:center"><div style="font-size:46px;font-weight:600">Alodi Delivery</div><div style="font-size:24px;opacity:.85;margin-top:8px" id="cstat">Incoming call · verified</div></div>
+    <svg class="a" viewBox="0 0 512 512" style="left:108px;top:280px;width:160px;height:160px"><circle cx="256" cy="256" r="184" fill="none" stroke="#f05a00" stroke-width="104"/><rect class="live" x="187" y="215" width="26" height="82" rx="13" fill="#fff"/><rect class="live" x="243" y="182" width="26" height="148" rx="13" fill="#fff"/><rect class="live" x="298" y="215" width="26" height="82" rx="13" fill="#fff"/></svg>
+    <div class="a" id="acc" style="left:143px;bottom:70px;width:90px;height:90px;border-radius:50%;background:#f05a00"></div>
+  </div></div>
+  <div class="a" id="row1" style="left:700px;top:160px;display:flex;gap:26px;align-items:flex-start"><svg viewBox="0 0 512 512" style="width:110px;height:110px;flex:none"><circle cx="256" cy="256" r="184" fill="none" stroke="#f05a00" stroke-width="104"/><rect class="live" x="187" y="215" width="26" height="82" rx="13" fill="#fff"/><rect class="live" x="243" y="182" width="26" height="148" rx="13" fill="#fff"/><rect class="live" x="298" y="215" width="26" height="82" rx="13" fill="#fff"/></svg>
+    <div style="background:#f6f3f1;color:#1f2a44;border-radius:30px;padding:28px 36px;font-size:40px;font-weight:500;line-height:1.2;width:860px">Hi Minh! When’s a good time?</div></div>
+  <div class="a" id="row2" style="left:760px;top:420px;display:flex;gap:26px;align-items:flex-start"><div id="tt" style="background:#fff;color:#1f2a44;border-radius:30px;padding:28px 36px;font-size:44px;font-weight:500;line-height:1.25;width:800px"><span class="k">Tomorrow after five.</span> Leave it with <span class="k">security in Tower B.</span> Or call <span class="k">my wife.</span></div><img id="m8" src="assets/people/buyer-oh.svg" style="width:130px;height:130px;border-radius:50%;flex:none;box-shadow:0 0 0 5px #f6f3f1"></div>
+  <div class="a wave" id="w8" style="left:900px;top:770px"></div>
+</section>
+
+<!-- card -->
+<section class="sc day" id="s10">
+  <div class="card" id="fc" style="left:500px;top:150px;width:920px;padding:44px 64px 24px">
+    <div style="font-size:30px;font-weight:600;margin-bottom:26px">Context card · Minh’s air fryer</div>
+    <div class="row fr"><span>When</span><b class="hl">Sunday, after 17:00</b></div>
+    <div class="row fr"><span>Where</span><b>Tower B security</b></div>
+    <div class="row fr"><span>Who</span><b>Wife can receive</b></div>
+  </div>
+  <img class="av" id="g10" src="assets/people/buyer-joy.svg" style="left:150px;top:380px;width:220px;height:220px">
+</section>
+
+<!-- rules and send, stays on from the card -->
+<section class="sc day" id="s11">
+  <div class="pill ru" style="left:150px;top:300px">Inside calling hours ✓</div>
+  <div class="pill ru" style="left:150px;top:410px">Clear answer ✓</div>
+  <div class="pill ru" style="left:150px;top:520px">Nothing needs a person ✓</div>
+  <div class="card" id="fly" style="left:700px;top:370px;width:380px;padding:24px 30px 18px;z-index:3">
+    <div style="font-size:21px;font-weight:600;margin-bottom:8px">Context card</div>
+    <div style="font-size:23px;line-height:1.5"><b class="hl" style="font-weight:600">Sunday, after 17:00</b><br>Tower B security<br>Wife can receive</div>
+  </div>
+  <div class="ph" id="p11" style="left:1330px;top:88px"><div class="scr"><div class="isl"></div>
+    <div class="a" style="left:28px;right:28px;top:80px"><img id="n11i" src="assets/people/next-joy.svg" style="width:96px;border-radius:50%"><div style="font-size:34px;font-weight:600;margin-top:12px">Next shipper</div><div style="font-size:23px;color:#4a556e">Sunday route</div></div>
+  </div></div>
+</section>
+
+<!-- delivered -->
+<section class="sc" id="s12" style="background:linear-gradient(180deg,#ffd9bf 0%,#fff1e7 55%,#f6f3f1 100%)">
+  <div class="a big" id="t12" style="left:0;right:0;top:70px;text-align:center;font-size:132px">Delivered.</div>
+  <img class="av hp" id="h1" src="assets/people/next-joy.svg" style="left:220px;top:300px;width:330px;height:330px">
+  <img class="av hp" id="h2" src="assets/people/buyer-joy.svg" style="left:795px;top:300px;width:330px;height:330px">
+  <img class="av hp" id="h3" src="assets/people/seller-joy.svg" style="left:1370px;top:300px;width:330px;height:330px">
+  <div class="box" id="box12" style="left:580px;top:470px;width:180px;height:142px"><i class="e l"></i><i class="e r"></i><svg viewBox="0 0 40 20"><path d="M6 4 Q20 22 34 4" fill="none" stroke="#1f2a44" stroke-width="3.4" stroke-linecap="round"/></svg></div>
+  <div class="pill" id="l1" style="left:805px;top:670px;height:72px;font-size:30px">Minh gets the parcel</div>
+  <div class="pill" id="l2" style="left:225px;top:670px;height:72px;font-size:30px">Shipper saves a trip</div>
+  <div class="pill" id="l3" style="left:1380px;top:670px;height:72px;font-size:30px">Seller keeps the sale</div>
+</section>
+
+<!-- memo -->
+<section class="sc day" id="s13">
+  <div class="ph" id="p13" style="left:240px;top:88px"><div class="scr"><div class="isl"></div>
+    <div class="a" style="left:28px;top:80px;font-size:36px;font-weight:600">Rescheduled</div>
+    <div class="a" style="left:28px;top:132px;font-size:23px;color:#4a556e">Hold and say it</div>
+    <div class="a wave" id="w13" style="left:30px;top:220px;height:140px"></div>
+    <div class="a" style="left:28px;right:28px;top:420px;height:14px;border-radius:7px;background:#eceef2"><div id="rec" style="height:100%;border-radius:7px;background:#f05a00;transform-origin:left;transform:scaleX(0)"></div></div>
+    <div class="a" style="left:28px;top:450px;font-size:23px;color:#4a556e">10 seconds</div>
+    <div class="a" id="hold" style="left:109px;bottom:70px;width:160px;height:160px;border-radius:50%;background:#1f2a44"></div>
+  </div></div>
+  <img class="av" src="assets/people/shipper-tongue.svg" id="t13i" style="left:780px;top:130px;width:200px;height:200px">
+  <div class="card" id="c13" style="left:780px;top:400px;width:900px;padding:32px 52px 16px">
+    <div class="row" style="border:0"><span>When</span><b class="hl">Monday, before 10:00</b></div><div class="row"><span>Where</span><b>Front desk</b></div>
+  </div>
+</section>
+
+<!-- a person -->
+<section class="sc day" id="s14">
+  <div class="a" id="pv" style="left:220px;top:250px;display:grid;justify-items:center;gap:26px"><img src="assets/people/buyer-grim.svg" style="width:220px;border-radius:50%;box-shadow:0 0 0 8px #fff"><div class="pill" style="position:relative">“Maybe… or tonight?”</div></div>
+  <svg class="a" id="stop" viewBox="0 0 512 512" style="left:790px;top:300px;width:280px;height:280px"><circle cx="256" cy="256" r="184" fill="none" stroke="#f05a00" stroke-width="104"/><rect x="206" y="206" width="100" height="100" rx="14" fill="#1f2a44"/></svg>
+  <div class="a" id="arr" style="left:1110px;top:380px;font-size:90px;color:#1f2a44">→</div>
+  <div class="a" id="pc" style="left:1290px;top:220px;display:grid;justify-items:center;gap:26px"><img src="assets/people/cs-joy.svg" style="width:300px;border-radius:50%;box-shadow:0 0 0 8px #fff"><div class="pill" style="position:relative;background:#1f2a44;color:#fff">A real person</div></div>
+</section>
+
+<!-- dashboard -->
+<section class="sc day" id="s15">
+  <img id="dash" src="assets/console.png" style="position:absolute;left:210px;top:90px;width:1500px;border-radius:22px;box-shadow:0 60px 120px -40px rgba(18,26,44,.55)">
+</section>
+
+<!-- close -->
+<section class="sc night" id="s16">
+  <div class="a" id="ew" style="left:0;right:0;top:260px;display:flex;justify-content:center;align-items:baseline;font-family:BVPX;font-size:230px;line-height:1;letter-spacing:-.03em;color:#fff"><span id="eal">al</span><span style="position:relative;display:inline-block;width:.66em;margin:0 .02em;align-self:center;transform:translateY(.07em)"><svg viewBox="0 0 24 24" style="display:block;width:100%;overflow:visible"><circle id="er" cx="12" cy="12" r="8.6" fill="none" stroke="#f05a00" stroke-width="5.4" transform="rotate(-90 12 12)"/><g fill="#fff"><rect class="eb" x="8.55" y="10.25" width="1.5" height="3.5" rx=".75"/><rect class="eb" x="11.25" y="8.9" width="1.5" height="6.2" rx=".75"/><rect class="eb" x="13.95" y="10.25" width="1.5" height="3.5" rx=".75"/></g></svg></span><span id="edi">di</span></div>
+  <div class="a" id="slogan" style="left:0;right:0;top:610px;text-align:center;font-family:BVP;font-size:76px;letter-spacing:-.02em">Make the second drop land.</div>
+</section>
+
+<div id="shut" style="position:absolute;inset:0;z-index:60;visibility:hidden;display:flex"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div id="drop"></div>
+<div class="st" id="st1"></div><div class="st" id="st2"></div><div class="st" id="st3"></div><div class="st" id="st4"></div>
+<div id="capbox"></div>
+</div>
+<script src="assets/gsap.min.js"></script>
+<script>
+(async () => {
+  const T = await (await fetch("timeline.json")).json();
+  const S = T.start, D = T.dur;
+  const tl = gsap.timeline({ paused: true });
+  const $ = (q) => document.querySelector(q);
+  const out = "expo.out", io = "power3.inOut";
+  const spr = "back.out(1.9)";
+  const pop = (el, at, o = {}) => tl.from(el, { opacity: 0, scale: 0.6, y: 26, duration: 0.55, ease: spr, ...o }, at);
+  const face = (el, at, src) => { tl.set(el, { attr: { src: `assets/people/${src}.svg` } }, at); tl.fromTo(el, { scale: 0.86 }, { scale: 1, duration: 0.45, ease: "back.out(3)" }, at); };
+
+  // every cut is different and comes from what is on screen; the logo only appears when Alodi itself does
+  const IO = "expo.inOut";
+  let z = 10;
+  const enter = (next, at) => { const zi = ++z; tl.set(next, { visibility: "visible", zIndex: zi, opacity: 1 }, at); };
+  const leave = (prev, at) => tl.set(prev, { visibility: "hidden" }, at);
+  // whip: both scenes travel together, motion-blurred at speed
+  const whip = (prev, next, at) => {
+    enter(next, at - 0.35);
+    tl.fromTo(next, { xPercent: 100 }, { xPercent: 0, duration: 0.7, ease: IO }, at - 0.35);
+    tl.to(prev, { xPercent: -100, duration: 0.7, ease: IO }, at - 0.35);
+    tl.fromTo("#stage", { filter: "blur(0px)" }, { filter: "blur(9px)", duration: 0.35, ease: "power2.in", yoyo: true, repeat: 1 }, at - 0.35);
+    leave(prev, at + 0.36);
+  };
+  // any clip shape growing over the old scene
+  const reveal = (prev, next, at, from, to, dur = 0.8, ease = IO) => {
+    enter(next, at - dur / 2);
+    tl.fromTo(next, { clipPath: from }, { clipPath: to, duration: dur, ease }, at - dur / 2);
+    tl.set(next, { clipPath: "none" }, at + dur / 2);
+    leave(prev, at + dur / 2);
+  };
+  // sheet: the new scene rises like a phone sheet while the old one sinks back
+  const sheet = (prev, next, at) => {
+    enter(next, at - 0.4);
+    tl.fromTo(next, { yPercent: 100, borderRadius: 60 }, { yPercent: 0, borderRadius: 0, duration: 0.8, ease: IO }, at - 0.4);
+    tl.to(prev, { scale: 0.92, opacity: 0.4, duration: 0.8, ease: IO }, at - 0.4);
+    leave(prev, at + 0.41);
+  };
+  // zoom through: fly into the old scene and arrive in the new one
+  const zoom = (prev, next, at, inFrom = 0.8) => {
+    tl.to(prev, { scale: 1.7, opacity: 0, filter: "blur(16px)", duration: 0.5, ease: "power3.in" }, at - 0.4);
+    enter(next, at - 0.12);
+    tl.fromTo(next, { scale: inFrom, opacity: 0, filter: "blur(16px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.6, ease: "power3.out" }, at - 0.12);
+    leave(prev, at + 0.12);
+  };
+  const whipV = (prev, next, at) => {
+    enter(next, at - 0.35);
+    tl.fromTo(next, { yPercent: -100 }, { yPercent: 0, duration: 0.7, ease: IO }, at - 0.35);
+    tl.to(prev, { yPercent: 100, duration: 0.7, ease: IO }, at - 0.35);
+    leave(prev, at + 0.36);
+  };
+  // shutter: columns close over the old scene and open onto the new one
+  const shutter = (prev, next, at) => {
+    const cols = document.querySelectorAll("#shut i");
+    tl.set("#shut", { visibility: "visible" }, at - 0.5);
+    tl.fromTo(cols, { scaleY: 0, transformOrigin: "bottom" }, { scaleY: 1, duration: 0.42, stagger: 0.035, ease: "power3.inOut" }, at - 0.5);
+    enter(next, at + 0.08); leave(prev, at + 0.08);
+    tl.set(cols, { transformOrigin: "top" }, at + 0.08);
+    tl.to(cols, { scaleY: 0, duration: 0.42, stagger: 0.035, ease: "power3.inOut" }, at + 0.08);
+    tl.set("#shut", { visibility: "hidden" }, at + 0.75);
+  };
+  // dip: a slow breath through deep navy
+  const dip = (prev, next, at) => {
+    tl.to(prev, { opacity: 0, duration: 0.5, ease: "power2.in" }, at - 0.5);
+    tl.set("#stage", { background: "#121a2c" }, at - 0.5);
+    enter(next, at);
+    tl.fromTo(next, { opacity: 0 }, { opacity: 1, duration: 0.4 }, at);
+    leave(prev, at);
+  };
+  const c = (k) => S[k] - 0.1; // mark opens just before the line starts
+
+  // status pill: says in plain words what the agent is doing
+  const MK = '<svg viewBox="0 0 512 512"><circle cx="256" cy="256" r="184" fill="none" stroke="#f05a00" stroke-width="104"/><rect x="187" y="215" width="26" height="82" rx="13" fill="#1f2a44"/><rect x="243" y="182" width="26" height="148" rx="13" fill="#1f2a44"/><rect x="298" y="215" width="26" height="82" rx="13" fill="#1f2a44"/></svg>';
+  const status = (id, text, a, b) => { $(id).innerHTML = MK + text; tl.set(id, { xPercent: -50 }, 0); tl.fromTo(id, { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: 0.4, ease: out }, a); tl.to(id, { opacity: 0, y: -24, duration: 0.3 }, b); };
+
+  // captions
+  for (const k of Object.keys(T.captions)) {
+    const parts = T.captions[k], total = parts.reduce((n, x) => n + x.length, 0);
+    let t = S[k];
+    for (const x of parts) {
+      const d = D[k] * x.length / total, el = document.createElement("div");
+      el.className = "cap"; el.textContent = x; $("#capbox").appendChild(el);
+      tl.to(el, { opacity: 1, duration: 0.12 }, t); tl.to(el, { opacity: 0, duration: 0.12 }, t + d - 0.04);
+      t += d;
+    }
+  }
+
+  // 1
+  tl.set("#s1", { visibility: "visible", zIndex: 1 }, 0);
+  tl.from("#s1", { opacity: 0, duration: 0.8 }, 0);
+  tl.from("#p1", { y: 200, duration: 1.5, ease: out }, 0.2);
+  pop("#minh1", S.n01 + 0.8); 
+  pop("#s1 .pill", S.n01 + 1.2);
+  pop("#n1", S.n01 + 2.4); tl.to("#p1", { x: "+=7", duration: 0.05, repeat: 9, yoyo: true }, S.n01 + 2.4);
+  pop("#n2", S.n01 + 3.6);
+  // 2
+  whip("#s1", "#s2", c("n02"));
+  pop("#tuan", S.n02 - 0.2); pop("#box2", S.n02);
+  document.querySelectorAll(".rg").forEach((r, i) => tl.fromTo(r, { scale: 0.85, opacity: 0.8 }, { scale: 1.6, opacity: 0, duration: 1.2, repeat: 2, ease: "power1.out" }, S.n02 + 2.4 + i * 0.5));
+  pop("#c1", S.n02 + 2.3); pop("#c2", S.n02 + 3.2);
+  face("#tuan", S.n02 + 4.3, "shipper-grim");
+  tl.from("#drip", { opacity: 0, y: -50, duration: 0.5 }, S.n02 + 4.3);
+  tl.to("#drip", { y: 150, opacity: 0, duration: 0.9, ease: "power2.in" }, S.n02 + 4.9);
+  pop("#st", S.n03 + 0.1);
+  face("#tuan", S.n03 + 1.2, "shipper-sad");
+  tl.to("#box2", { x: -560, y: 110, rotate: -8, duration: 1.1, ease: io }, S.n03 + 2.2);
+  tl.fromTo("#naBg", { opacity: 0 }, { opacity: 1, duration: 0.3 }, S.n03 + 6.9);
+  tl.from("#na", { opacity: 0, scale: 1.3, filter: "blur(16px)", duration: 0.5, ease: out }, S.n03 + 7);
+  // 3
+  reveal("#s2", "#s3", c("n04"), "inset(0% 50% 0% 50%)", "inset(0% 0% 0% 0%)");
+  pop("#m3", S.n04 - 0.2); pop("#ml", S.n04 + 0.3);
+  pop("#t3", S.n04 + 1.4); pop("#tl", S.n04 + 2);
+  // 4: the drop, like the first film
+  tl.to("#drop", { y: "0%", duration: 0.32, ease: io }, 29.9);
+  tl.set("#s4", { visibility: "visible", zIndex: 40 }, 30.22);
+  tl.set("#s3", { visibility: "hidden" }, 30.22);
+  tl.to("#drop", { y: "-100%", duration: 0.42, ease: io }, 30.25);
+  const L = 2 * Math.PI * 8.6;
+  tl.fromTo("#br", { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: 0.7, ease: out }, 30.45);
+  tl.from(".bb", { scaleY: 0, svgOrigin: "12 12", duration: 0.55, stagger: 0.07, ease: "back.out(3)" }, 30.75);
+  tl.from("#bal", { opacity: 0, x: 120, duration: 0.6, ease: out }, 30.95);
+  tl.from("#bdi", { opacity: 0, x: -120, duration: 0.6, ease: out }, 30.95);
+  tl.from("#t4", { opacity: 0, y: 26, duration: 0.6, ease: out }, S.n05 + 1.3);
+  // 5
+  zoom("#s4", "#s5", c("n06"));
+  tl.from("#p5", { y: 140, duration: 0.8, ease: out }, S.n06 - 0.1);
+  pop("#ride", S.n06 + 0.4);
+  tl.from("#touch", { opacity: 0, scale: 1.8, duration: 0.45, ease: out }, S.n06 + 1.1);
+  tl.to("#touch", { scale: 0.8, duration: 0.12 }, S.n06 + 1.6);
+  tl.to("#bA", { background: "#f05a00", borderColor: "#f05a00", color: "#fff", duration: 0.15 }, S.n06 + 1.62);
+  tl.to("#touch", { opacity: 0, scale: 2, duration: 0.5 }, S.n06 + 1.7);
+  face("#ride", S.n06 + 1.7, "shipper-joy");
+  pop(".q1", S.n06 + 2.2, { stagger: 0.55 });
+  tl.to("#ride", { x: -760, rotate: -6, duration: 1, ease: "power3.in" }, S.n06 + 5.1);
+  // 6
+  reveal("#s5", "#s6", c("n07"), "circle(0px at 930px 358px)", "circle(1500px at 930px 358px)", 0.9, "power3.inOut");
+  status("#st1", "Alodi is messaging Minh", S.n07 + 0.7, c("n08") + 0.2);
+  pop("#ag", S.n07 - 0.1, { scale: 0.4 });
+  for (const f of ["#flow1", "#flow2"]) { const P = $(f).getTotalLength(); tl.fromTo(f, { strokeDasharray: P, strokeDashoffset: P }, { strokeDashoffset: 0, duration: 0.9, ease: io }, S.n07 + 2.1); }
+  tl.from("#p6", { x: 160, opacity: 0, duration: 0.7, ease: out }, S.n07 + 1.5);
+  pop("#m1", S.n07 + 3); pop("#k1", S.n07 + 3.4); pop("#k2", S.n07 + 3.55);
+  tl.from("#zz", { opacity: 0, y: 14, duration: 0.5 }, S.n08 + 0.2);
+  // 8: stays in the same space, the call comes in
+  enter("#s8", S.n08 + 4);
+  tl.fromTo("#s8", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, S.n08 + 4);
+  tl.fromTo("#p8", { x: 970 }, { x: 0, duration: 0.75, ease: IO }, S.n08 + 4);
+  tl.to("#p6", { x: -970, duration: 0.75, ease: IO }, S.n08 + 4);
+  tl.to(["#ag", "#s6 svg.a"], { opacity: 0, duration: 0.3 }, S.n08 + 4);
+  leave("#s6", S.n08 + 4.8);
+  status("#st2", "Alodi is calling Minh", S.n08 + 4.8, S.a01 + D.a01 - 0.2);
+  tl.to("#p8 .scr", { x: "+=6", duration: 0.05, repeat: 11, yoyo: true }, S.n08 + 4.8);
+  tl.to("#acc", { scale: 0, duration: 0.25 }, S.a01 - 0.4);
+  tl.set("#cstat", { textContent: "On a call" }, S.a01 - 0.3);
+  pop("#row1", S.a01 + 0.1);
+  status("#st3", "Alodi is listening", S.m01 - 0.1, c("n09"));
+  pop("#row2", S.m01 + 0.1);
+  face("#m8", S.m01 + 3, "buyer-joy");
+  const ks = document.querySelectorAll(".k"), kt = [0.2, 2.6, 4.9];
+  ks.forEach((k, i) => tl.to(k, { color: "#e25400", fontWeight: 600, duration: 0.25 }, S.m01 + kt[i]));
+  // 10
+  sheet("#s8", "#s10", c("n09"));
+  status("#st4", "Alodi is writing the card", S.n09 + 0.4, S.n10 + D.n10);
+  tl.from("#fc", { y: 60, opacity: 0, duration: 0.6, ease: out }, S.n09);
+  pop("#g10", S.n09 + 0.5);
+  tl.from(".fr", { opacity: 0, x: -50, duration: 0.42, stagger: 0.55, ease: out }, S.n09 + 2.2);
+  // 11
+  tl.set("#s11", { visibility: "visible", zIndex: 13, opacity: 0 }, S.n10 - 0.3);
+  tl.to("#s11", { opacity: 1, duration: 0.35 }, S.n10 - 0.3);
+  tl.set("#s10", { visibility: "hidden" }, S.n10 + 0.1);
+  pop(".ru", S.n10 + 0.1, { stagger: 0.3 });
+  tl.from("#p11", { x: 160, opacity: 0, duration: 0.6, ease: out }, S.n10);
+  tl.to("#fly", { x: 655, y: -30, scale: 0.86, duration: 1, ease: io }, S.n10 + 2.2);
+  // 12
+  reveal("#s11", "#s12", c("n11"), "polygon(0% 0%, 0% 0%, -30% 100%, -30% 100%)", "polygon(0% 0%, 130% 0%, 100% 100%, -30% 100%)", 1);
+  tl.from("#t12", { opacity: 0, scale: 0.8, duration: 0.6, ease: spr }, S.n11 + 3.1);
+  tl.from("#h1", { opacity: 0, scale: 0.6, duration: 0.5, ease: spr }, S.n11 + 0.3);
+  tl.from("#box12", { opacity: 0, duration: 0.3 }, S.n11 + 0.8);
+  tl.to("#box12", { x: 40, y: -10, duration: 0.6, ease: io }, S.n11 + 2.4);
+  tl.from("#h2", { opacity: 0, scale: 0.6, duration: 0.5, ease: spr }, S.n11 + 2.8);
+  tl.to("#box12", { y: "-=44", duration: 0.2, repeat: 3, yoyo: true, ease: "power2.out" }, S.n11 + 3.2);
+  pop("#l1", S.n12 + 0.1); pop("#l2", S.n12 + 1.5); 
+  tl.from("#h3", { opacity: 0, scale: 0.6, duration: 0.5, ease: spr }, S.n12 + 2.9); pop("#l3", S.n12 + 3.1);
+  // 13
+  whipV("#s12", "#s13", c("n13"));
+  tl.from("#p13", { y: 140, duration: 0.7, ease: out }, S.n13 - 0.1);
+  pop("#t13i", S.n13 + 0.5);
+  tl.to("#hold", { scale: 0.85, background: "#f05a00", duration: 0.2 }, S.n13 + 3);
+  tl.to("#rec", { scaleX: 1, duration: 2.2, ease: "none" }, S.n13 + 3);
+  tl.from("#c13", { y: 60, opacity: 0, duration: 0.6, ease: out }, S.n13 + 5.3);
+  // 14
+  shutter("#s13", "#s14", c("n14"));
+  pop("#pv", S.n14);
+  tl.from("#stop", { opacity: 0, scale: 0.4, duration: 0.5, ease: spr }, S.n14 + 3.4);
+  tl.from("#arr", { opacity: 0, x: -30, duration: 0.4 }, S.n14 + 4.4);
+  pop("#pc", S.n14 + 4.6);
+  // 15
+  zoom("#s14", "#s15", c("n15"), 1.5);
+  tl.fromTo("#dash", { scale: 0.92, y: 40 }, { scale: 1.06, y: -20, duration: D.n15 + 1.6, ease: "power1.inOut" }, S.n15 - 0.4);
+  // 16
+  dip("#s15", "#s16", c("n16"));
+  tl.set("#er", { strokeDasharray: L, strokeDashoffset: L }, 0);
+  tl.fromTo("#er", { strokeDasharray: L, strokeDashoffset: L }, { strokeDashoffset: 0, duration: 0.6, ease: out }, S.n16 + 0.5);
+  tl.from(".eb", { scaleY: 0, svgOrigin: "12 12", duration: 0.5, stagger: 0.07, ease: "back.out(3)" }, S.n16 + 0.75);
+  tl.from("#eal", { opacity: 0, x: 110, duration: 0.6, ease: out }, S.n16 + 0.85);
+  tl.from("#edi", { opacity: 0, x: -110, duration: 0.6, ease: out }, S.n16 + 0.85);
+  tl.from("#slogan", { opacity: 0, y: 26, duration: 0.7, ease: out }, S.n16 + 1.5);
+  tl.set("#stage", {}, T.end);
+
+  // gentle life: faces bob, the bars and voices move with time, and each moment drifts slowly toward the viewer
+  for (const id of ["w8", "w13"]) $("#" + id).innerHTML = "<i></i>".repeat(id === "w13" ? 20 : 34);
+  const waves = [...document.querySelectorAll(".wave i")], live = [...document.querySelectorAll(".live")];
+  const marks = Object.values(S), stage = $("#stage");
+  const draw = (t) => {
+    const a = [0, ...marks].filter((m) => m <= t).pop(), b = marks.find((m) => m > t) ?? T.end + 1;
+    stage.style.transform = `scale(${1 + 0.022 * ((t - a) / (b - a))})`;
+    waves.forEach((w, i) => { w.style.height = 14 + 80 * Math.abs(Math.sin(t * 5.3 + i * 0.55) * Math.sin(t * 1.7 + i * 0.21)) + "%"; });
+    live.forEach((r, i) => { const k = 0.55 + 0.45 * Math.abs(Math.sin(t * 3.4 + (i % 3) * 1.1)); r.style.transformOrigin = "center"; r.style.transformBox = "fill-box"; r.style.transform = `scaleY(${k})`; });
+  };
+  window.__film = { fps: 30, end: T.end, ready: true, seek: (t) => { tl.seek(t, false); draw(t); } };
+  // load every face before the first frame
+  const faces = [...new Set([...document.documentElement.innerHTML.matchAll(/assets\/people\/[a-z-]+\.svg/g)].map((m) => m[0]).concat(["shipper-grim", "shipper-sad", "shipper-joy", "buyer-joy"].map((x) => `assets/people/${x}.svg`)))];
+  await Promise.all(faces.map((u) => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); }));
+  await document.fonts.ready;
+  window.__film.seek(0);
+})();
+</script></body></html>

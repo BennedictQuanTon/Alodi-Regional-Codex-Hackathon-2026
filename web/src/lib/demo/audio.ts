@@ -1,24 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { DemoState } from "./types";
+import { VOICE } from "./voice";
+
+const sfx = (name: "tap" | "pop" | "chime", volume: number) => {
+  const a = new Audio(`/audio/sfx/${name}.mp3`);
+  a.volume = volume;
+  a.play().catch(() => {});
+};
 
 /**
- * Demo audio mock: ringtone via WebAudio, dialogue via the browser's speechSynthesis (English voice).
- * Production uses pre-recorded phrases + commercial TTS + streaming ASR.
+ * Judges' demo sound: recorded call lines, a ringtone via WebAudio and three short effects.
+ * Browsers only allow sound after a click, so it starts with the Play button.
  */
 export function useCallAudio(state: DemoState, enabled: boolean) {
   const spoken = useRef(new Set<string>());
+  const current = useRef<HTMLAudioElement | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
-  const [hasEnVoice, setHasEnVoice] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    const check = () => setHasEnVoice(speechSynthesis.getVoices().some((v) => v.lang.toLowerCase().startsWith("en")));
-    check();
-    speechSynthesis.addEventListener("voiceschanged", check);
-    return () => speechSynthesis.removeEventListener("voiceschanged", check);
-  }, []);
+    if (!enabled) return;
+    for (const v of Object.values(VOICE)) new Audio(v.src).preload = "auto";
+  }, [enabled]);
 
   // Turning sound on mid-call must not replay earlier lines
   const linesRef = useRef(state.call.lines);
@@ -31,21 +35,38 @@ export function useCallAudio(state: DemoState, enabled: boolean) {
 
   // Dialogue
   useEffect(() => {
-    if (!enabled || !("speechSynthesis" in window)) return;
-    const voices = speechSynthesis.getVoices();
-    const en = voices.find((v) => v.lang.toLowerCase().startsWith("en"));
+    if (state.call.lines.length === 0) {
+      spoken.current.clear();
+      current.current?.pause();
+    }
+    if (!enabled) return;
     for (const l of state.call.lines) {
       if (spoken.current.has(l.id)) continue;
       spoken.current.add(l.id);
-      const u = new SpeechSynthesisUtterance(l.text);
-      u.lang = "en-US";
-      if (en) u.voice = en;
-      u.rate = 1.08 * state.speed;
-      u.pitch = l.who === "ai" ? 1.05 : 0.85;
-      speechSynthesis.speak(u);
+      const v = VOICE[l.text];
+      if (!v) continue;
+      current.current?.pause();
+      const a = new Audio(v.src);
+      a.playbackRate = state.speed;
+      current.current = a;
+      a.play().catch(() => {});
     }
-    if (state.call.lines.length === 0) spoken.current.clear();
   }, [state.call.lines, enabled, state.speed]);
+
+  // Effects: the shipper's tap, a chat message arriving, the context card and the delivery
+  const screen = state.shipper.screen;
+  const agentChats = state.chat.filter((m) => m.from === "agent").length;
+  const prev = useRef({ screen, agentChats });
+  useEffect(() => {
+    const p = prev.current;
+    prev.current = { screen, agentChats };
+    if (!enabled) return;
+    if (screen !== p.screen) {
+      if (screen === "waiting" || screen === "memo") sfx("tap", 0.8);
+      if (screen === "context" || screen === "delivered") sfx("chime", 0.7);
+    }
+    if (agentChats > p.agentChats) sfx("pop", 0.7);
+  }, [screen, agentChats, enabled]);
 
   // Ringtone while ringing
   useEffect(() => {
@@ -80,8 +101,6 @@ export function useCallAudio(state: DemoState, enabled: boolean) {
   }, [state.call.status, enabled]);
 
   useEffect(() => {
-    if (!enabled && typeof window !== "undefined" && "speechSynthesis" in window) speechSynthesis.cancel();
+    if (!enabled) current.current?.pause();
   }, [enabled]);
-
-  return { hasEnVoice };
 }

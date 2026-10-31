@@ -1,0 +1,56 @@
+[
+ [
+  "c1",
+  "af_bella",
+  1.0,
+  "Hello Mr. Minh, this is the automated delivery assistant calling about your air fryer. This call is recorded so we get the delivery right \u2014 is that okay?"
+ ],
+ [
+  "c2",
+  "am_puck",
+  1.0,
+  "Sure, go ahead."
+ ],
+ [
+  "c3",
+  "af_bella",
+  1.0,
+  "Our shipper missed you this morning. Tomorrow we have eight to twelve, or five to eight in the evening. Which works for you?"
+ ],
+ [
+  "c4",
+  "am_puck",
+  1.0,
+  "Tomorrow after five, please. I'm out until late, so leave it with security in Tower B. Or call my wife, oh nine oh three, two one four."
+ ],
+ [
+  "c5",
+  "af_bella",
+  1.0,
+  "Confirming: Sunday, the first of November, five to eight pm, left with Tower B security, and your wife if needed. Is that right?"
+ ],
+ [
+  "c6",
+  "am_puck",
+  1.0,
+  "That's right."
+ ],
+ [
+  "c7",
+  "af_bella",
+  1.0,
+  "Thank you, Mr. Minh. Have a good afternoon."
+ ],
+ [
+  "c8",
+  "am_puck",
+  1.0,
+  "Hmm, let me check tomorrow, maybe afternoon-ish... actually I might be home tonight, just leave it anywhere."
+ ],
+ [
+  "c9",
+  "af_bella",
+  1.0,
+  "Noted. We'll get back to you to confirm a time. Thank you."
+ ]
+]

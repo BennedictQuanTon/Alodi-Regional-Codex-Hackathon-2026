@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { PhoneFrame } from "@/components/demo/phone";
 import { useFit } from "@/components/demo/stage";
+import { BrandWipe } from "@/components/site/brand-wipe";
 import { Mark, Wordmark } from "@/components/site/brand";
 import { AGENT_STEPS, useLiveState, type LiveState, type StepStatus } from "@/lib/live/state";
 
@@ -166,6 +167,7 @@ export function LiveStage() {
           </div>
         </div>
       </div>
+      <BrandWipe />
     </div>
   );
 }

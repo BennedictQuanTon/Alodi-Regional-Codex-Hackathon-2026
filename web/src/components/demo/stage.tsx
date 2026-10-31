@@ -1,6 +1,7 @@
 "use client";
 
 import { ViewTransition, useEffect, useRef, useState } from "react";
+import { BrandWipe } from "@/components/site/brand-wipe";
 import { useDemo } from "@/lib/demo/engine";
 import { BuyerPhone } from "./buyer-phone";
 import { ConsolePanel } from "./console-parts";
@@ -76,6 +77,7 @@ export function DemoStage() {
         </div>
         <Director captions={captions} setCaptions={setCaptions} />
       </div>
+      <BrandWipe />
     </div>
   );
 }

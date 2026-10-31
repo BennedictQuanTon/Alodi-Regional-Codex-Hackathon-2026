@@ -95,7 +95,7 @@ function Switch({ on, onClick, label }: { on: boolean; onClick: () => void; labe
 /** Floating control dock: scenario, play, step, reset, clock, options. */
 export function Director({ captions, setCaptions }: { captions?: boolean; setCaptions?: (v: boolean) => void; compact?: boolean }) {
   const { state: s, engine } = useDemo();
-  const [audio, setAudio] = useLocalFlag("alodi-audio", false);
+  const [audio, setAudio] = useLocalFlag("alodi-audio", true);
   const [open, setOpen] = useState(false);
   useCallAudio(s, audio);
 

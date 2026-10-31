@@ -1,0 +1,11 @@
+{
+ "Hello Mr. Minh, this is the automated delivery assistant calling about your air fryer. This call is recorded so we get the delivery right — is that okay?": "c1",
+ "Sure, go ahead.": "c2",
+ "Our shipper missed you this morning. Tomorrow we have 8 to 12, or 5 to 8 in the evening. Which works for you?": "c3",
+ "Tomorrow after five, please. I’m out until late, so leave it with security in Tower B. Or call my wife, 0903 xxx 214.": "c4",
+ "Confirming: Sunday 1 November, 5 to 8 pm, left with Tower B security, and your wife on 0903 xxx 214 if needed. Is that right?": "c5",
+ "That’s right.": "c6",
+ "Thank you, Mr. Minh. Have a good afternoon.": "c7",
+ "Hmm, let me check tomorrow, maybe afternoon-ish… actually I might be home tonight, just leave it anywhere.": "c8",
+ "Noted. We’ll get back to you to confirm a time. Thank you.": "c9"
+}

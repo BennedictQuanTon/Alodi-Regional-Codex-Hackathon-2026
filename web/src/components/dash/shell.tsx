@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ViewTransition, useSyncExternalStore } from "react";
 import { flushSync } from "react-dom";
 import { Wordmark } from "@/components/site/brand";
+import { BrandWipe } from "@/components/site/brand-wipe";
 
 type Theme = "light" | "dark";
 const KEY = "alodi-dash-theme";
@@ -170,6 +171,7 @@ export function DashShell({ children, reviewCount = 116 }: { children: React.Rea
             <div>{children}</div>
           </ViewTransition>
         </main>
+        <BrandWipe />
       </div>
     </div>
   );
