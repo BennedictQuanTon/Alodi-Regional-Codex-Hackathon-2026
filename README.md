@@ -202,7 +202,7 @@ OpenAI keys stay on the server. In live mode, call audio goes to OpenAI.
 | **Implemented, live use needs a key** | GPT Live calls, GPT Transcribe memos and GPT-6.1 Terra extraction |
 | **Working, developer screen** | `/dev/integrated` runs real orders against the backend: a No answer tap opens a case, the 60-minute timer fires and a policy-checked call is issued |
 | **Scripted, mock data** | `/demo` tells the full story with sound and no backend; `/console` and `/metrics` use mock data |
-| **Interface only** | `/live` and `/live/shipper` stay empty until connected to the backend |
+| **Needs the local backend** | `/live?session=<id>` and `/live/shipper?session=<id>` run real calls through `scripts/start-live-sessions.ps1`; they don't work on the deployed website |
 | **Production design, not built** | Decisions API, Agents SDK, Evals gating, gpt-oss-20b, real phone lines, Zalo messages, carrier integration |
 
 This is an unauthenticated demo. It doesn't call real phone numbers and it isn't production-ready. Tests don't measure live speech or extraction accuracy.
@@ -241,9 +241,37 @@ DEMO_CLOCK_SPEED=1
 </details>
 
 <details>
+<summary><b>Live sessions</b></summary>
+
+Each session gets its own backend and SQLite database behind `/api/s/<id>`. The phone owns the call, microphone and sound and connects directly to the AI provider, so it works across networks. The first phone keeps the session; the dashboard only observes, with an optional **Dashboard sound** switch. **Mute** turns the phone's microphone off, and **Restart demo** restores a prepared snapshot in seconds. Delete `alodi.prepared.db` after changing seed or morning-workflow code.
+
+`OPENAI_API_KEY` must be set in `.env`. Calls are paid. On Windows:
+
+```powershell
+# In web: serve the production build
+npm run build
+npm run start -- --hostname 127.0.0.1 --port 3005
+
+# In a second terminal: note the https URL it prints
+cloudflared tunnel --url http://127.0.0.1:3002 --no-autoupdate --protocol http2
+
+# In a third terminal, from the repository root: prints each session's links
+.\scripts\start-live-sessions.ps1 -PublicOrigin <https tunnel URL>
+```
+
+</details>
+
+<details>
+<summary><b>Narrated demo voices</b></summary>
+
+`/tour` plays clips from `web/public/tour`. To change the words, edit `web/src/lib/demo/tour-script.json` and run `api\.venv\Scripts\python.exe scripts\generate-tour-audio.py`. It regenerates only the lines that changed and makes paid OpenAI requests.
+
+</details>
+
+<details>
 <summary><b>Deploy</b></summary>
 
-The website deploys to Vercel with **Root Directory** `web`, framework Next.js and no environment variables. Only the web app is deployed: the demos are scripted, the **Live demo** button points visitors to the stage, and `/dev` pages return 404. On the machine running the live demo, set `NEXT_PUBLIC_LIVE_READY=1` so the button opens `/live`.
+The website deploys to Vercel with **Root Directory** `web`, framework Next.js and no environment variables. Only the web app is deployed: the demos are scripted, `/tour` plays by itself, and `/dev` pages return 404. `/live` needs the session setup below.
 
 </details>
 
@@ -256,7 +284,8 @@ The website deploys to Vercel with **Root Directory** `web`, framework Next.js a
 | `/start` | Choose the live or judges' demo |
 | `/demo` | Scripted stage: shipper app, buyer phone, operations panel |
 | `/demo/shipper`, `/demo/buyer`, `/demo/console` | The same demo, one screen per window |
-| `/live`, `/live/shipper` | Live demo interface |
+| `/tour` | One-screen narrated demo that plays by itself with sound; needs no backend |
+| `/live?session=<id>`, `/live/shipper?session=<id>` | Live demo dashboard and phone for one session |
 | `/console` | Operations dashboard |
 | `/metrics` | Output metrics and savings calculator |
 | `/script` | Demo script |

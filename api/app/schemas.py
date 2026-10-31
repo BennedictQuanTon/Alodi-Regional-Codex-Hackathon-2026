@@ -56,6 +56,8 @@ class OrderDetail(BaseModel):
     rescue_messages: list[dict[str, Any]] = Field(default_factory=list)
     calls: list[dict[str, Any]] = Field(default_factory=list)
     provider_requests: list[dict[str, Any]] = Field(default_factory=list)
+    action_guard: dict[str, Any] = Field(default_factory=dict)
+    reset_job: dict[str, Any] | None = None
 
 
 class MessageView(BaseModel):

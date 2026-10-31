@@ -56,6 +56,9 @@ export function memoForm(audio: Blob, filename: string, binding?: MemoBinding, r
   return data;
 }
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001").replace(/\/$/, "");
+export class ApiError extends Error {
+  constructor(message: string, readonly status: number, readonly code?: string) { super(message); this.name = "ApiError"; }
+}
 
 export function apiUrl(path: string, base = API_URL) {
   if (/^https?:\/\//i.test(path)) return new URL(path).toString();
@@ -83,7 +86,7 @@ export async function request<T>(path: string, init: RequestInit = {}, base = AP
     if (!response.ok) {
       const detail = body?.detail;
       // Backend error messages must be public-safe. Never echo arbitrary HTTP bodies/SDP.
-      throw new Error(typeof detail === "string" ? detail : typeof detail?.message === "string" ? detail.message : `Request failed (${response.status}).`);
+      throw new ApiError(typeof detail === "string" ? detail : typeof detail?.message === "string" ? detail.message : typeof body?.message === "string" ? body.message : `Request failed (${response.status}).`, response.status, typeof body?.code === "string" ? body.code : undefined);
     }
     return body as T;
   } finally {

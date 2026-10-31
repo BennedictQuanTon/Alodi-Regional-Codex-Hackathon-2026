@@ -1,9 +1,11 @@
 """Explicit demo controls. Reset shares the scheduler lock and changes generation."""
 
 from datetime import datetime, timedelta
+from uuid import uuid4
 
 from sqlalchemy import func, select
 
+from app.contracts import ClockChange
 from app.db.models import (
     CallAttempt,
     DemoState,
@@ -14,7 +16,9 @@ from app.db.models import (
     ShipperEvent,
 )
 from app.db.seed import load_seed_pack, seed_database
+from app.db.snapshot import restore_snapshot, save_snapshot
 from app.morning import WorkflowError
+from app.schemas import MorningJobRequest
 
 
 class DemoService:
@@ -210,8 +214,10 @@ class DemoService:
             await self.scheduler.acknowledge_cancellations(body.generation_id)
         return result
 
-    async def reset(self, generation, scenario):
+    async def reset(self, generation, scenario, *, prepare=False, progress=None):
+        progress = progress or (lambda stage, message: None)
         async with self.scheduler.lock:
+            progress("cancelling", "Closing calls and cancelling pending provider and memo jobs.")
             async with self.flow.morning.transaction(generation) as (session, now, log):
                 active_orders = (
                     (
@@ -233,7 +239,62 @@ class DemoService:
             # Includes unacknowledged cancellation from a failed earlier reset.
             await self.scheduler.cancel_generation(generation)
             await self.scheduler.acknowledge_cancellations(generation)
+            self.scheduler.retire_generation(generation)
+            if prepare:
+                progress("restoring", "Restoring the prepared demo state.")
+                restored = str(uuid4())
+                if await restore_snapshot(self.settings, restored):
+                    self.scheduler.activate_generation(restored)
+                    on_reset = getattr(self, "on_generation_reset", None)
+                    if on_reset:
+                        await on_reset(restored)
+                    return {
+                        "status": "reset",
+                        "generation_id": restored,
+                        "scenario": scenario,
+                        "clock": await self.read(),
+                    }
+            progress("seeding", "Creating a new generation of synthetic demo orders.")
             settings = self.settings.model_copy(update={"demo_scenario": scenario})
             pack = load_seed_pack(settings.mock_pack_dir)
             summary = await seed_database(self.database, settings, pack, reset=True)
-            return {"status": "reset", "generation_id": summary.generation_id, "scenario": scenario}
+            self.scheduler.activate_generation(summary.generation_id)
+            on_reset = getattr(self, "on_generation_reset", None)
+            if on_reset:
+                await on_reset(summary.generation_id)
+            result = {
+                "status": "reset",
+                "generation_id": summary.generation_id,
+                "scenario": scenario,
+            }
+            if prepare:
+                day = settings.demo_start.astimezone(settings.timezone).date()
+                morning_at = datetime.combine(day, pack.hub.morning_run, settings.timezone)
+                await self.change_clock(
+                    ClockChange(
+                        generation_id=summary.generation_id,
+                        speed=1,
+                        paused=True,
+                        jump=morning_at.isoformat(),
+                    )
+                )
+                request = MorningJobRequest(generation_id=summary.generation_id)
+                progress("morning_load", "Preparing the normal morning availability workflow.")
+                await self.flow.morning.load(request)
+                progress("dispatching", "Dispatching synthetic morning messages.")
+                await self.flow.morning.dispatch(summary.generation_id)
+                await self.change_clock(
+                    ClockChange(
+                        generation_id=summary.generation_id,
+                        speed=1,
+                        paused=True,
+                        jump=datetime.combine(
+                            day, datetime.min.time().replace(hour=10), settings.timezone
+                        ).isoformat(),
+                    )
+                )
+                progress("route_cutoff", "Closing morning replies and preparing the route.")
+                await self.flow.morning.cutoff(request)
+                await save_snapshot(self.settings)
+                result["clock"] = await self.read()
+            return result

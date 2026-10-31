@@ -1,17 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { PhoneFrame } from "@/components/demo/phone";
 import { useFit } from "@/components/demo/stage";
 import { BrandWipe } from "@/components/site/brand-wipe";
 import { Mark, Wordmark } from "@/components/site/brand";
+import { liveSessionId } from "@/lib/live/session";
 import { AGENT_STEPS, useLiveState, type LiveState, type StepStatus } from "@/lib/live/state";
 
 // Live demo stage. The shipper's screen runs on a real phone (/live/shipper); this screen shows everything that
-// happens around it: the customer's phone, the SPX dashboard and the agent's run.
+// happens around it: the customer's phone, the SPX dashboard and the agent's run. It only plays sound when switched on.
 
 const noSubscribe = () => () => {};
+const pageSearch = () => window.location.search;
+const noValue = () => "";
 const wallClock = () => {
   const d = new Date();
   return d.getHours() * 60 + d.getMinutes();
@@ -31,27 +34,30 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 function CustomerPhone({ state, clock }: { state: LiveState; clock: number }) {
-  const calling = state.call.status !== "idle";
+  const calling = state.started && (state.finishing || state.call.status !== "idle" || ["ended", "error"].includes(state.connection.status));
+  const firstVoice = state.messages.findIndex((message) => message.kind === "voice");
+  const beforeCall = firstVoice < 0 ? state.messages : state.messages.slice(0, firstVoice);
+  const afterCall = firstVoice < 0 ? [] : state.messages.slice(firstVoice);
+  const missed = state.callLog.filter((entry) => entry.status === "missed");
+  const messages = useRef<HTMLDivElement>(null);
+  const transcript = state.messages.map((message) => message.text).join("") + missed.map((entry) => entry.id).join("");
+  useEffect(() => { const viewport = messages.current; if (viewport) viewport.scrollTop = viewport.scrollHeight; }, [transcript]);
   return (
     <PhoneFrame clock={clock}>
       <div className="flex h-full flex-col pt-14">
         <div className="border-b border-[#eee] px-5 pb-3 text-[15px] font-medium">Delivery Assistant</div>
         {calling && (
           <div className="border-b border-[#eee] bg-[#fff1e7] px-5 py-3 text-[14px]">
-            <div className="font-medium">{state.call.status === "ringing" ? "Incoming call" : "On a call with Alodi"}</div>
-            <div className="mt-0.5 ui-muted">{state.call.caption}</div>
+            <div className="font-medium">{state.finishing ? "Saving delivery details…" : state.call.status === "ringing" ? "Incoming call" : state.connection.status === "ended" ? state.card ? "Conversation completed" : "Call ended · reset required" : state.connection.status === "error" ? "Call interrupted" : "On a call with Alodi"}</div>
+            <div className="mt-0.5 ui-muted">{state.finishing ? "Saving your delivery plan. Please wait for confirmation." : state.call.caption}</div>
           </div>
         )}
-        <div className="flex-1 space-y-2 overflow-auto p-4">
-          {state.messages.length ? (
-            state.messages.map((m, i) => (
-              <div key={i} className={`max-w-[80%] rounded-[18px] px-3.5 py-2 text-[14px] ${m.from === "buyer" ? "ml-auto bg-[var(--ui-ink)] text-white" : "bg-[#f1f1f1]"}`}>
-                {m.text}
-              </div>
-            ))
-          ) : (
-            <div className="flex h-full items-center justify-center text-[14px] ui-muted">No messages yet.</div>
-          )}
+        <div ref={messages} className="flex-1 space-y-2 overflow-auto p-4" role="log" aria-label="Actual buyer conversation" aria-live="polite">
+          {state.started && <>
+            {beforeCall.map((message, index) => <div key={`before:${index}`} className={`max-w-[80%] rounded-[18px] px-3.5 py-2 text-[14px] ${message.from === "buyer" ? "ml-auto bg-[var(--ui-ink)] text-white" : "bg-[#f1f1f1]"}`}>{message.text}</div>)}
+            {missed.map((entry) => <div key={entry.id} className="flex max-w-[80%] items-center gap-2 rounded-[18px] bg-[#f1f1f1] px-3.5 py-2 text-[14px]" aria-label="Missed call log"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="shrink-0 text-[#f05a00]" role="img" aria-label="Missed call"><path d="M5 15c4-4 10-4 14 0l-2 4-4-1v-3h-2v3l-4 1-2-4Z" /><path d="m8 4 8 5m0-5v5h-5" /></svg><div><div>{entry.text || "Missed call"}</div><time dateTime={entry.at} className="text-[12px] ui-muted">{new Date(entry.at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</time></div></div>)}
+            {afterCall.map((message, index) => <div key={`after:${index}`} className={`max-w-[80%] rounded-[18px] px-3.5 py-2 text-[14px] ${message.from === "buyer" ? "ml-auto bg-[var(--ui-ink)] text-white" : "bg-[#f1f1f1]"}`}>{message.text}</div>)}
+          </>}
         </div>
       </div>
     </PhoneFrame>
@@ -73,8 +79,8 @@ function AgentRun({ state }: { state: LiveState }) {
         <Mark kind="wave" size={18} className="text-[#f05a00]" />
         Agent run
       </div>
-      <div className="mt-1 text-[13px] ui-muted">{running ? running.label : "Waiting for the shipper’s tap"}</div>
-      <ol className="mt-4 flex-1">
+      <div className="mt-1 text-[13px] ui-muted">{state.finishing ? "Saving delivery details · please wait" : running ? running.label : state.card ? "Delivery context saved" : state.error ? "Restart this demo to retry" : state.message || "Waiting for the shipper’s tap"}</div>
+      <ol className="mt-4 flex-1 overflow-auto">
         {AGENT_STEPS.map((s, i) => {
           const st = state.steps[s.id];
           return (
@@ -92,6 +98,7 @@ function AgentRun({ state }: { state: LiveState }) {
           );
         })}
       </ol>
+      {(state.result || state.proposal || state.error) && <details className="border-t border-[#eee] py-2 text-[12.5px] ui-muted"><summary>Actual result and next action</summary><p className="mt-2">{state.error || state.message}</p><pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-words font-sans">{JSON.stringify({ result: state.result, proposal: state.proposal, saved_context: state.context }, null, 2)}</pre></details>}
       <div className="grid grid-cols-3 gap-2 border-t border-[#eee] pt-3">
         {(["when", "where", "who"] as const).map((k) => (
           <div key={k}>
@@ -110,8 +117,10 @@ const DASH_H = 1052;
 const DASH_SCALE = 0.669;
 
 export function LiveStage() {
-  const { state } = useLiveState();
+  const { state, reset, refresh, setDashboardSound } = useLiveState("display");
   const clock = useSyncExternalStore(noSubscribe, wallClock, () => 0);
+  const session = liveSessionId(useSyncExternalStore(noSubscribe, pageSearch, noValue));
+  const scoped = (path: string) => session ? `${path}?session=${session}` : path;
   const BASE_W = 1760;
   const BASE_H = 790;
   const { ref, scale } = useFit(BASE_W, BASE_H);
@@ -123,22 +132,22 @@ export function LiveStage() {
           <Link href="/" aria-label="Alodi home">
             <Wordmark className="text-[24px]" />
           </Link>
-          <span className="ui-badge ui-badge-outline">Live</span>
+          <span className="ui-badge ui-badge-outline">{state.mode === "live" ? "Live model" : state.mode ? `${state.mode} provider` : "Live"}</span>
         </div>
         <div className="flex items-center gap-2">
           <Pill on={state.shipperOnline}>{state.shipperOnline ? "Shipper phone synced" : "Waiting for shipper phone"}</Pill>
           <Pill on={state.connected}>{state.connected ? "Backend connected" : "Backend not connected"}</Pill>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/live/shipper" target="_blank" className="ui-btn ui-btn-ghost">
-            Shipper screen
-          </Link>
+          <button className={`ui-btn ${state.connection.dashboardSound ? "ui-btn-primary" : "ui-btn-outline"}`} aria-pressed={!!state.connection.dashboardSound} onClick={() => void setDashboardSound(!state.connection.dashboardSound)}>Dashboard sound: {state.connection.dashboardSound ? "On" : "Off"}</button>
+          <button className="ui-btn ui-btn-ghost" disabled={state.resetting || !state.generation} onClick={() => { if (window.confirm("Restart this demo from the beginning?")) void reset(); }}>{state.resetting ? "Restarting…" : "Restart demo"}</button>
           <Link href="/start" className="ui-btn ui-btn-outline">
             Switch demo
           </Link>
         </div>
       </header>
 
+      {(state.error || state.resetting) && <div className="flex items-center justify-center gap-3 text-[13px] ui-muted" role={state.error ? "alert" : "status"}>{state.resetting ? `Restarting this session · ${state.resetStage || "preparing"}` : state.error}<button className="ui-btn ui-btn-ghost" onClick={() => void refresh()}>Refresh</button></div>}
       <div ref={ref} className="relative flex-1 overflow-hidden">
         <div
           className="absolute left-1/2 top-1/2 flex items-stretch gap-6 px-6"
@@ -152,7 +161,7 @@ export function LiveStage() {
             <Label>SPX dashboard</Label>
             <div className="ui-card h-[704px] overflow-hidden p-0">
               <iframe
-                src="/console"
+                src={scoped("/console")}
                 title="SPX hub dashboard"
                 className="origin-top-left border-0"
                 style={{ width: DASH_W, height: DASH_H, transform: `scale(${DASH_SCALE})` }}

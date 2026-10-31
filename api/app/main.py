@@ -2,6 +2,7 @@
 
 from contextlib import asynccontextmanager
 from datetime import date as Date
+from datetime import timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query, Request
@@ -10,8 +11,10 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import func, select, text
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.action_guard import action_guard
 from app.clock import BusinessClock
 from app.contracts import RescueReply
+from app.dashboard import dashboard_router
 from app.db.migrate import upgrade_database
 from app.db.models import (
     AvailabilityReply,
@@ -34,6 +37,8 @@ from app.demo import DemoService
 from app.morning import MorningService, WorkflowError, window_note
 from app.part2 import Part2Adapter
 from app.rescue_routes import rescue_router
+from app.reset_jobs import ResetJobs
+from app.route_a import RouteARoom, route_a_router
 from app.scheduler import Scheduler
 from app.schemas import (
     AuditView,
@@ -112,14 +117,22 @@ def create_app(
                 part2_adapter.bind(app.state.workflow)
             app.state.scheduler = Scheduler(app.state.workflow, part2_adapter)
             app.state.demo = DemoService(app.state.scheduler)
+            app.state.reset_jobs = ResetJobs(app.state.demo)
             async with database.sessions.begin() as session:
                 state = await session.get(DemoState, 1)
                 if state:
+                    if ai_runtime is not None:
+                        ai_runtime.observations.activate(state.generation_id)
                     # Environment switches initialize each process; controls may change
                     # them during the demo. Existing business time and speed are retained.
                     state.auto_buyer = settings.auto_buyer
                     state.offline_mode = settings.offline_mode
                     app.state.morning.clock.now(state)
+            if settings.app_env == "demo":
+                app.state.route_a = RouteARoom(
+                    app.state.demo, ai_runtime, app.state.reset_jobs
+                )
+                await app.state.route_a.initialize()
             if settings.app_env == "demo" and (
                 start_scheduler is True or (start_scheduler is None and clock is None)
             ):
@@ -127,6 +140,9 @@ def create_app(
             try:
                 yield
             finally:
+                if hasattr(app.state, "route_a"):
+                    await app.state.route_a.shutdown()
+                await app.state.reset_jobs.shutdown()
                 await app.state.scheduler.stop()
                 if ai_runtime is not None:
                     await ai_runtime.shutdown()
@@ -136,8 +152,33 @@ def create_app(
     app = FastAPI(title="Alodi local API", version="0.1.0", lifespan=lifespan)
     app.state.settings = settings
     app.state.ai_runtime = ai_runtime
+
+    @app.middleware("http")
+    async def reset_guard(request: Request, call_next):
+        jobs = getattr(request.app.state, "reset_jobs", None)
+        ending_call = request.url.path.startswith("/ai/calls/") and request.url.path.endswith(
+            "/end"
+        )
+        if (
+            jobs
+            and jobs.running
+            and request.method == "POST"
+            and request.url.path != "/demo/workflow-reset"
+            and not ending_call
+        ):
+            return JSONResponse(
+                status_code=409,
+                content={
+                    "code": "reset_in_progress",
+                    "detail": "Wait for this session's workflow reset.",
+                },
+            )
+        return await call_next(request)
+
     app.include_router(workflow_router())
     app.include_router(rescue_router(fixture_memo=part2_router is None))
+    app.include_router(route_a_router())
+    app.include_router(dashboard_router())
     if part2_router is not None:
         app.include_router(part2_router)
 
@@ -311,11 +352,23 @@ def create_app(
                     .order_by(ProviderRequest.created_at)
                 )
             ).all()
+            state = await session.get(DemoState, 1)
+            now = request.app.state.morning.clock.now(state)
+            jobs = request.app.state.reset_jobs
+            guard = action_guard(order, rescue_cases, now, settings)
+            if jobs.running:
+                guard.update(
+                    can_tap=False,
+                    reason="Workflow reset is in progress.",
+                    next_action="Wait for the reset to finish.",
+                )
             return OrderDetail(
                 order=order_view(order),
                 context=order.context,
                 pending_event=order.context.get("pending_event"),
                 context_card=order.context.get("card"),
+                action_guard=guard,
+                reset_job=jobs.get(jobs.active) if jobs.running else None,
                 calls=[
                     {
                         "id": call.id,
@@ -327,6 +380,11 @@ def create_app(
                         "recording_consent": call.recording_consent,
                         "duration_s": call.duration_s,
                         "requested_at": call.requested_at.astimezone(settings.timezone).isoformat(),
+                        "answer_deadline_at": (
+                            call.requested_real_at + timedelta(seconds=30)
+                        ).isoformat()
+                        if call.status == "requested"
+                        else None,
                         "provider_session_id": call.id
                         if ai_runtime and call.id in ai_runtime.calls
                         else None,

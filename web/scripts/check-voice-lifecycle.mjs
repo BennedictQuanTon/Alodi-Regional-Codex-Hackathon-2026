@@ -160,6 +160,12 @@ function fixture(overrides = {}) {
   assert.equal(env.track.enabled, false, "browser drain must wait for provider unmute acknowledgement via server");
   socket.message({ ...turn, input_allowed: true, playback_revision: 1 });
   assert.equal(env.track.enabled, true, "matching server permission after drain enables listening");
+  controller.suppressInputUntilAllowed();
+  assert.equal(env.track.enabled, false, "a Route A closed-gate request disables the actual provider input track");
+  socket.message({ ...turn, input_allowed: true, playback_revision: 1 });
+  assert.equal(env.track.enabled, false, "a stale grant on the separate voice socket cannot release the Route A hold");
+  controller.releaseInputSuppression();
+  assert.equal(env.track.enabled, true, "a correlated route release still requires the existing measured playback gate");
   env.frame(7600, 0.1);
   assert.equal(env.track.enabled, false, "late resumed speech immediately re-mutes mic");
   socket.message({ ...turn, input_allowed: true, playback_revision: 1 });

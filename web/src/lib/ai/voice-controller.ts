@@ -14,11 +14,22 @@ export type VoiceState = {
   level: number;
   seconds: number;
   needsPlayback: boolean;
+  /** The caller's own choice. Their microphone stays off whatever the call would allow. */
+  muted: boolean;
   activity: "waiting" | "speaking" | "listening" | "processing" | "notes";
   diagnostics: { microphone: "off" | "permission" | "on"; socket: string; peer: string; dataChannel: string; sampleRate?: number; framesSent: number };
 };
 
-const initialState = (): VoiceState => ({ status: "idle", captions: [], level: 0, seconds: 0, needsPlayback: false, activity: "waiting", diagnostics: { microphone: "off", socket: "closed", peer: "closed", dataChannel: "closed", framesSent: 0 } });
+const initialState = (): VoiceState => ({ status: "idle", captions: [], level: 0, seconds: 0, needsPlayback: false, muted: false, activity: "waiting", diagnostics: { microphone: "off", socket: "closed", peer: "closed", dataChannel: "closed", framesSent: 0 } });
+
+export type VoiceControllerOptions = {
+  /** A supplied remote stream is mandatory when set; never fall back to a local microphone. */
+  inputStream?: () => Promise<MediaStream>;
+  ownsInputStream?: boolean;
+  /** Gesture-unlocked display output. Its owner closes the context on disposal. */
+  playback?: { context: AudioContext; audio: HTMLAudioElement };
+  onOutputStream?: (stream: MediaStream) => void;
+};
 
 /** Browser transport only. The backend owns transcripts, decisions, and persistence. */
 export class VoiceController {
@@ -49,14 +60,20 @@ export class VoiceController {
   private generation = 0;
   private ready = false;
   private serverReady = false;
+  private externalInputSuppressed = false;
   private issuedSocketPath?: string;
   private pagehide = () => { void this.end("navigation"); };
 
-  constructor(readonly config: AiConfig, readonly base = API_URL) {
+  constructor(readonly config: AiConfig, readonly base = API_URL, private options: VoiceControllerOptions = {}) {
     window.addEventListener("pagehide", this.pagehide);
   }
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
   snapshot = () => this.state;
+  /** Route A local gate: hold the forwarded track closed until a valid server grant. */
+  suppressInputUntilAllowed() { this.externalInputSuppressed = true; this.updateInput(); }
+  releaseInputSuppression() { this.externalInputSuppressed = false; this.updateInput(); }
+  /** Disabling the track means no audio leaves this device, so the provider hears nothing. */
+  setMuted(muted: boolean) { if (this.state.muted !== muted) { this.patch({ muted }); this.updateInput(); } }
   private patch(patch: Partial<VoiceState>) { this.state = { ...this.state, ...patch }; this.listeners.forEach((listener) => listener()); }
   private diagnostic(patch: Partial<VoiceState["diagnostics"]>) { this.patch({ diagnostics: { ...this.state.diagnostics, ...patch } }); }
   private send(value: unknown) { if (this.socket?.readyState === WebSocket.OPEN) this.socket.send(JSON.stringify(value)); }
@@ -109,11 +126,11 @@ export class VoiceController {
     try {
       if (this.config.mode === "live") {
         if (this.config.voice_provider !== "gpt_live" || this.config.transport !== "webrtc") throw new Error("This voice lab requires GPT Live over WebRTC.");
-        if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) throw new Error("Microphone access needs HTTPS or localhost and a supported browser.");
-        this.context = new AudioContext();
-        await this.context.resume();
+        if (!this.options.inputStream && (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia)) throw new Error("Microphone access needs HTTPS or localhost and a supported browser.");
+        this.context = this.options.playback?.context || new AudioContext();
+        await this.settledResume(this.context);
         if (!this.current(generation)) return;
-        this.audio = new Audio();
+        this.audio = this.options.playback?.audio || new Audio();
         this.audio.autoplay = true;
         this.audio.onerror = () => { if (this.current(generation)) this.fail(new Error("Call audio failed. End the call and try again.")); };
         this.outputDeadline = setInterval(() => {
@@ -167,11 +184,12 @@ export class VoiceController {
   }
 
   private updateInput() {
-    const allowed = this.config.mode === "live" && this.state.status === "connected" && this.ready && this.serverReady && this.playback.inputAllowed && !this.state.needsPlayback && this.context?.state === "running";
+    const permitted = !this.externalInputSuppressed && this.config.mode === "live" && this.state.status === "connected" && this.ready && this.serverReady && this.playback.inputAllowed && !this.state.needsPlayback && this.context?.state === "running";
+    const allowed = permitted && !this.state.muted;
     this.stream?.getAudioTracks().forEach((track) => { track.enabled = allowed; });
     if (!allowed && this.userActive) this.reportUserActivity(false);
-    const activity = allowed ? this.playback.turn?.phase === "notes" ? "notes" : "listening" : this.playback.heard && !this.playback.drained ? "speaking" : this.playback.drained ? "processing" : "waiting";
-    const message = this.config.mode === "stub" ? "Stub simulation · typed turns, no microphone or provider traffic" : this.state.needsPlayback ? "Audio is blocked. Enable call audio to continue; your microphone is off." : activity === "notes" ? "Listening for optional notes. Say no more, or stay silent for 8 seconds to finish." : activity === "listening" ? "Listening · you can speak now." : activity === "speaking" ? "Alodi is speaking. Please wait; your microphone is off." : activity === "processing" ? "Processing your response. Please wait; your microphone is off." : "Waiting for Alodi's audio. Your microphone is off.";
+    const activity = permitted ? this.playback.turn?.phase === "notes" ? "notes" : "listening" : this.playback.heard && !this.playback.drained ? "speaking" : this.playback.drained ? "processing" : "waiting";
+    const message = this.config.mode === "stub" ? "Stub simulation · typed turns, no microphone or provider traffic" : this.state.needsPlayback ? "Audio is blocked. Enable call audio to continue; your microphone is off." : this.state.muted ? "Muted. Alodi can't hear you." : activity === "notes" ? "Listening for optional notes. Say no more, or stay silent for 8 seconds to finish." : activity === "listening" ? "Listening · you can speak now." : activity === "speaking" ? "Alodi is speaking. Please wait; your microphone is off." : activity === "processing" ? "Processing your response. Please wait; your microphone is off." : "Waiting for Alodi's audio. Your microphone is off.";
     const startedListening = allowed && this.state.diagnostics.microphone !== "on";
     if (this.state.activity !== activity || this.state.message !== message || this.state.diagnostics.microphone !== (allowed ? "on" : "off")) this.patch({ activity, message, ...(startedListening ? { notice: undefined } : {}), diagnostics: { ...this.state.diagnostics, microphone: allowed ? "on" : "off" } });
   }
@@ -263,10 +281,11 @@ export class VoiceController {
   }
 
   private async microphone(generation: number) {
-    this.diagnostic({ microphone: "permission" });
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 }, video: false });
+    if (!this.options.inputStream) this.diagnostic({ microphone: "permission" });
+    const stream = this.options.inputStream ? await this.options.inputStream() : await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 }, video: false });
+    if (!stream.getAudioTracks().length || stream.getAudioTracks().some((track) => track.readyState === "ended")) throw new Error("The supplied microphone stream is unavailable. Answer again on the phone.");
     stream.getAudioTracks().forEach((track) => { track.enabled = false; });
-    if (!this.current(generation)) { stream.getTracks().forEach((track) => track.stop()); throw new DOMException("Cancelled", "AbortError"); }
+    if (!this.current(generation)) { if (this.options.ownsInputStream !== false) stream.getTracks().forEach((track) => track.stop()); throw new DOMException("Cancelled", "AbortError"); }
     this.stream = stream;
     return stream;
   }
@@ -293,6 +312,7 @@ export class VoiceController {
       if (!this.current(generation) || this.peer !== peer || !this.audio) return;
       const remote = event.streams[0] || new MediaStream([event.track]);
       this.audio.srcObject = remote;
+      this.options.onOutputStream?.(remote);
       this.startRemoteMeter(remote, generation);
       void this.playAudio();
     };
@@ -358,6 +378,11 @@ export class VoiceController {
     this.remoteFrame = requestAnimationFrame(measure);
   }
 
+  /** Safari can leave resume() pending indefinitely; the state check decides what happens next. */
+  private settledResume(context: AudioContext) {
+    return Promise.race([context.resume(), new Promise<void>((resolve) => { setTimeout(resolve, 2000); })]);
+  }
+
   async playAudio() {
     if (this.awaitingReplay) return;
     const generation = this.generation;
@@ -365,9 +390,11 @@ export class VoiceController {
     const context = this.context;
     const wasBlocked = this.state.needsPlayback;
     try {
-      await context?.resume();
+      if (context) await this.settledResume(context);
       if (audio?.srcObject) await audio.play();
       if (!this.current(generation) || audio !== this.audio) return;
+      // The microphone gate needs a running context, so a stuck one must offer the audio button.
+      if (context && context.state !== "running") throw new Error("Call audio is not running.");
       // A live stream cannot rewind lost speech. The server repeats the entire prompt
       // under a fresh turn before the local input gate can open.
       this.awaitingReplay = wasBlocked;
@@ -437,7 +464,7 @@ export class VoiceController {
     if (this.meterFrame !== undefined) cancelAnimationFrame(this.meterFrame);
     if (this.remoteFrame !== undefined) cancelAnimationFrame(this.remoteFrame);
     this.meterFrame = this.remoteFrame = undefined;
-    this.stream?.getTracks().forEach((track) => { track.enabled = false; track.stop(); });
+    this.stream?.getTracks().forEach((track) => { track.enabled = false; if (this.options.ownsInputStream !== false) track.stop(); });
     this.stream = undefined;
     this.source?.disconnect();
     this.source = undefined;
@@ -447,16 +474,17 @@ export class VoiceController {
     this.lastPlaybackReport = undefined;
     this.awaitingReplay = false;
     this.userActive = false;
+    this.externalInputSuppressed = false;
     if (this.audio) { this.audio.onerror = null; this.audio.pause(); this.audio.srcObject = null; }
     this.audio = undefined;
-    void this.context?.close().catch(() => {});
+    if (!this.options.playback) void this.context?.close().catch(() => {});
     this.context = undefined;
     const peer = this.peer;
     this.peer = undefined;
     this.channel?.close();
     this.channel = undefined;
     if (peer) { peer.ontrack = null; peer.onconnectionstatechange = null; peer.close(); }
-    this.patch({ level: 0, needsPlayback: false, diagnostics: { ...this.state.diagnostics, microphone: "off", peer: "closed", dataChannel: "closed" } });
+    this.patch({ level: 0, needsPlayback: false, muted: false, diagnostics: { ...this.state.diagnostics, microphone: "off", peer: "closed", dataChannel: "closed" } });
   }
   dispose() { window.removeEventListener("pagehide", this.pagehide); void this.end("unmount", false); this.listeners.clear(); }
 }
