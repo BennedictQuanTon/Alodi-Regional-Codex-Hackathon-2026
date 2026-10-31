@@ -142,7 +142,7 @@ function ArchitectureDiagram() {
               {[
                 ["Ask for a window", "tool", "Before delivery, ≥2 options"],
                 ["Send chat", "tool", "Branch A · Shopee chat, Zalo"],
-                ["AI call", "tool", "Max 2 calls · ASR ↔ TTS"],
+                ["AI call", "tool", "Max 2 calls · GPT Live speech"],
                 ["Extract", "tool", "JSON schema + confidence"],
                 ["Policy guard", "rule", "Quiet hours, caps · human approval"],
               ].map(([t, kind, d], i) => (
@@ -186,8 +186,8 @@ function ArchitectureDiagram() {
           cols="sm:grid-cols-2 xl:grid-cols-4"
           items={[
             { t: "Model gateway", tech: "OpenAI API", d: "Structured Outputs; on-prem LLM later" },
-            { t: "ASR", tech: "AssemblyAI", d: "Streaming Vietnamese; PhoWhisper later" },
-            { t: "Vietnamese TTS", tech: "OpenAI TTS", d: "Pre-recorded + dynamic phrases" },
+            { t: "Vietnamese calls", tech: "GPT Live", d: "WebRTC speech after a fixed disclosure" },
+            { t: "Voice memo transcription", tech: "GPT Transcribe", d: "Vietnamese memo audio to text" },
             { t: "PII redactor", tech: "Guardrails", d: "Masks phones and addresses before cloud" },
           ]}
         />

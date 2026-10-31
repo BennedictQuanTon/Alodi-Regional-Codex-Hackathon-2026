@@ -257,9 +257,10 @@ export const TECH_DEMO: Tech[] = [
   { name: "Motion", note: "Transitions", icon: "siFramer" },
   { name: "FastAPI", note: "Agent API", icon: "siFastapi" },
   { name: "SQLite", note: "Demo state", icon: "siSqlite" },
-  { name: "OpenAI", note: "Structured Outputs · Realtime", icon: "siOpenai" },
+  { name: "OpenAI", note: "Structured Outputs", icon: "siOpenai" },
+  { name: "GPT Live", note: "Vietnamese calls · WebRTC", icon: "siOpenai" },
   { name: "Codex", note: "Eval loop", icon: "siOpenai" },
-  { name: "AssemblyAI", note: "Vietnamese ASR", icon: "/logos/assemblyai-mark.svg" },
+  { name: "GPT Transcribe", note: "Vietnamese voice memos", icon: "siOpenai" },
   { name: "LangGraph", note: "State machine", icon: "siLanggraph" },
   { name: "Docker", note: "Compose, one VM", icon: "siDocker" },
 ];
@@ -401,7 +402,7 @@ export const SOURCE_LOGOS = [
 export const FAQ = [
   {
     q: "Does the demo call real phone numbers?",
-    a: "No. The AI call runs in the browser. In production it uses a branded call line: fixed phrases are pre-recorded, dynamic parts use TTS, and calls stay under about 90 seconds.",
+    a: "No. The voice lab runs in the browser: a fixed disclosure plays first, then GPT Live handles Vietnamese speech within the configured call limit. A branded phone line is a production integration.",
   },
   {
     q: "Why doesn’t the agent label “suspected bomb” orders itself?",

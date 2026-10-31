@@ -9,3 +9,7 @@ __pycache__/
 # duplicates of prep/02-technical/diagrams/
 /alodi-architecture.pdf
 /alodi-flow.pdf
+# Local credentials and generated runtime data
+/.env
+/ai/.venv/
+/data/
