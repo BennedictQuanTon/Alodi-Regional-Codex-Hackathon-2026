@@ -6,9 +6,10 @@ import { Chevron, LogoLink } from "@/components/site/brand";
 
 const LINKS = [
   { href: "#problem", label: "Problem" },
-  { href: "#approach", label: "Approach" },
+  { href: "#product", label: "Architecture" },
   { href: "#how-it-works", label: "Product" },
-  { href: "#competitors", label: "Competitors" },
+  { href: "#tech", label: "Stack" },
+  { href: "#codex", label: "Codex" },
   { href: "#team", label: "Team" },
 ];
 

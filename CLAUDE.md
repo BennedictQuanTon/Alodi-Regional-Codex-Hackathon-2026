@@ -18,7 +18,7 @@ All UI copy, docs and the demo script are in **English**.
 
 - Landing: **Source Serif 4** (weight 400, never bold) for headings and big numbers, **Geist Mono** for body, nav, buttons and labels, **Geist** for long card copy. Follows `DESIGN.md` / monad.com.
 - Demo (`/demo/*`): **Geist** only, following `Component_demo and UI for application.md` (shadcn-style: 24px cards, 18px pills, hairlines, minimal copy), with Alodi navy + orange instead of black + red.
-- Dashboard (`/console`, `/metrics`): **Playfair Display** (italic for page and card titles) + **Source Sans 3**, following `Dashboard_Desig.md`, with Alodi colours, light and dark mode.
+- Dashboard (`/console`, `/metrics`): **Geist** only, in the demo UI language (white cards on a neutral canvas, hairlines, navy + one orange action), laid out like an SPX hub operations screen: KPI strip, rescue pipeline by business step, policy guard, exception queue, routes, CS queue. Figures come from `prep/02-technical/mock-data` via `export_dashboard.py`. Light and dark mode.
 - Wordmark and taglines: **Be Vietnam Pro** (ExtraBold for the logo, Medium for taglines), per `prep/04-brand/source/alodi-brand-sheet.png`.
 
 ## Colour

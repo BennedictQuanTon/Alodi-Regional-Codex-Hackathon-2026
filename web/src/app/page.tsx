@@ -1,4 +1,5 @@
 import { Approach } from "@/components/landing/approach";
+import { CodexEcosystem } from "@/components/landing/codex";
 import { ClosingCta, Competitors, Faq, Footer, Roadmap, Sources } from "@/components/landing/closing";
 import { Hero, SourceStrip } from "@/components/landing/hero";
 import { ScrollProgress, SmoothScroll } from "@/components/landing/motion";
@@ -26,6 +27,7 @@ export default function Home() {
         <Features />
         <Outcomes />
         <Stack />
+        <CodexEcosystem />
         <Roadmap />
         <Competitors />
         <Team />

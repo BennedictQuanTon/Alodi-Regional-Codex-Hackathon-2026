@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { BOM_RATES, GMV, LOSS_MODEL } from "@/lib/content";
+import { AREA_DAY, BOM_RATES, GMV, LOSS_MODEL } from "@/lib/content";
 import { useGrow } from "./motion";
 
 const C1 = "var(--chart-1)";
 const FONT = { fontFamily: "var(--font-mono)" };
 const C2 = "var(--chart-2)";
 const C3 = "var(--chart-3)";
+const C4 = "var(--color-sky)";
 const GRID = "var(--color-ash-soft)";
 const AXIS = "var(--color-smoke)";
 
@@ -97,39 +98,41 @@ export function BomRateChart() {
   );
 }
 
-// 2 · A day at a 10,000-order depot
+// 2 · A day in one area (20 couriers, 4,000 orders)
 export function DepotDayChart() {
   const { ref, p } = useGrow();
   const W = 560;
   const H = 210;
   const full = W;
-  const failW = full * 0.08 * 6; // the 800-order bar is magnified for legibility (noted below)
+  const failW = full * 0.08 * 6; // the failed-order bar is magnified for legibility (noted below)
+  const { orders, failed, rescued, returned } = AREA_DAY;
+  const n = (v: number) => v.toLocaleString("en-US");
   return (
-    <svg ref={ref} viewBox={`0 0 ${W} ${H}`} className="w-full" style={FONT} role="img" aria-label="10,000 orders, 800 failed, 200 rescued and 600 returned">
+    <svg ref={ref} viewBox={`0 0 ${W} ${H}`} className="w-full" style={FONT} role="img" aria-label={`${n(orders)} orders, ${failed} failed, ${rescued} rescued and ${returned} returned`}>
       <text x={0} y={14} fontSize="12" fill={AXIS}>
-        10,000 deliveries in a day
+        {n(orders)} deliveries in a day
       </text>
       <rect x={0} y={24} width={full * p} height={20} rx={4} fill="var(--color-navy-mist)" />
       <rect x={full * 0.92} y={24} width={full * 0.08 * p} height={20} fill={C1} />
       <text x={full * 0.92 - 8} y={62} fontSize="11" fill={AXIS} textAnchor="end">
-        800 fail first time (8%)
+        {failed} fail first time (8%)
       </text>
 
       <path d={`M${full * 0.92},46 L0,92 M${full},46 L${failW},92`} stroke="var(--color-ash)" fill="none" />
 
       <text x={0} y={86} fontSize="12" fill={AXIS}>
-        Of the 800 failed orders
+        Of the {failed} failed orders
       </text>
       <path d={barPath(0, 96, failW * 0.25 * p - 1, 34)} fill={C2} />
       <path d={barPath(failW * 0.25 * p + 1, 96, failW * 0.75 * p - 1, 34)} fill={C1} />
       <text x={10} y={118} fontSize="13" fill="var(--color-parchment)" opacity={p}>
-        200
+        {rescued}
       </text>
       <text x={failW * 0.25 + 12} y={118} fontSize="13" fill="var(--color-ink)" opacity={p}>
-        600 returned
+        {returned} returned
       </text>
       <text x={0} y={156} fontSize="11" fill="var(--color-graphite)">
-        200 delivered on a later attempt (baseline ~25%, industry average per Shipsy)
+        {rescued} delivered on a later attempt (baseline ~25%, industry average per Shipsy)
       </text>
       <text x={0} y={178} fontSize="11" fill="var(--color-orange-deep)">
         Alodi targets the orange part: turn returns into deliveries
@@ -141,7 +144,7 @@ export function DepotDayChart() {
   );
 }
 
-// 3 · Daily loss per depot (million VND)
+// 3 · Monthly loss per area (million VND)
 export function LossChart() {
   const { ref, p } = useGrow();
   const [tip, setTip] = useState<Tip>(null);
@@ -149,13 +152,13 @@ export function LossChart() {
   const L = 52;
   const R = 56;
   const H = 170;
-  const max = 50;
+  const { max, ticks } = LOSS_MODEL;
   const x = (v: number) => (v / max) * (W - L - R);
-  const colors = [C1, C2, C3];
+  const colors = [C1, C2, C3, C4];
   return (
     <div className="relative">
-      <svg ref={ref} viewBox={`0 0 ${W} ${H}`} className="w-full" style={FONT} role="img" aria-label="Daily loss per depot, low 37.2 and high 45.6 million dong">
-        {[0, 10, 20, 30, 40, 50].map((t) => (
+      <svg ref={ref} viewBox={`0 0 ${W} ${H}`} className="w-full" style={FONT} role="img" aria-label="Monthly loss per area, low 447 and high 499 million dong">
+        {ticks.map((t) => (
           <g key={t}>
             <line x1={L + x(t)} x2={L + x(t)} y1={8} y2={H - 26} stroke={GRID} />
             <text x={L + x(t)} y={H - 8} fontSize="11" fill={AXIS} textAnchor="middle">

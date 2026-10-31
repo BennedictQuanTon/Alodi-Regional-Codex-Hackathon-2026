@@ -116,11 +116,22 @@ export const HERO_STATS = [
     source: "Shopee Help Center, article 79559",
   },
   {
-    value: "₫31–46M",
+    value: "₫473M",
     tag: "Modelled",
-    text: "lost per day at a 10,000-order depot; the sourced share alone is ≈ 31M VND",
-    source: "Team model from Shopee fees, GHN courier pay, Shipsy benchmarks",
+    text: "lost every month in one area of 20 couriers and 4,000 orders a day; ≈ ₫5.7B a year",
+    source: "Team cost model (PRD §18.8) from Shopee fees, GHN courier pay, Shipsy benchmarks",
   },
+];
+
+/** One area: 20 couriers, 4,000 orders a day, 8% failed first time, 25% rescued today. */
+export const AREA_DAY = { orders: 4000, failed: 320, rescued: 80, returned: 240 };
+
+/** Projected, best-in-class rescue (Shipsy vendor range). PRD §18.8.5. */
+export const SAVINGS = [
+  { value: "₫194M", text: "net saving a month, after running costs", note: "Projected" },
+  { value: "41%", text: "of the monthly loss cut; ≈ ₫2.3B a year", note: "Projected" },
+  { value: "₫21M", text: "running cost a month, 4.4% of the loss", note: "Estimate" },
+  { value: "~2 wks", text: "for the ₫75–98M area server to pay back", note: "Projected" },
 ];
 
 export const BOM_RATES = [
@@ -130,12 +141,15 @@ export const BOM_RATES = [
   { label: "Sale season", from: 25, to: 30, note: "Tran Anh Tung" },
 ];
 
+/** Monthly loss for one area, million VND (PRD §18.8.1). */
 export const LOSS_MODEL = {
+  max: 500,
+  ticks: [0, 100, 200, 300, 400, 500],
   rows: [
-    { label: "Low", segs: [24, 7.2, 6], total: 37.2 },
-    { label: "High", segs: [24, 9.6, 12], total: 45.6 },
+    { label: "Low", segs: [288, 86.4, 27.4, 44.8], total: 447 },
+    { label: "High", segs: [288, 115.2, 51.3, 44.8], total: 499 },
   ],
-  legend: ["Return fees 600 × 40K = 24M", "Redelivery 7.2–9.6M", "Hub / CS 6–12M (estimate)"],
+  legend: ["Return fees 288M", "Redelivery pay 86–115M", "Courier door time 27–51M", "CS call-backs 45M (estimate)"],
 };
 
 export const GMV = [
@@ -230,7 +244,7 @@ export const OUTPUT_METRICS = [
     targetNote: "goal after the Codex loop, vs. baseline v0",
   },
   {
-    problem: "Scale beyond people (≈13 callers per depot)",
+    problem: "Scale beyond people (≈ 5 full-time callers per area)",
     metric: "Safe autonomy",
     how: "% of cases handled alone, error rate inside that group, zero high-stakes actions without approval, zero calls outside hours.",
     kind: "Measured",
@@ -238,45 +252,48 @@ export const OUTPUT_METRICS = [
     targetNote: "quiet hours and autonomy boundary",
   },
   {
-    problem: "40,000 VND per order, 31–46M VND per depot per day",
+    problem: "40,000 VND per order, ₫473M per area per month",
     metric: "Money",
-    how: "Return fees avoided plus CS hours saved, against agent cost per case.",
+    how: "Return fees, redelivery pay, courier door time and CS calls avoided, minus the ₫21M monthly running cost.",
     kind: "Projected",
-    target: "VND/case",
-    targetNote: "agent cost measured, extra rescue rate assumed",
+    target: "₫194M",
+    targetNote: "net a month at best-in-class rescue (41%)",
   },
 ];
 
-export type Tech = { name: string; note: string; icon: string };
+/** `icon` is a simple-icons key (si*) or a path under /public/logos; `mono` is a two-letter fallback. */
+export type Tech = { name: string; note: string; icon?: string; mono?: string };
 
-/** `icon` is a simple-icons key (si*) or a path under /public/logos. */
+// Demo day (PRD §16.3, §16.5): one VM, Docker Compose, cloud APIs, mock data.
 export const TECH_DEMO: Tech[] = [
-  { name: "Next.js", note: "Three-screen stage", icon: "siNextdotjs" },
+  { name: "Next.js", note: "Courier, ops and buyer screens", icon: "siNextdotjs" },
   { name: "TypeScript", note: "Scenario engine", icon: "siTypescript" },
   { name: "Tailwind CSS", note: "Design tokens", icon: "siTailwindcss" },
   { name: "Motion", note: "Transitions", icon: "siFramer" },
-  { name: "FastAPI", note: "Agent API", icon: "siFastapi" },
-  { name: "SQLite", note: "Demo state", icon: "siSqlite" },
-  { name: "OpenAI", note: "Structured Outputs · Realtime", icon: "siOpenai" },
-  { name: "Codex", note: "Eval loop", icon: "siOpenai" },
-  { name: "AssemblyAI", note: "Vietnamese ASR", icon: "/logos/assemblyai-mark.svg" },
-  { name: "LangGraph", note: "State machine", icon: "siLanggraph" },
+  { name: "FastAPI", note: "REST + WebSocket hub", icon: "siFastapi" },
+  { name: "Pydantic", note: "Extraction schema", icon: "siPydantic" },
+  { name: "OpenAI API", note: "Tool calling · Structured Outputs", icon: "siOpenai" },
+  { name: "AssemblyAI", note: "Speech to text", icon: "/logos/assemblyai-mark.svg" },
+  { name: "Presidio", note: "PII masking", mono: "Pr" },
+  { name: "SQLite", note: "Demo database", icon: "siSqlite" },
+  { name: "Caddy", note: "HTTPS / WSS", icon: "siCaddy" },
   { name: "Docker", note: "Compose, one VM", icon: "siDocker" },
 ];
 
+// Production, local-first per area (PRD §18.8.2): one GPU workstation, OpenAI only as a masked fallback.
 export const TECH_PROD: Tech[] = [
+  { name: "gpt-oss-20b", note: "OpenAI open-weight, on the area server", icon: "siOpenai" },
+  { name: "Ollama / vLLM", note: "Model serving", icon: "siOllama" },
+  { name: "PhoWhisper", note: "Vietnamese ASR", icon: "/logos/vinai-mark.png" },
+  { name: "Piper TTS", note: "Dynamic voice lines", mono: "Pi" },
+  { name: "NVIDIA RTX", note: "2 × 16 GB GPUs", icon: "siNvidia" },
   { name: "PostgreSQL", note: "Order context", icon: "siPostgresql" },
-  { name: "Temporal", note: "Durable timers", icon: "siTemporal" },
-  { name: "Apache Kafka", note: "CDC / queue", icon: "siApachekafka" },
-  { name: "Redis", note: "Rate limits", icon: "siRedis" },
-  { name: "Hugging Face", note: "Open-weight 7–14B", icon: "siHuggingface" },
-  { name: "NVIDIA", note: "Regional GPU gateway", icon: "siNvidia" },
-  { name: "PhoWhisper", note: "On-prem ASR", icon: "/logos/vinai-mark.png" },
-  { name: "Zalo", note: "OA + ZNS", icon: "siZalo" },
-  { name: "Asterisk", note: "Branded SIP trunk", icon: "siAsterisk" },
+  { name: "Redis", note: "Queue · rate limits", icon: "siRedis" },
+  { name: "Temporal", note: "Durable 60′ / 2 h timers", icon: "siTemporal" },
   { name: "MinIO", note: "Audio vault · 30-day TTL", icon: "siMinio" },
-  { name: "Grafana", note: "Metrics dashboard", icon: "siGrafana" },
-  { name: "Kubernetes", note: "Per-region deploy", icon: "siKubernetes" },
+  { name: "Zalo ZNS", note: "Risky orders only", icon: "siZalo" },
+  { name: "Asterisk", note: "Branded SIP trunk", icon: "siAsterisk" },
+  { name: "Grafana", note: "Ops metrics", icon: "siGrafana" },
 ];
 
 export const ROADMAP = [

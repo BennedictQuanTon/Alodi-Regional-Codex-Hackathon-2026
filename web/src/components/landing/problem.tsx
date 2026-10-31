@@ -56,7 +56,7 @@ export function Problem() {
           </Reveal>
           <Reveal delay={0.08}>
             <ChartCard
-              title="A day at a 10,000-order depot"
+              title="A day in one area: 20 couriers, 4,000 orders"
               source="Team assumptions; baseline rescue rate from Shipsy"
               note="8% is a conservative mark below the VECOM range. The 20–30% baseline rescue rate is a vendor figure."
             >
@@ -65,9 +65,9 @@ export function Problem() {
           </Reveal>
           <Reveal>
             <ChartCard
-              title="Daily loss per depot (million VND)"
-              source="Shopee return fee policy; GHN courier earnings; hub/CS cost is a team estimate"
-              note="Redelivery: 800 orders × ~1.5 attempts × 6,000–8,000 VND courier pay."
+              title="Monthly loss per area (million VND)"
+              source="Shopee Return & Refund Policy §7.1; GHN courier earnings; Glints courier income; CS cost is a team estimate (PRD §18.8)"
+              note="320 failed a day; 240 returned × 40,000 VND; redelivery 320 × 1.5 attempts × 6,000–8,000 VND; × 30 days. Midpoint ≈ ₫473M."
             >
               <LossChart />
             </ChartCard>
@@ -76,7 +76,7 @@ export function Problem() {
             <ChartCard
               title="E-commerce grows faster than call teams can hire"
               source="Metric, E-commerce Report 2025 (Shopee, TikTok Shop, Lazada, Tiki)"
-              note="2024 derived from the 34.75% growth. Q1 2026 grew a further 46.6%. 13 callers is a team estimate."
+              note="2024 derived from the 34.75% growth. Q1 2026 grew a further 46.6%. 5 callers is a team estimate."
             >
               <div className="grid items-end gap-8 sm:grid-cols-[1.1fr_1fr]">
                 <GmvChart />
@@ -89,9 +89,9 @@ export function Problem() {
                   </div>
                   <div>
                     <div className="t-number text-[56px]">
-                      ≈ <Figure value="13" /> callers
+                      ≈ <Figure value="5" /> callers
                     </div>
-                    <div className="mt-2 text-[13px] text-smoke">to phone 800 buyers a day (800 × 2 calls × 4 min)</div>
+                    <div className="mt-2 text-[13px] text-smoke">to phone 320 buyers a day (320 × 2 calls × 4 min, 8-hour shifts)</div>
                   </div>
                 </div>
               </div>

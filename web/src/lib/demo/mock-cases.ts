@@ -209,22 +209,3 @@ export const MOCK_CASES: MockCase[] = [
     context: "Delivered on attempt 2 · building security",
   },
 ];
-
-/** KPI cards: value, badge, and a 7-day spark series (last bar = today). */
-export const KPIS = [
-  { label: "Failed today", value: "812", badge: "8.1% of 10,024", tone: "neutral", spark: [760, 790, 845, 801, 830, 776, 812] },
-  { label: "Agent rescuing", value: "214", badge: "Live", tone: "primary", spark: [180, 196, 205, 188, 220, 201, 214] },
-  { label: "Handled autonomously", value: "61%", badge: "1.8% error", tone: "good", spark: [48, 52, 55, 57, 58, 60, 61] },
-  { label: "Needs a person", value: "23", badge: "6 min median wait", tone: "warn", spark: [31, 28, 30, 26, 25, 24, 23] },
-] as const;
-
-/** Rescue rate per day, last 14 days (%), vs the ~25% industry baseline. */
-export const RESCUE_DAILY = [24, 26, 25, 27, 29, 28, 31, 30, 32, 33, 31, 34, 35, 34];
-export const RESCUE_WEEKLY = [25, 26, 28, 30, 31, 33, 34];
-export const BASELINE = 25;
-
-export const REASONS = [
-  { label: "No answer", value: 52 },
-  { label: "Rescheduled", value: 31 },
-  { label: "Refused", value: 17 },
-];

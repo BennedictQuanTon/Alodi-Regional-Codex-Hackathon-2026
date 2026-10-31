@@ -42,8 +42,10 @@ export function useDashTheme() {
 }
 
 const NAV: { href: string; label: string }[] = [
-  { href: "/console", label: "Overview" },
+  { href: "/console", label: "Hub overview" },
   { href: "/console#queue", label: "Exception queue" },
+  { href: "/console#routes", label: "Routes" },
+  { href: "/console#cs", label: "CS queue" },
   { href: "/metrics", label: "Metrics" },
   { href: "/demo", label: "Demo stage" },
   { href: "/script", label: "Demo script" },
@@ -87,7 +89,7 @@ function ThemeToggle() {
   );
 }
 
-export function DashShell({ children, reviewCount = 23 }: { children: React.ReactNode; reviewCount?: number }) {
+export function DashShell({ children, reviewCount = 116 }: { children: React.ReactNode; reviewCount?: number }) {
   const [theme] = useDashTheme();
   const path = usePathname();
 
@@ -98,7 +100,7 @@ export function DashShell({ children, reviewCount = 23 }: { children: React.Reac
           <Link href="/" aria-label="Alodi home">
             <Wordmark className="text-[28px]" tone={theme === "dark" ? "light" : "navy"} />
           </Link>
-          <div className="mt-1.5 text-[13px] d-muted">Operations · Binh Thanh depot</div>
+          <div className="mt-1.5 text-[13px] d-muted">Operations · Binh Thanh hub</div>
         </div>
         <nav className="mt-2 flex flex-col">
           {NAV.map((n, i) => {
@@ -149,9 +151,11 @@ export function DashShell({ children, reviewCount = 23 }: { children: React.Reac
           </nav>
           <div className="ml-auto flex items-center gap-3">
             <ThemeToggle />
-            <span className="d-chip d-chip-warn hidden sm:inline-flex">
-              <span className="size-1.5 rounded-full bg-[var(--d-accent)]" aria-hidden />
-              {reviewCount} to review
+            <span className="hidden sm:inline-flex">
+              <span className="d-chip d-chip-warn">
+                <span className="size-1.5 rounded-full bg-[var(--d-accent)]" aria-hidden />
+                {reviewCount} with CS
+              </span>
             </span>
             <span className="grid size-9 place-items-center rounded-full border-2 border-[var(--d-surface)] bg-[var(--d-primary)] text-[13px] font-semibold text-white" title="Long Quan Ton">
               LT
