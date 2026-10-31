@@ -1,8 +1,8 @@
-"""Alodi cost vs loss model for one area / hub (20 couriers, 4,000 orders a day).
+"""Alodi cost vs loss model for one area / hub (20 shippers, 4,000 orders a day).
 
 Compares two ways to run Alodi in production:
   * local_first  — one on-prem server per hub (one-time purchase), open-weight models run locally
-                   (OpenAI gpt-oss-20b as a fallback, VinAI PhoWhisper); OpenAI GPT-Live-1, Decisions API (GPT-6 Luna) and GPT-5.6 Terra in the cloud;
+                   (OpenAI gpt-oss-20b as a fallback, VinAI PhoWhisper); OpenAI GPT-Live-1, Decisions API (GPT-6 Luna) and GPT-6.1 Terra in the cloud;
                    AWS only for encrypted off-site backup.
   * aws_managed  — the earlier design: dedicated Multi-AZ stack on AWS + Bedrock/Transcribe/Connect.
 
@@ -17,13 +17,13 @@ DAYS = 30              # days per month
 HOURS = 730            # hours per month
 
 # ------------------------------------------------------------------ the hub
-ORDERS_PER_DAY = 4_000                     # estimate (team sizing: one area, 20 couriers)
+ORDERS_PER_DAY = 4_000                     # estimate (team sizing: one area, 20 shippers)
 FAIL_RATE = 0.08                           # sourced: VECOM 8–12% (Nguoi Lao Dong, 19 Jul 2025) — low end
 BASELINE_RESCUE = 0.25                     # vendor: Shipsy, industry rescue 20–30%
 RETURN_FEE = 40_000                        # sourced: Shopee Return & Refund Policy §7.1 (11 Mar 2026)
 EXTRA_ATTEMPTS = 1.5                       # estimate inside Shopee's 2–3 contact attempts (Help Center 79569)
-COURIER_PAY_PER_ATTEMPT = (6_000, 8_000)   # sourced: GHN blog, courier earns ₫6–8k per order
-COURIER_INCOME_MONTH = (8_000_000, 15_000_000)  # sourced: Glints VN, full-time courier ₫8–15M/month
+COURIER_PAY_PER_ATTEMPT = (6_000, 8_000)   # sourced: GHN blog, shipper earns ₫6–8k per order
+COURIER_INCOME_MONTH = (8_000_000, 15_000_000)  # sourced: Glints VN, full-time shipper ₫8–15M/month
 COURIER_HOURS_MONTH = 26 * 9               # estimate: 26 days × 9 h
 DOOR_MIN_PER_FAIL = 5                      # estimate: two calls + waiting at the door
 CS_CALLS_PER_FAIL = 2                      # estimate (STATS §4: 2 calls × 4 min)
@@ -39,7 +39,7 @@ SCENARIOS = {   # projected. Shipsy (vendor): industry rescue 20–30%, best-in-
 # ------------------------------------------------------------------ usage per day (mock-data/expected-day-summary.json)
 BILLED_CALL_MIN = 134         # ≤ 134 billed minutes (67 answered calls × 2 min)
 LLM_TOKENS_IN, LLM_TOKENS_OUT = 6.0e6, 0.72e6
-TERRA_SHARE = 0.20            # estimate: share of LLM traffic the Decisions API escalates to GPT-5.6 Terra
+TERRA_SHARE = 0.20            # estimate: share of LLM traffic the Decisions API escalates to GPT-6.1 Terra
 ZNS_PER_DAY = {"risky_only": 1_250, "all_orders": 6_110}   # 547 risky orders (high COD / failed before) + replies + 484 rescue messages
 
 # ------------------------------------------------------------------ local-first: one-time hardware per hub (listed-price, VN retail)
@@ -54,10 +54,10 @@ HARDWARE = {
 def local_first_month(msg_policy: str) -> dict:
     # OpenAI stack (listed prices, developers.openai.com, checked 31 Oct 2026):
     #   Decisions API on GPT-6 Luna triages every message: $0.10 per 1M input tokens, no output charge.
-    #   GPT-5.6 Terra orchestrates the cases triage escalates (TERRA_SHARE of LLM traffic): $2 / $12 per 1M tokens.
+    #   GPT-6.1 Terra orchestrates the cases triage escalates (TERRA_SHARE of LLM traffic): $1 / $5 per 1M tokens.
     #   GPT-Live-1 runs the AI calls: $0.05 per session minute; its backend calls are the Terra share above.
     luna_usd = LLM_TOKENS_IN / 1e6 * 0.10 * DAYS
-    terra_usd = TERRA_SHARE * (LLM_TOKENS_IN / 1e6 * 2.00 + LLM_TOKENS_OUT / 1e6 * 12.00) * DAYS
+    terra_usd = TERRA_SHARE * (LLM_TOKENS_IN / 1e6 * 1.00 + LLM_TOKENS_OUT / 1e6 * 5.00) * DAYS
     live_usd = BILLED_CALL_MIN * 0.05 * DAYS
     sip = BILLED_CALL_MIN * DAYS * 780 + 50_000                    # Viettel Mobile SIP: ₫780/min off-net, ₫50k/month per line
     zns = ZNS_PER_DAY[msg_policy] * DAYS * 300                     # ZNS transactional template ≈ ₫300 (oazns.vn, worldfone)
@@ -65,7 +65,7 @@ def local_first_month(msg_policy: str) -> dict:
     power = kwh * 3_000                                            # EVN business tariff ≈ ₫2,666 normal / ₫5,025 peak → ₫3,000 blended
     return {
         "Decisions API on GPT-6 Luna (triage of every message)": luna_usd * FX,
-        "GPT-5.6 Terra (orchestration, ~20% of LLM traffic after triage)": terra_usd * FX,
+        "GPT-6.1 Terra (orchestration, ~20% of LLM traffic after triage)": terra_usd * FX,
         "GPT-Live-1 (AI calls, $0.05 a minute)": live_usd * FX,
         "Local models: gpt-oss-20b fallback, PhoWhisper for memos": 0,
         "Viettel Mobile SIP trunk (calls + line)": sip,
@@ -97,8 +97,8 @@ def loss_month():
     hourly = tuple(i / COURIER_HOURS_MONTH for i in COURIER_INCOME_MONTH)
     items = {
         "Return fees paid by sellers": (returned * RETURN_FEE * DAYS,) * 2,
-        "Courier pay for redelivery attempts": tuple(failed * EXTRA_ATTEMPTS * p * DAYS for p in COURIER_PAY_PER_ATTEMPT),
-        "Courier time lost when the buyer doesn't answer": tuple(failed * DOOR_MIN_PER_FAIL / 60 * h * DAYS for h in hourly),
+        "Shipper pay for redelivery attempts": tuple(failed * EXTRA_ATTEMPTS * p * DAYS for p in COURIER_PAY_PER_ATTEMPT),
+        "Shipper time lost when the buyer doesn't answer": tuple(failed * DOOR_MIN_PER_FAIL / 60 * h * DAYS for h in hourly),
         "Hub / CS staff calling buyers back": (failed * CS_CALLS_PER_FAIL * CS_MIN_PER_CALL / 60 * CS_COST_HOUR * DAYS,) * 2,
     }
     total = (sum(v[0] for v in items.values()), sum(v[1] for v in items.values()))
@@ -112,7 +112,7 @@ def savings_month(s):
     items = {
         "Return fees avoided": failed * s["extra_rescue_pts"] * RETURN_FEE * DAYS,
         "Redelivery attempts avoided": attempts_saved * sum(COURIER_PAY_PER_ATTEMPT) / 2 * DAYS,
-        "Courier door time saved": attempts_saved * DOOR_MIN_PER_FAIL / 60 * hourly_mid * DAYS,
+        "Shipper door time saved": attempts_saved * DOOR_MIN_PER_FAIL / 60 * hourly_mid * DAYS,
         "CS calls handled by the agent": failed * CS_CALLS_PER_FAIL * CS_MIN_PER_CALL / 60 * CS_COST_HOUR * s["auto_share"] * DAYS,
     }
     return {"items": items, "total": sum(items.values())}

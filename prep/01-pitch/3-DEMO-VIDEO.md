@@ -66,7 +66,7 @@ Rules:
 | Wordmark | Be Vietnam Pro ExtraBold (outlined SVG in `04-brand/logo/`) | — | — | — |
 
 - Not used: Source Serif 4 (landing only), Playfair (dashboard only), any coding-style monospace other than Geist Mono.
-- Geist has no “₫” glyph, so money is written **“194M VND”**.
+- Geist has no “₫” glyph, so money is written **“187M VND”**.
 - Sentence case. No exclamation marks. Words enter one at a time.
 
 ### 3.3 Logo in motion (mark C: ring + sound bars)
@@ -164,9 +164,9 @@ Timecodes are mm:ss:ff at 30 fps. **Bold** text is on screen. *Italic* text is v
 | --- | --- | --- | --- | --- |
 | 00:00:00 | Black navy. A caret blinks at centre | — | — | Kick + key tap (first sound at frame 2) |
 | 00:00:15 | Words type in, one per half-beat | **Have you ever** | *Have you ever…* | Tick per word |
-| 00:01:15 | Line 2 replaces line 1 (mask up) | **missed the courier’s call** | *missed the courier’s call…* | Ticks |
+| 00:01:15 | Line 2 replaces line 1 (mask up) | **missed the shipper’s call** | *missed the shipper’s call…* | Ticks |
 | 00:02:15 | Line 3 | **in the middle of a meeting?** | *…in the middle of a meeting?* | Ticks, low thud on “meeting” |
-| 00:04:00 | Cut to the **buyer phone** (`/buyer`, real UI): a lock-screen notification slides in: “Missed call · Courier” ×2 | Notification text (UI) | — | Two muted vibration buzzes |
+| 00:04:00 | Cut to the **buyer phone** (`/buyer`, real UI): a lock-screen notification slides in: “Missed call · Shipper” ×2 | Notification text (UI) | — | Two muted vibration buzzes |
 | 00:05:15 | Chat-bubble micro-story (as @nickmotionstudio): “Your parcel is being returned to the seller.” | Bubble (UI) | *Then your parcel goes back.* | Soft pop, then a descending two-note “miss” |
 | 00:07:00 | The bubble greys out; the screen pushes away | — | — | Reverse cymbal into the cut |
 
@@ -178,7 +178,7 @@ Vertical cut: a persistent caption sits on top for the whole film, as in the ref
 | --- | --- | --- | --- | --- |
 | 00:08:00 | Chart 06 (buyer survey) builds from the centre line outwards, one row per beat | **We asked 100 buyers.** | *We asked a hundred buyers.* | Tick per row |
 | 00:11:00 | The top row’s “often” share counts up | **[real %] often called while busy** | *[real line]* | Boom on landing |
-| 00:12:15 | Chart 07: the 12 courier dots pop one by one, orange for “yes” | **…and 12 couriers.** → **[real] want it. [real] said no.** | *And twelve couriers.* | 12 pops, pitched up |
+| 00:12:15 | Chart 07: the 12 shipper dots pop one by one, orange for “yes” | **…and 12 shippers.** → **[real] want it. [real] said no.** | *And twelve shippers.* | 12 pops, pitched up |
 | 00:16:00 | **Receipt 1**: a browser frame with a screenshot of the Shopee Return & Refund Policy page **[USER IMAGE 1]**; an orange underline wipes under the fee | **40,000 VND** counts 0 → 40,000 · source line | *Every failed order can cost the seller forty thousand dong.* | Wipe hiss, boom |
 | 00:20:00 | **Receipt 2**: the Nguoi Lao Dong headline **[USER IMAGE 2]** → chart 01 bars grow | **8–12% refused** · **25–30% in sale season** | *Eight to twelve percent are refused at the door.* | Ticks, boom |
 | 00:24:00 | **Receipt 3**: Shopee Help Center 79559; the sentence types in Geist Mono: “Shopee does not yet support choosing a specific delivery time.” | **0 ways to pick a time** | *And buyers have no way to pick a time.* | Typing, then silence |
@@ -192,21 +192,21 @@ Every receipt shows its source line in Geist Mono for at least 2 s: `Source: Sho
 | TC | Visual | On screen | VO | Sound |
 | --- | --- | --- | --- | --- |
 | 00:30:00 | **Drop.** The Alodi mark draws (ring, then the sound bars), the wordmark rises | **Alodi** → **Make the second drop land.** | — | Impact + logo sting, music drop |
-| 00:33:00 | Sketch → UI (as @themilesholden): four wireframes in a 2 × 2 grid morph into the real screens with a slight 2.5D tilt; Geist Mono labels pop beside them | **01 COURIER · 02 OPS · 03 BUYER · 04 CONTROL** | *One agent. Four screens. All live.* | Four pops on beats |
+| 00:33:00 | Sketch → UI (as @themilesholden): four wireframes in a 2 × 2 grid morph into the real screens with a slight 2.5D tilt; Geist Mono labels pop beside them | **01 SHIPPER · 02 OPS · 03 BUYER · 04 CONTROL** | *One agent. Four screens. All live.* | Four pops on beats |
 | 00:36:00 | Clock flips to 06:30 on the iPad; the buyer chat gets the window question; four chips pop | **Every morning, ask first.** | *Every morning, Alodi asks each buyer for two windows.* | Rising pops |
-| 00:40:00 | Phone close-up: thumb taps **A · No answer** (orange); the undo ring sweeps | **One tap. No typing.** | *If it still fails, the courier taps once.* | Click + haptic thud, ticking |
+| 00:40:00 | Phone close-up: thumb taps **A · No answer** (orange); the undo ring sweeps | **One tap. No typing.** | *If it still fails, the shipper taps once.* | Click + haptic thud, ticking |
 | 00:44:00 | Chat bubble “We just missed you…” on the laptop; the iPad timer “AI call 1 in 60:00” fast-forwards | **Chat first. Call on silence.** | *Alodi messages straight away, and calls if there’s silence…* | Pop; ticking accelerates |
 | 00:48:00 | Policy line appears with a ring + check: “08:00–20:30 · call 1 of 2” | **Inside the rules.** | *…only inside the rules.* | Blip |
 | 00:50:00 | The laptop rings; the logo’s sound bars become the call waveform; the buyer’s words appear as they speak | Transcript line | Buyer (recorded): *“Tomorrow after five… security in Tower B… or call my wife.”* | Synth ring, voice, soft typing |
 | 00:56:00 | The sentence splits into three fields that fly into a card; confidence bars fill 0.94 / 0.88 / 0.91; stamp “Auto-applied” with ring + check | **One sentence → three fields** | *One sentence becomes structured context.* | Whoosh ×3, chime |
-| 01:00:00 | The card slides into the courier’s phone; jump to “Sun 17:22” → **Delivered** | **Second drop: landed.** | *The next courier knows when, where and who.* | Swish, glass tap, boom |
+| 01:00:00 | The card slides into the shipper’s phone; jump to “Sun 17:22” → **Delivered** | **Second drop: landed.** | *The next shipper knows when, where and who.* | Swish, glass tap, boom |
 | 01:03:00 | Tap **C · Refused** → iPad CS queue “Suggested label · needs a person” → a hand taps **Approve** | **High stakes stay human.** | *And anything high-stakes goes to a person.* | Click, blip |
 
 ### 5.4 OpenAI at the core — bars 34–45 (01:06:00 – 01:30:00), night background, half-time
 
 | TC | Visual | On screen | VO | Sound |
 | --- | --- | --- | --- | --- |
-| 01:06:00 | Hairlines draw the system (as @thekevin.mp4): Courier tap → **Alodi Agent** → tools (chat · call · extract) → **Policy guard** → Card | Node labels in Geist Mono | *Under the hood, one agent runs every order.* | Granular hiss following the lines |
+| 01:06:00 | Hairlines draw the system (as @thekevin.mp4): Shipper tap → **Alodi Agent** → tools (chat · call · extract) → **Policy guard** → Card | Node labels in Geist Mono | *Under the hood, one agent runs every order.* | Granular hiss following the lines |
 | 01:10:00 | Agent node expands: **gpt-oss-20b** with the OpenAI logo (real logo, once) and the tag “runs on the area server” | **OpenAI gpt-oss-20b · on site** | *OpenAI’s open-weight model makes the decisions, on a server at each area.* | Low pulse |
 | 01:14:00 | The extract tool opens: the strict JSON schema types out key by key, values fill from the call | `time_window` · `drop_location` · `alt_receiver` | *Structured Outputs turn speech into strict JSON.* | Typing |
 | 01:18:00 | The voice node: the assistant line with the waveform; tag “OpenAI TTS” | **The assistant’s voice** | *OpenAI’s voice speaks to the buyer.* | Waveform tone |
@@ -219,9 +219,9 @@ Every receipt shows its source line in Geist Mono for at least 2 s: `Source: Sho
 | --- | --- | --- | --- | --- |
 | 01:30:00 | Headline types in | **We tested it on [N] real cases.** *(fill after the eval; otherwise “on 47 test conversations”)* | *[fill]* | Ticks |
 | 01:33:00 | Eval numbers count up | **F1 [measured] · 0 calls out of hours · 0 labels without approval** | *[fill with measured numbers]* | Boom on each |
-| 01:37:00 | Chart 03: the “Today” bar (473M) stands; the “With Alodi” bar drops to 279M; the orange cost sliver appears | **−194M VND a month** | *At best-in-class rescue, one area saves about a hundred ninety million dong a month…* | Silence pocket, then boom |
-| 01:42:00 | The counter rolls to the year | **≈ 2.3B VND a year · 41% of the loss** | *…two point three billion a year.* | Boom |
-| 01:45:00 | Chart 05: the cost bar fills to 4.4 % | **21M VND a month to run · 4% of the loss** | *It costs four percent of what is lost.* | Tick |
+| 01:37:00 | Chart 03: the “Today” bar (473M) stands; the “With Alodi” bar drops to 286M; the orange cost sliver appears | **−187M VND a month** | *At best-in-class rescue, one area saves about a hundred eighty-seven million dong a month…* | Silence pocket, then boom |
+| 01:42:00 | The counter rolls to the year | **≈ 2.25B VND a year · 40% of the loss** | *…two point two five billion a year.* | Boom |
+| 01:45:00 | Chart 05: the cost bar fills to 5.8 % | **27M VND a month to run · 6% of the loss** | *It costs six percent of what is lost.* | Tick |
 | 01:48:00 | Chart 08 tiles 2 and 3 flip in | **6 s to context · 65% handled alone** | *Six seconds from answer to card. Two in three cases handled alone.* | Two blips |
 | 01:51:00 | Label line | `Money projected · Shipsy best-in-class (vendor) · PRD §18.8` | — | — |
 
@@ -268,19 +268,19 @@ const BEAT = 0.5; // seconds
 
 ### 8.1 Director’s brief (paste to an editor or a design assistant)
 
-> Make a 2-minute 16:9 product film for **Alodi**, an AI agent that rescues failed deliveries in Vietnam. The style is minimal, editorial and precise, like an Apple keynote product reel crossed with a Linear launch video. Dark navy `#121A2C` and parchment `#F6F3F1` backgrounds, navy ink `#1F2A44`, **one orange `#F05A00` accent per frame**, chart blue `#3F5FAE` / `#6D8AD6`. Type is **Geist** (500 for display, 600 for numbers) with **Geist Mono** uppercase labels and source lines; no serif, no other fonts. Music is at 120 BPM and every cut lands on a beat (15 frames at 30 fps). Words enter one at a time through a mask, with an out-expo ease and a 3-frame stagger. The real product UI is the hero: four screens (courier phone, carrier iPad dashboard, buyer phone, control). Hairline diagrams draw themselves. Numbers count up and hold for 3 beats with their source line visible. The logo is a ring with four sound bars, and the bars become the call waveform. Use one sound effect per visual event, 3–5 per second in busy parts, with a half-second of silence before each headline number. Forbidden: gradients, glows, particles, lens flares, 3D robots, sparkles, emoji, stock icons, more than two easing curves, and any number without its label.
+> Make a 2-minute 16:9 product film for **Alodi**, an AI agent that rescues failed deliveries in Vietnam. The style is minimal, editorial and precise, like an Apple keynote product reel crossed with a Linear launch video. Dark navy `#121A2C` and parchment `#F6F3F1` backgrounds, navy ink `#1F2A44`, **one orange `#F05A00` accent per frame**, chart blue `#3F5FAE` / `#6D8AD6`. Type is **Geist** (500 for display, 600 for numbers) with **Geist Mono** uppercase labels and source lines; no serif, no other fonts. Music is at 120 BPM and every cut lands on a beat (15 frames at 30 fps). Words enter one at a time through a mask, with an out-expo ease and a 3-frame stagger. The real product UI is the hero: four screens (shipper phone, carrier iPad dashboard, buyer phone, control). Hairline diagrams draw themselves. Numbers count up and hold for 3 beats with their source line visible. The logo is a ring with four sound bars, and the bars become the call waveform. Use one sound effect per visual event, 3–5 per second in busy parts, with a half-second of silence before each headline number. Forbidden: gradients, glows, particles, lens flares, 3D robots, sparkles, emoji, stock icons, more than two easing curves, and any number without its label.
 
 ### 8.2 Scene prompts
 
 | Scene | Prompt |
 | --- | --- |
-| Hook | *Navy background, a single blinking caret, then “Have you ever / missed the courier’s call / in the middle of a meeting?” word by word through a slide-up mask, one tick per word; cut on the beat to a real phone lock screen receiving two missed-call notifications.* |
+| Hook | *Navy background, a single blinking caret, then “Have you ever / missed the shipper’s call / in the middle of a meeting?” word by word through a slide-up mask, one tick per word; cut on the beat to a real phone lock screen receiving two missed-call notifications.* |
 | Problem receipts | *Parchment background. A clean browser window slides in holding a policy page screenshot; an orange underline wipes under “40,000”; the number counts from 0 with a sub boom; a Geist Mono source line fades in bottom-left and stays for 2 seconds.* |
 | Four screens | *Four wireframe sketches in a 2 × 2 grid morph into the real UI screens in 15 frames each, with a slight 2.5D tilt and soft 6 % shadow; uppercase Geist Mono labels 01–04 pop beside each screen on consecutive beats.* |
 | The tap | *Macro push-in on a phone; a thumb taps an orange “A · No answer” button; a thin 2-minute ring sweeps; the iPad in soft focus behind shows the same event appearing as “pending”.* |
 | The call | *Laptop rings; the Alodi logo’s four sound bars detach and follow the voice waveform; the transcript appears as spoken in white Geist on navy; the sentence then splits into three labelled fields that fly into a card with confidence bars filling.* |
 | OpenAI core | *Hairlines draw a five-node system on navy, 2 px, with nodes popping on the beat; one node expands to show “gpt-oss-20b · on site” with the OpenAI logo; a strict JSON schema types out; six rules each get a ring-and-check stamp.* |
-| Output | *Two thin columns: “Today 473M VND” and “With Alodi 279M VND”, with an orange sliver for the running cost; a large “−194M VND a month” counts in, then “≈ 2.3B VND a year · 41%”; the label “projected” stays visible.* |
+| Output | *Two thin columns: “Today 473M VND” and “With Alodi 286M VND”, with an orange sliver for the running cost; a large “−187M VND a month” counts in, then “≈ 2.25B VND a year · 40%”; the label “projected” stays visible.* |
 | End | *Four team portraits slide in on beats; the Alodi lockup forms (the ring draws, the bars rise, the wordmark lifts); the bars pulse three times, then hold in silence.* |
 
 ### 8.3 Work worth studying (for the bar, not to copy)
@@ -310,7 +310,7 @@ A first cut of the film is built from code, so it can be re-rendered after every
 | Step | File | What it does |
 | --- | --- | --- |
 | 1 · Voice | `script.json`, `tts.py` | Kokoro-82M (Apache-2.0), run locally. Narrator `af_heart`; call assistant `af_bella`; buyer `am_michael` |
-| 2 · UI footage | `capture.cjs` → `build_clips.py` | Records the real demo UI on four screens at once (courier phone 560 × 1000, buyer phone, ops iPad 1280 × 1000, control 1600 × 1000), scenarios A_main and REFUSE, into `clips/` |
+| 2 · UI footage | `capture.cjs` → `build_clips.py` | Records the real demo UI on four screens at once (shipper phone 560 × 1000, buyer phone, ops iPad 1280 × 1000, control 1600 × 1000), scenarios A_main and REFUSE, into `clips/` |
 | 3 · Timeline | `timeline.py` → `timeline.json` | Scene times, voice starts, 207 sound cues, call-voice loudness for the logo’s bars |
 | 4 · Music + SFX | `audio.py` → `audio/` | 120 BPM music bed and every sound effect synthesised in code (no samples, no licences); voice ducking; mix |
 | 5 · Picture | `film/index.html` | The film as a page: every frame is a pure function of time, so it renders the same every time |

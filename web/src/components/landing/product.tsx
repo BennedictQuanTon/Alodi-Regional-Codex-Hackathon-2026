@@ -70,7 +70,7 @@ function RowLabel({ children, right }: { children: React.ReactNode; right?: stri
 }
 
 export function Outcomes() {
-  const net = 185.7;
+  const net = 187.4;
   const loss = 472.9;
   return (
     <section id="metrics" className="scroll-mt-28 py-20 md:py-24">
@@ -111,7 +111,7 @@ export function Outcomes() {
                 <div className={`flex flex-col p-7 md:p-8 ${cellBorder(3)}`}>
                   <span className="text-[12px] uppercase tracking-[0.08em] text-smoke">a month, net</span>
                   <div className="t-number mt-6 whitespace-nowrap text-[56px] leading-none text-orange-deep md:text-[64px]">
-                    <Figure value="₫186M" />
+                    <Figure value="₫187M" />
                   </div>
                   <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-ash-soft">
                     <motion.div
@@ -122,7 +122,7 @@ export function Outcomes() {
                       transition={{ duration: 1.3, ease: EASE }}
                     />
                   </div>
-                  <p className="mt-2 text-[12px] text-smoke">39% of the ₫473M lost each month</p>
+                  <p className="mt-2 text-[12px] text-smoke">40% of the ₫473M lost each month</p>
                   <a href={NUMBERS_PDF} target="_blank" rel="noreferrer" className="mt-5 text-[13px] font-medium text-navy underline decoration-orange decoration-2 underline-offset-4 hover:text-orange-deep">
                     See every formula · PDF →
                   </a>
@@ -130,7 +130,7 @@ export function Outcomes() {
               </div>
             </div>
           </div>
-          <SourceNote className="mt-4">PRD §2.3, §23 targets; §18.8 team cost model, best-in-class rescue 25% → 65% (Shipsy vendor range); base case ₫91M a month.</SourceNote>
+          <SourceNote className="mt-4">PRD §2.3, §23 targets; §18.8 team cost model, best-in-class rescue 25% → 65% (Shipsy vendor range); base case ₫92M a month.</SourceNote>
         </Reveal>
       </div>
     </section>

@@ -12,7 +12,7 @@ export type MockCase = {
   channel: "Chat" | "AI call" | "Voice memo" | "—";
   conf: number | null;
   updated: string;
-  courier: string;
+  shipper: string;
   context?: string;
   note?: string;
   transcript?: string[];
@@ -32,7 +32,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "Chat",
     conf: 0.97,
     updated: "10:41",
-    courier: "Tuan Nguyen",
+    shipper: "Tuan Nguyen",
     context: "Today 17:30–19:00 · hand to buyer",
     transcript: ["Buyer (chat): I’m home after 5:30 today", "Agent: Noted — 17:30–19:00 today."],
   },
@@ -48,7 +48,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "AI call",
     conf: 0.62,
     updated: "10:37",
-    courier: "Hoa Le",
+    shipper: "Hoa Le",
     note: "Two answers conflict: chat picked “Tomorrow morning”, the call said “tonight”.",
     transcript: ["Assistant: When would you like it?", "Buyer: Tonight… actually, maybe tomorrow…"],
     suggestion: "Ask again in chat with two concrete windows",
@@ -65,9 +65,9 @@ export const MOCK_CASES: MockCase[] = [
     channel: "Voice memo",
     conf: 0.93,
     updated: "10:33",
-    courier: "Long Vu",
+    shipper: "Long Vu",
     context: "Tomorrow 08:00–10:00 · Tower A reception",
-    transcript: ["Courier (memo): She wants tomorrow before ten, leave it at Tower A reception."],
+    transcript: ["Shipper (memo): She wants tomorrow before ten, leave it at Tower A reception."],
   },
   {
     id: "SPXVN0123450333",
@@ -81,7 +81,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "—",
     conf: null,
     updated: "10:29",
-    courier: "Phat Ho",
+    shipper: "Phat Ho",
     note: "Refused at the door. The agent did not contact the buyer.",
     suggestion: "Suggested label “suspected bomb” · needs approval",
   },
@@ -97,7 +97,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "AI call",
     conf: null,
     updated: "10:26",
-    courier: "Tuan Nguyen",
+    shipper: "Tuan Nguyen",
     note: "AI call 1 in progress · 00:41",
   },
   {
@@ -112,7 +112,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "Chat",
     conf: null,
     updated: "10:21",
-    courier: "Hoa Le",
+    shipper: "Hoa Le",
     note: "Chat sent · AI call 1 at 11:21",
   },
   {
@@ -127,7 +127,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "AI call",
     conf: null,
     updated: "10:14",
-    courier: "Long Vu",
+    shipper: "Long Vu",
     note: "Cycle 2 · call 1 unanswered · call 2 at 12:14",
   },
   {
@@ -142,7 +142,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "AI call",
     conf: null,
     updated: "09:58",
-    courier: "Phat Ho",
+    shipper: "Phat Ho",
     note: "Two rescue cycles used, four unanswered calls.",
     suggestion: "Suggested label “undeliverable” · needs approval",
   },
@@ -158,7 +158,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "Chat",
     conf: 1,
     updated: "07:12",
-    courier: "Tuan Nguyen",
+    shipper: "Tuan Nguyen",
     context: "Today 14:00–16:00 (buyer tapped a slot)",
     transcript: ["Buyer tapped: Afternoon · 14:00–16:00"],
   },
@@ -174,7 +174,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "Voice memo",
     conf: 0.9,
     updated: "09:40",
-    courier: "Hoa Le",
+    shipper: "Hoa Le",
     context: "Delivered on attempt 2 · 09:40",
   },
   {
@@ -189,7 +189,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "Chat",
     conf: 0.71,
     updated: "09:36",
-    courier: "Phat Ho",
+    shipper: "Phat Ho",
     note: "Buyer asked to deliver to “my mum’s place in District 12” instead.",
     suggestion: "Cross-district address change: needs approval and a new route",
   },
@@ -205,7 +205,7 @@ export const MOCK_CASES: MockCase[] = [
     channel: "AI call",
     conf: 0.95,
     updated: "09:12",
-    courier: "Tuan Nguyen",
+    shipper: "Tuan Nguyen",
     context: "Delivered on attempt 2 · building security",
   },
 ];

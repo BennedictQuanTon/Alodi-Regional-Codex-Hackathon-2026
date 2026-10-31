@@ -31,7 +31,7 @@ export default function ScriptPage() {
             Open the stage
           </Link>
           <Link href="/demo/shipper" className="ui-btn ui-btn-outline">
-            Courier window
+            Shipper window
           </Link>
           <Link href="/demo/buyer" className="ui-btn ui-btn-outline">
             Buyer window

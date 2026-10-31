@@ -25,7 +25,7 @@ export const SOURCES: Source[] = [
     url: "https://tuoitre.vn/nld/nhuc-nhoi-nan-bom-hang-19625071822023801.htm",
   },
   {
-    label: "GHN, courier earnings per order",
+    label: "GHN, shipper earnings per order",
     detail: "6,000–8,000 VND per order (not an official Shopee figure).",
     url: "https://ghn.vn/blogs/tip-ban-hang/mot-don-hang-shipper-shopee-duoc-bao-nhieu-tien",
   },
@@ -76,7 +76,7 @@ export const SOURCES: Source[] = [
   },
   {
     label: "Shiprocket, Contact buyer / IVR",
-    detail: "Automated SMS + IVR when the courier marks the buyer unreachable; IVR on Advanced/Pro plans only.",
+    detail: "Automated SMS + IVR when the shipper marks the buyer unreachable; IVR on Advanced/Pro plans only.",
     url: "https://support.shiprocket.in/support/solutions/articles/43000664217-how-does-the-contact-buyer-functionality-work-",
   },
   {
@@ -99,9 +99,9 @@ export const SOURCES: Source[] = [
 /** TL;DR: what Alodi is, in one sentence and five lines. Sits right above "How Alodi works". */
 export const TLDR = {
   headline: "Alodi is the AI agent that rescues failed deliveries.",
-  body: "When a courier can’t reach the buyer, they tap one button. Alodi messages the buyer, calls if there’s silence, and hands the next courier a card with when, where and who to deliver to.",
+  body: "When a shipper can’t reach the buyer, they tap one button. Alodi messages the buyer, calls if there’s silence, and hands the next shipper a card with when, where and who to deliver to.",
   facts: [
-    { k: "For", v: "Carriers like SPX, their couriers and buyers" },
+    { k: "For", v: "Carriers like SPX, their shippers and buyers" },
     { k: "Starts with", v: "One tap: No answer · Rescheduled · Refused" },
     { k: "Does", v: "Chats now, calls if silent, extracts a context card" },
     { k: "Never", v: "Labels or returns an order without a person" },
@@ -113,7 +113,7 @@ export const TLDR = {
  * Demo video under the TL;DR. Drop the file in web/public/video/ and set `src` (and optionally `poster`).
  * Leave `src` empty to show the placeholder frame.
  */
-export const DEMO_VIDEO = { src: "", poster: "", length: "2:00", caption: "The full rescue, from the courier’s tap to the second drop" };
+export const DEMO_VIDEO = { src: "", poster: "", length: "2:00", caption: "The full rescue, from the shipper’s tap to the second drop" };
 
 export const HERO_STATS = [
   { value: "₫40,000", text: "return fee the seller pays on each failed order", source: "Shopee policy §7.1; ₫40,000 cap since Apr 2025 (GHN)" },
@@ -160,10 +160,10 @@ export const SURVEY = {
     n: 100,
     stats: [
       { value: "86%", text: "want to choose a delivery window" },
-      { value: "66%", text: "called the courier back and couldn’t reach them" },
+      { value: "66%", text: "called the shipper back and couldn’t reach them" },
     ],
   },
-  couriers: {
+  shippers: {
     n: 12,
     from: "6 carriers",
     stats: [
@@ -177,7 +177,7 @@ export const FEATURES = [
   {
     k: "01",
     title: "One tap instead of an error code",
-    body: "The courier picks No answer, Rescheduled, or Refused. The agent does the rest.",
+    body: "The shipper picks No answer, Rescheduled, or Refused. The agent does the rest.",
     tint: "rgba(240,90,0,0.35)",
   },
   {
@@ -189,13 +189,13 @@ export const FEATURES = [
   {
     k: "03",
     title: "Message first, call if silent",
-    body: "Chat goes out the moment the courier taps. 60 minutes of silence triggers call one, two hours later call two. Calls only 08:00–20:30.",
+    body: "Chat goes out the moment the shipper taps. 60 minutes of silence triggers call one, two hours later call two. Calls only 08:00–20:30.",
     tint: "rgba(236,218,152,0.9)",
   },
   {
     k: "04",
     title: "A ten-second voice memo",
-    body: "Buyer rescheduled on the phone? The courier repeats it aloud; speech-to-text turns it into structured data.",
+    body: "Buyer rescheduled on the phone? The shipper repeats it aloud; speech-to-text turns it into structured data.",
     tint: "rgba(255,148,115,0.6)",
   },
   {
@@ -213,7 +213,7 @@ export const FEATURES = [
   {
     k: "07",
     title: "Order Context Object",
-    body: "Versioned context with an audit log: who changed what, and when, across agent, buyer, courier and CS.",
+    body: "Versioned context with an audit log: who changed what, and when, across agent, buyer, shipper and CS.",
     tint: "rgba(236,218,152,0.9)",
   },
   {
@@ -226,7 +226,7 @@ export const FEATURES = [
 
 /** Output metrics from PRD §2.3 and §23: measured on stage from the event log and the eval set. */
 export const OUTPUT_METRICS = [
-  { metric: "Time-to-context", target: "< 10 s", how: "Buyer’s answer to the card on the courier’s phone, median" },
+  { metric: "Time-to-context", target: "< 10 s", how: "Buyer’s answer to the card on the shipper’s phone, median" },
   { metric: "Extraction F1", target: "≥ 0.90", how: "Per field, on a held-out set of chat, call and memo samples" },
   { metric: "Wrong auto-applies", target: "< 2%", how: "Of the cases the agent closes on its own" },
   { metric: "Without a person", target: "0", how: "Labels, returns or calls out of hours" },
@@ -235,8 +235,8 @@ export const OUTPUT_METRICS = [
 /** What one area gets back each day (PRD §18.8 best-in-class case, SLIDES §3.4). Projected. */
 export const AREA_GAINS = [
   { value: "416", label: "CS calls handled by the agent", note: "≈ 28 staff-hours" },
-  { value: "96", label: "fewer wasted courier trips", note: "320 × 0.3 attempts" },
-  { value: "24 min", label: "back per courier", note: "96 trips × 5 min ÷ 20" },
+  { value: "96", label: "fewer wasted shipper trips", note: "320 × 0.3 attempts" },
+  { value: "24 min", label: "back per shipper", note: "96 trips × 5 min ÷ 20" },
 ];
 
 /** Downloadable proof of every number: formulas, inputs, sources (generated from prep/02-technical/cost-model). */
@@ -247,7 +247,7 @@ export type Tech = { name: string; note: string; icon?: string; mono?: string };
 
 // Demo day (PRD §16.3, §16.5): one VM, Docker Compose, cloud APIs, mock data.
 export const TECH_DEMO: Tech[] = [
-  { name: "Next.js", note: "Courier, ops and buyer screens", icon: "siNextdotjs" },
+  { name: "Next.js", note: "Shipper, ops and buyer screens", icon: "siNextdotjs" },
   { name: "TypeScript", note: "Scenario engine", icon: "siTypescript" },
   { name: "Tailwind CSS", note: "Design tokens", icon: "siTailwindcss" },
   { name: "Motion", note: "Transitions", icon: "siFramer" },
@@ -292,12 +292,12 @@ export const COMPETITORS = {
     {
       label: "Trigger",
       cells: [
-        "Courier taps one meaningful button",
+        "Shipper taps one meaningful button",
         "NDR code from carrier API",
         "NDR event",
         "Tracking exception",
         "NDR from carrier",
-        "Courier marks NDR",
+        "Shipper marks NDR",
         "Recipient books a slot",
       ],
     },
@@ -355,8 +355,8 @@ export const TEAM = [
   { name: "Thanh Loi Tran", role: "Data Engineer", role2: "Backend Developer", focus: "Order Context Object, APIs, metrics log", photo: "/team/thanh-loi-tran.jpg", pos: "50% 30%" },
 ];
 
-/** Couriers whose riders the team interviewed (prep/06-survey). Logos from each company’s site or Wikimedia Commons. */
-export const COURIER_LOGOS = [
+/** Shippers whose riders the team interviewed (prep/06-survey). Logos from each company’s site or Wikimedia Commons. */
+export const SHIPPER_LOGOS = [
   { name: "SPX Express", src: "/logos/couriers/spx.svg", ratio: 2.5, url: "https://spx.vn" },
   { name: "Giao Hang Nhanh", src: "/logos/couriers/ghn.png", ratio: 3.5, url: "https://ghn.vn" },
   { name: "J&T Express", src: "/logos/couriers/jt.svg", ratio: 4.78, url: "https://jtexpress.vn" },
@@ -382,7 +382,7 @@ export const FAQ = [
     a: "Not for the hackathon: Structured Outputs, good prompts and a Codex-run eval loop are enough. In production, fine-tune ASR for regional accents and address vocabulary first, then distill the extractor.",
   },
   {
-    q: "Does Alodi replace the courier app or route planner?",
+    q: "Does Alodi replace the shipper app or route planner?",
     a: "No. Alodi reads orders and events, talks to the buyer, and writes structured context back into the carrier’s own systems.",
   },
 ];

@@ -4,7 +4,7 @@ Everything needed to **pitch Alodi** and to **rebuild it from zero** — landing
 
 Team Develarper · MVP demo on **31 October 2026**.
 
-> **Make the second drop land.** Alodi rescues failed deliveries: the courier taps one button, the agent messages and calls the buyer at the right time, then hands back structured context for the next attempt. High-stakes decisions stay with people.
+> **Make the second drop land.** Alodi rescues failed deliveries: the shipper taps one button, the agent messages and calls the buyer at the right time, then hands back structured context for the next attempt. High-stakes decisions stay with people.
 
 ---
 
@@ -17,7 +17,7 @@ Team Develarper · MVP demo on **31 October 2026**.
 | [`03-design/`](03-design/) | How it looks: the complete design system to rebuild every page, original reference specs, CSS tokens, screenshots of the current build | [`DESIGN.md`](03-design/DESIGN.md) |
 | [`04-brand/`](04-brand/) | Alodi identity (mark C, sound bars — the one on the landing page): outlined SVG wordmarks, marks, app icons, favicon, lockups with taglines, PNG exports, Be Vietnam Pro font | [`BRAND.md`](04-brand/BRAND.md) |
 | [`05-assets/`](05-assets/) | Team portraits, source logos (Shopee, VECOM, Metric…), tech logos (Next.js, FastAPI, OpenAI…) | [`ASSETS.md`](05-assets/ASSETS.md) |
-| [`06-survey/`](06-survey/) | **Mock** survey data (100 customers, 12 couriers) with codebook and summary, to build the EDA charts before the real interviews | [`SURVEY.md`](06-survey/SURVEY.md) |
+| [`06-survey/`](06-survey/) | **Mock** survey data (100 customers, 12 shippers) with codebook and summary, to build the EDA charts before the real interviews | [`SURVEY.md`](06-survey/SURVEY.md) |
 
 ## Full file map
 
@@ -36,7 +36,7 @@ prep/
 │   │                                 ERD, state, sequences), API, architecture, data flow, production cloud design for
 │   │                                 a 20-courier / 2,000-order hub, live demo, mock data, demo-day stack with code,
 │   │                                 build plan, eval, acceptance, traceability, risks
-│   ├── mock-data/                    fictional hub: 20 couriers, 2,000 orders, simulated day, 7 stage scenarios,
+│   ├── mock-data/                    fictional hub: 20 shippers, 2,000 orders, simulated day, 7 stage scenarios,
 │   │                                 utterances, 47 eval samples, 20 test cases, generate.py
 │   ├── requirements.txt              backend Python dependencies
 │   ├── package.json.example          frontend dependencies
@@ -70,7 +70,7 @@ prep/
 └── 06-survey/                       MOCK data until the real interviews replace it
     ├── SURVEY.md
     ├── customers.csv            100 buyers: profile tags + 16 questions
-    ├── couriers.csv             12 couriers from SPX, GHN, J&T, BEST, GHTK, Viettel Post
+    ├── couriers.csv             12 shippers from SPX, GHN, J&T, BEST, GHTK, Viettel Post
     ├── codebook.csv                  questions in English and Vietnamese, types, values
     ├── summary_MOCK.csv              headline shares for slides
     └── generate_mock_survey.py
@@ -91,7 +91,7 @@ These come from the project rules and should survive the rebuild:
 | Kind | Where | Status |
 | --- | --- | --- |
 | Problem figures (40,000 VND, 8–12%, 0 windows, 473M VND a month per area) | `01-pitch/4-SLIDES.md` §3 | Sourced from public documents; models are labelled |
-| Money saved (194M VND a month, 41%, best-in-class) | `02-technical/PRD.md` §18.8 | **Projected** (vendor rescue range) |
+| Money saved (187M VND a month, 40%, best-in-class) | `02-technical/PRD.md` §18.8 | **Projected** (vendor rescue range) |
 | Survey results | `06-survey/` | **Mock** until the real interviews replace them |
 | Output metrics on `/metrics` and the dashboard KPIs | current web build | **Mock** until the eval runs — replace with real numbers before showing them as results |
 | Demo case (Minh Hoang, air fryer, Tower B…) | demo engine | Fictional data |

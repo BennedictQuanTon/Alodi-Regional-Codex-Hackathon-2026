@@ -21,13 +21,13 @@ type Node = { title: string; sub: string; logo?: string; mark?: "dot" | "check" 
 const INPUTS: Node[] = [
   { title: "Route planner", sub: "feasible windows", logo: "/logos/couriers/spx.svg" },
   { title: "Order system", sub: "today’s orders, COD", logo: "/logos/couriers/spx.svg" },
-  { title: "Courier tap", sub: "No answer · Rescheduled · Refused", mark: "dot" },
+  { title: "Shipper tap", sub: "No answer · Rescheduled · Refused", mark: "dot" },
   { title: "Buyer chat", sub: "quick replies, free text", logos: ["siShopee", "siZalo"] },
   { title: "AI call", sub: "GPT-Live-1 over a branded SIP line", logo: "siAsterisk" },
 ];
 
 const OUTPUTS: Node[] = [
-  { title: "Context card", sub: "to the courier, next attempt", logo: "/logos/couriers/spx.svg" },
+  { title: "Context card", sub: "to the shipper, next attempt", logo: "/logos/couriers/spx.svg" },
   { title: "CS queue", sub: "a person decides", mark: "check" },
   { title: "Ops dashboard", sub: "events, metrics, audit", mark: "square" },
 ];
@@ -48,7 +48,7 @@ const STORES = [
 const MODELS = [
   { icon: "siOpenai", name: "GPT-Live-1", sub: "real-time voice calls with the buyer" },
   { icon: "siOpenai", name: "Decisions API", sub: "GPT-6 Luna triages every message" },
-  { icon: "siOpenai", name: "GPT-6.1 Terra", sub: "orchestrates buyer, courier and policy" },
+  { icon: "siOpenai", name: "GPT-6.1 Terra", sub: "orchestrates buyer, shipper and policy" },
   { icon: "siOpenai", name: "gpt-oss-20b", sub: "local fallback · PhoWhisper for memos" },
 ];
 

@@ -64,8 +64,8 @@ export function DemoStage() {
           style={{ width: BASE_W, height: BASE_H - 120, transform: `translate(-50%, -50%) scale(${scale})`, transformOrigin: "center" }}
         >
           <Enter i={0}>
-            <Label>Courier</Label>
-            <ViewTransition name="phone-courier" share="morph" default="none">
+            <Label>Shipper</Label>
+            <ViewTransition name="phone-shipper" share="morph" default="none">
               <PhoneFrame clock={state.clock}>
                 <ShipperApp state={state} engine={engine} />
               </PhoneFrame>

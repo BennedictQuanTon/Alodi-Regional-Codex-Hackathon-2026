@@ -122,8 +122,8 @@ export function DashShell({ children, reviewCount = 116 }: { children: React.Rea
           })}
         </nav>
         <div className="mt-auto space-y-5 px-6 pb-7">
-          <Link href="/demo" className="d-btn d-btn-primary w-full">
-            Open live demo
+          <Link href="/start" className="d-btn d-btn-primary w-full">
+            Open the demo
           </Link>
           <div className="space-y-3 text-[14px] d-text2">
             <div>Settings</div>

@@ -6,6 +6,10 @@ Charts: [`charts/`](charts/), rendered by `charts/make_charts.py` from the cost 
 
 ---
 
+**Current deck order (`Alodi-Pitch.pptx`, 15 slides):** cover · skit video · TL;DR · our story · problem 1, survey · problem 2, research · why we built Alodi · demo film · live demo (blank) · tech stack and OpenAI APIs · metrics and output · future plan · team · thank you · references. The slide table in §2 describes the earlier order; figures below still apply.
+
+---
+
 ## 1. Deck design
 
 ### 1.1 Canvas and grid
@@ -42,14 +46,14 @@ Same family as the demo UI and the film, so slides, charts and video read as one
 | Source line | Geist Mono | 18 px | 400 |
 | Wordmark | Be Vietnam Pro ExtraBold (outlined SVG from `04-brand/`) | — | — |
 
-Money is written **“186M VND”**, because Geist has no “₫” glyph.
+Money is written **“187M VND”**, because Geist has no “₫” glyph.
 
 ### 1.4 Rules
 
 - One idea per slide, at most 12 words of body text. The voice carries the rest.
 - Every number has a label (*sourced*, *modelled*, *projected*, *mock*) and a plain-text source line. No [1] markers or superscripts.
 - Glyphs: Alodi marks (ring + dot / check / sound bars / square) and plain arrows only. Real logos only to name real companies (sources strip, tech).
-- No stock photos of couriers unless they are the team’s own **[USER IMAGE]**; no AI-generated people.
+- No stock photos of shippers unless they are the team’s own **[USER IMAGE]**; no AI-generated people.
 - Builds: one element per click, matching the film’s motion (out-expo, 0.4 s). No spins, bounces or flies.
 
 ## 2. Slide by slide
@@ -57,14 +61,14 @@ Money is written **“186M VND”**, because Geist has no “₫” glyph.
 | # | Slide | Background | Layout | Content | Chart / asset | Source line |
 | --- | --- | --- | --- | --- | --- | --- |
 | S1 | **Title** | Night | Lockup centred, team name below | Alodi mark C + wordmark · “Make the second drop land.” · Team Develarper | `04-brand/lockup/alodi-lockup-make-the-second-drop-land-dark.svg` | — |
-| S2 | **Hook** | Night | One question, centred, word build | “Have you ever missed the courier’s call in the middle of a meeting?” | Buyer phone screenshot with two missed calls (`/buyer`) | — |
-| S3 | **What people told us** | Day | Two charts side by side (cols 1–7 and 8–12) | Buyers: pain frequency · Couriers: would you like it? | `charts/06-problem-survey-buyers-MOCK-light` + `07-problem-survey-couriers-MOCK-light` → **replace with real results** | “Alodi buyer survey (n = …) and courier interviews (n = …), Oct 2026” |
+| S2 | **Hook** | Night | One question, centred, word build | “Have you ever missed the shipper’s call in the middle of a meeting?” | Buyer phone screenshot with two missed calls (`/buyer`) | — |
+| S3 | **What people told us** | Day | Two charts side by side (cols 1–7 and 8–12) | Buyers: pain frequency · Shippers: would you like it? | `charts/06-problem-survey-buyers-MOCK-light` + `07-problem-survey-couriers-MOCK-light` → **replace with real results** | “Alodi buyer survey (n = …) and shipper interviews (n = …), Oct 2026” |
 | S4 | **The real cost** | Day | Three hero numbers in a row + refusal chart below | **40,000 VND** per failed order · **8–12%** refused · **0** ways to pick a time | `charts/01-problem-refusal-rates-light` | “Shopee Return & Refund Policy §7.1 · VECOM, Nguoi Lao Dong 19 Jul 2025 · Shopee Help Center 79559” |
-| S5 | **One area, one month** | Day | Chart cols 1–8, hero number cols 9–12 | **473M VND** lost a month (≈ 5.7B VND a year) · 20 couriers · 4,000 orders a day | `charts/02-problem-monthly-loss-light` | “Modelled: Shopee §7.1, VECOM 8%, Shipsy 25% (vendor), GHN, Glints — PRD §18.8” |
-| S6 | **Alodi in one picture** | Day | Flow left → right: tap → chat → call → extract → card, with the human lane below | “One tap. One conversation. One card for the next courier.” | Simplified `02-technical/diagrams/alodi-flow.png` | — |
-| S7 | **Live demo** | Night | Four labelled frames (01 courier, 02 ops, 03 buyer, 04 control) | Switch to the devices | Screens from the build | — |
-| S8 | **OpenAI at the core** | Night | System diagram, hairlines; OpenAI logo once | GPT-Live-1 · Decisions API (GPT-6 Luna) · GPT-5.6 Terra · Structured Outputs · OpenAI TTS · API fallback for the hard 10% · policy guard in code | PRD §18.8.2 diagram, restyled | “PRD §16, §18.8” |
-| S9 | **What it delivers** | Day | Before/after chart cols 1–8; three tiles below or right | **−186M VND a month (39%)** · ≈ 2.2B VND a year · costs 4% of the loss · **6 s** to context · **65%** handled alone | `charts/03-output-before-after-light`, `05-output-cost-share-light`, `08-output-three-numbers-light` | “Projected: Shipsy best-in-class 50–65% (vendor), PRD §18.8. 6 s and 65%: target until measured” |
+| S5 | **One area, one month** | Day | Chart cols 1–8, hero number cols 9–12 | **473M VND** lost a month (≈ 5.7B VND a year) · 20 shippers · 4,000 orders a day | `charts/02-problem-monthly-loss-light` | “Modelled: Shopee §7.1, VECOM 8%, Shipsy 25% (vendor), GHN, Glints — PRD §18.8” |
+| S6 | **Alodi in one picture** | Day | Flow left → right: tap → chat → call → extract → card, with the human lane below | “One tap. One conversation. One card for the next shipper.” | Simplified `02-technical/diagrams/alodi-flow.png` | — |
+| S7 | **Live demo** | Night | Four labelled frames (01 shipper, 02 ops, 03 buyer, 04 control) | Switch to the devices | Screens from the build | — |
+| S8 | **OpenAI at the core** | Night | System diagram, hairlines; OpenAI logo once | GPT-Live-1 · Decisions API (GPT-6 Luna) · GPT-6.1 Terra · Structured Outputs · OpenAI TTS · API fallback for the hard 10% · policy guard in code | PRD §18.8.2 diagram, restyled | “PRD §16, §18.8” |
+| S9 | **What it delivers** | Day | Before/after chart cols 1–8; three tiles below or right | **−187M VND a month (40%)** · ≈ 2.25B VND a year · costs 6% of the loss · **6 s** to context · **65%** handled alone | `charts/03-output-before-after-light`, `05-output-cost-share-light`, `08-output-three-numbers-light` | “Projected: Shipsy best-in-class 50–65% (vendor), PRD §18.8. 6 s and 65%: target until measured” |
 | S10 | **Team + ask** | Night | Four portraits, names, roles; one ask line | “Next: shadow mode at one area.” | `05-assets/team/` | — |
 
 Backup slides (appendix):
@@ -96,13 +100,13 @@ Labels:
 | **3 failed COD orders in 90 days** | Shopee disables COD for that buyer, which is why labels need a person | Sourced | Shopee Help Center 79196 |
 | **429.7T VND** | 2025 sales on Shopee, TikTok Shop, Lazada, Tiki (+34.75%) | Sourced | Metric via Brands Vietnam |
 
-### 3.2 One area, one month (20 couriers, 4,000 orders a day)
+### 3.2 One area, one month (20 shippers, 4,000 orders a day)
 
 | Item | Per month | Type | Basis |
 | --- | --- | --- | --- |
 | Return fees | 288M VND | Derived | 4,000 × 8% = 320 failed a day; 75% returned (Shipsy 25% rescue, vendor) × 40,000 VND × 30 |
-| Courier pay for redelivery | 86–115M VND | Derived | 320 × 1.5 attempts × 6–8k VND (GHN) |
-| Courier time at unanswered doors | 27–51M VND | Modelled | 320 × 5 min × courier income 8–15M VND a month (Glints) |
+| Shipper pay for redelivery | 86–115M VND | Derived | 320 × 1.5 attempts × 6–8k VND (GHN) |
+| Shipper time at unanswered doors | 27–51M VND | Modelled | 320 × 5 min × shipper income 8–15M VND a month (Glints) |
 | CS calling buyers back | 45M VND | Estimate | 320 × 2 calls × 4 min × 35,000 VND/h |
 | **Total loss** | **447–499M VND (≈ 473M)**; ≈ 5.7B VND a year | Modelled | PRD §18.8 |
 
@@ -111,10 +115,10 @@ Labels:
 | Item | Value | Type |
 | --- | --- | --- |
 | One-time infrastructure | 75–98M VND (2 × RTX 5060 Ti 16 GB, workstation, UPS, 4G router) | Listed price + estimate |
-| Running cost | **29.0M VND a month** (6.1% of the loss): GPT-Live-1 calls, Decisions API triage on GPT-6 Luna, GPT-5.6 Terra orchestration, SIP, Zalo ZNS for risky orders, electricity, fibre, backup, 0.1 FTE ops | Estimate (OpenAI list prices) |
+| Running cost | **27.3M VND a month** (5.8% of the loss): GPT-Live-1 calls, Decisions API triage on GPT-6 Luna, GPT-6.1 Terra orchestration, SIP, Zalo ZNS for risky orders, electricity, fibre, backup, 0.1 FTE ops | Estimate (OpenAI list prices) |
 | Gross saving, best-in-class | 214.7M VND a month (45%) | Projected |
-| **Net saving, best-in-class (headline)** | **185.7M VND a month = 39% of the loss; ≈ 2.23B VND a year**; server pays back in ~2 weeks | Projected |
-| Net saving, base / conservative | 90.7M (19%) / 46.5M (10%) a month | Projected |
+| **Net saving, best-in-class (headline)** | **187.4M VND a month = 40% of the loss; ≈ 2.25B VND a year**; server pays back in ~2 weeks | Projected |
+| Net saving, base / conservative | 92.4M (20%) / 48.3M (10%) a month | Projected |
 | vs AWS-managed design | 68.4M VND a month running cost → this design is ~58% cheaper | Estimate |
 
 The best-in-class assumption: today’s 25% rescue rises to 65%. Shipsy reports industry 20–30% and best-in-class 50–65% (vendor). The full model and every input are in PRD §18.8 and `02-technical/cost-model/cost_model.py`.
@@ -123,13 +127,13 @@ The best-in-class assumption: today’s 25% rescue rises to 65%. Shipsy reports 
 
 | Number | Meaning | Status |
 | --- | --- | --- |
-| **6 s** | From the buyer’s answer to the context card on the courier’s phone (time-to-context) | **Mock / target**: measured from the demo event log |
+| **6 s** | From the buyer’s answer to the context card on the shipper’s phone (time-to-context) | **Mock / target**: measured from the demo event log |
 | **65%** | Failed deliveries resolved without a person, with 0 calls out of hours and 0 labels without approval (safe autonomy) | **Mock / target**: measured by the eval run (mock day: 60%) |
 
 Supporting utilisation numbers (projected, per area per day):
 - ≈ 416 CS calls handled by the agent (≈ 28 staff-hours).
-- ≈ 96 fewer wasted courier trips.
-- ≈ 24 minutes back per courier.
+- ≈ 96 fewer wasted shipper trips.
+- ≈ 24 minutes back per shipper.
 
 ### 3.5 Rules (design numbers, not market data)
 
@@ -137,12 +141,12 @@ Supporting utilisation numbers (projected, per area per day):
 
 ## 4. Competitors (backup slide B3)
 
-**Headline:** *AI delivery rescue exists in India. Nobody builds it for Vietnamese buyers, starting from one courier tap.*
+**Headline:** *AI delivery rescue exists in India. Nobody builds it for Vietnamese buyers, starting from one shipper tap.*
 
 | | **Alodi** | ClickPost | Shipsy | AfterShip Agent | Ringg AI | Shiprocket | GHTK |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Market | Vietnam | India | India | Global | India | India | Vietnam |
-| Trigger | Courier taps one meaningful button | NDR code | NDR event | Tracking exception | NDR | Courier marks NDR | Recipient books a slot |
+| Trigger | Shipper taps one meaningful button | NDR code | NDR event | Tracking exception | NDR | Shipper marks NDR | Recipient books a slot |
 | Reaching the buyer | Marketplace chat → AI call | SMS, email, WhatsApp, IVR, voice | Automated CX agent | Drafts for approval | Voice agent | SMS + IVR | App, hotline |
 | Asks for a window before delivery | Yes, from the route planner | Not disclosed | Yes | Not disclosed | Not disclosed | Not disclosed | Yes, half-day |
 | Context for the next attempt | JSON with confidence, audit | Reattempt / return | Not disclosed | Suggested fix | Disposition | Reattempt / return | Note |
@@ -173,12 +177,12 @@ What makes Alodi different:
 | --- | --- | --- |
 | `01-problem-refusal-rates-{light,dark}` | S4 | Refusal rates by context |
 | `02-problem-monthly-loss-{light,dark}` | S5 | 473M VND loss, by item |
-| `03-output-before-after-{light,dark}` | S9 | Today vs with Alodi, −186M VND |
+| `03-output-before-after-{light,dark}` | S9 | Today vs with Alodi, −187M VND |
 | `04-output-scenarios-{light,dark}` | B1 | Conservative / base / best-in-class |
-| `05-output-cost-share-{light,dark}` | S9 | Running cost = 6.1% of the loss |
+| `05-output-cost-share-{light,dark}` | S9 | Running cost = 5.8% of the loss |
 | `06-problem-survey-buyers-MOCK-{light,dark}` | S3 | Buyer pain frequency (mock until real) |
-| `07-problem-survey-couriers-MOCK-{light,dark}` | S3 | Courier adoption (mock until real) |
-| `08-output-three-numbers-{light,dark}` | S9 | 186M VND · 6 s · 65% |
+| `07-problem-survey-couriers-MOCK-{light,dark}` | S3 | Shipper adoption (mock until real) |
+| `08-output-three-numbers-{light,dark}` | S9 | 187M VND · 6 s · 65% |
 
 Re-render after the real survey arrives: `python3 charts/make_charts.py` (needs matplotlib). It reads `../06-survey/customers.csv`, `couriers.csv` and the cost model output.
 
@@ -196,8 +200,8 @@ Cite in plain text (“Source: …”), never with numbered markers.
 - Metric via Brands Vietnam, E-commerce 2025: https://www.brandsvietnam.com/congdong/topic/thi-truong-tmdt-viet-nam-nam-2025-nhung-chuyen-dich-dang-chu
 
 **Money model**
-- GHN, courier pay per order: https://ghn.vn/blogs/tip-ban-hang/mot-don-hang-shipper-shopee-duoc-bao-nhieu-tien
-- Glints Vietnam, courier income: https://glints.com/vn/blog/muc-luong-shipper/
+- GHN, shipper pay per order: https://ghn.vn/blogs/tip-ban-hang/mot-don-hang-shipper-shopee-duoc-bao-nhieu-tien
+- Glints Vietnam, shipper income: https://glints.com/vn/blog/muc-luong-shipper/
 - Shipsy, NDR rescue rates (vendor): https://shipsy.ai/insights/what-is-ndr-non-delivery-report-management
 - Phong Vu, RTX 5060 Ti / 5090 listings: https://phongvu.vn/c/vga-rtx-5060-ti · https://phongvu.vn/c/vga-rtx-5090
 - Viettel Mobile SIP trunk: https://viettelnet.vn/tong-dai-ao-tong-dai-noi-bo-sip-trunking-mobile-sip-viettel/

@@ -20,8 +20,8 @@ export const TRAILER: Shot[] = [
   {
     tc: "0:18–0:26",
     screen: "/demo/shipper",
-    action: "10:02, the courier calls, no answer. Close-up of the thumb tapping “A · No answer”.",
-    vo: "With Alodi, the courier taps one button.",
+    action: "10:02, the shipper calls, no answer. Close-up of the thumb tapping “A · No answer”.",
+    vo: "With Alodi, the shipper taps one button.",
   },
   {
     tc: "0:26–0:36",
@@ -47,7 +47,7 @@ export const TRAILER: Shot[] = [
     tc: "1:08–1:20",
     screen: "/demo/shipper",
     action: "The context card slides in. Cut to the next day, 17:22, tap Delivered.",
-    vo: "Seconds later the context card is in the courier’s app. The next day, the parcel reaches the right person, at the right time.",
+    vo: "Seconds later the context card is in the shipper’s app. The next day, the parcel reaches the right person, at the right time.",
     onScreen: "Time-to-context: 4 seconds",
   },
   {
@@ -70,14 +70,14 @@ export const LIVE: Beat[] = [
   {
     time: "0:30",
     who: "Nomura Yoshio",
-    say: "Three screens: the courier app, the buyer’s phone, and the customer-service console. The demo clock fast-forwards: sixty minutes become six seconds.",
+    say: "Three screens: the shipper app, the buyer’s phone, and the customer-service console. The demo clock fast-forwards: sixty minutes become six seconds.",
     do: "Open /demo, scenario “A · No answer”, turn Auto-tap off, press Play.",
   },
   {
     time: "0:45",
     who: "Long Quan Ton",
-    say: "The courier arrives, calls, no answer. Instead of typing a note, he taps one button.",
-    do: "Tap A in the courier app.",
+    say: "The shipper arrives, calls, no answer. Instead of typing a note, he taps one button.",
+    do: "Tap A in the shipper app.",
   },
   {
     time: "1:00",
@@ -100,7 +100,7 @@ export const LIVE: Beat[] = [
   {
     time: "2:05",
     who: "Long Quan Ton",
-    say: "Four seconds after hang-up, the context card is in the courier’s app. The next day, delivered.",
+    say: "Four seconds after hang-up, the context card is in the shipper’s app. The next day, delivered.",
     do: "Let it run to Delivered (or press →).",
   },
   {

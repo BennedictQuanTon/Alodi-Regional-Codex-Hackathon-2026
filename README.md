@@ -6,22 +6,22 @@ Team **Develarper**'s project for the
 [Sea × OpenAI Regional Codex Hackathon, Vietnam](https://codexhackathon.sea.com/)
 (31 October 2026, Ho Chi Minh City).
 
-Alodi rescues failed deliveries for Vietnamese e-commerce. The courier taps one
+Alodi rescues failed deliveries for Vietnamese e-commerce. The shipper taps one
 button, the agent messages and calls the buyer at the right time, then hands
 back structured context for the next attempt. High-stakes decisions stay with
 people.
 
 ## How it works
 
-1. A delivery fails and the courier taps one button:
+1. A delivery fails and the shipper taps one button:
    - **A · No answer**: the agent chats the buyer at once; after 60 minutes of
      silence it places an AI call, and a second call 2 hours later.
-   - **B · Rescheduled**: the courier records a 10-second voice memo of what
+   - **B · Rescheduled**: the shipper records a 10-second voice memo of what
      the buyer said.
    - **Refused**: straight to customer service, no buyer contact.
 2. The agent extracts the time window, drop-off point and alternate receiver as
    structured JSON with a confidence score per field.
-3. Every field at 0.85 or above is applied automatically and the next courier
+3. Every field at 0.85 or above is applied automatically and the next shipper
    gets a context card; anything lower is confirmed in chat or sent to a person.
 4. Hard rules hold throughout: calls only 08:00–20:30, at most two calls per
    cycle, labels such as "suspected bomb" applied only by a person.
@@ -47,12 +47,14 @@ npm run dev        # http://localhost:3000
 | Route | What it is |
 | --- | --- |
 | `/` | Landing page |
-| `/demo` | Demo stage: courier app, buyer phone and operations panel side by side |
+| `/start` | Choose a demo: Live demo or Judges demo |
+| `/live` | Live demo interface, empty until connected to the backend |
+| `/demo` | Demo stage: shipper app, buyer phone and operations panel side by side |
 | `/demo/shipper` · `/demo/buyer` · `/demo/console` | One screen per window; tabs stay in sync |
 | `/console` | Operations dashboard: KPIs, rescue trend, failure reasons, exception queue, case detail |
 | `/metrics` | Output metrics and a projected-savings calculator |
 | `/script` | Demo script |
-| `/dev/integrated` | Real local database/workflow, scheduler, GPT calls and courier memo workspace |
+| `/dev/integrated` | Real local database/workflow, scheduler, GPT calls and shipper memo workspace |
 | `/dev/ai` | Standalone AI fixture lab (separate backend; does not apply to the real workflow) |
 
 Numbers on `/metrics` and the dashboard are *mock* until the eval runs;

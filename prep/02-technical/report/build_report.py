@@ -31,8 +31,8 @@ BASE = ROWS[("local_first", "risky_only", "base")]
 CONS = ROWS[("local_first", "risky_only", "conservative")]
 AWS = ROWS[("aws_managed", "risky_only", "best_in_class")]
 DAY = json.loads((ROOT / "prep/02-technical/mock-data/expected-day-summary.json").read_text())
-DOOR = L["items"]["Courier time lost when the buyer doesn't answer"]
-VERSION = "0.4 · working draft"
+DOOR = L["items"]["Shipper time lost when the buyer doesn't answer"]
+VERSION = "0.5 · working draft"
 DATE = "31 October 2026"
 
 
@@ -49,11 +49,11 @@ def rows_csv(p):
         return list(csv.DictReader(f))
 
 
-couriers = rows_csv(ROOT / "prep/06-survey/couriers.csv")
+shippers = rows_csv(ROOT / "prep/06-survey/couriers.csv")
 customers = rows_csv(ROOT / "prep/06-survey/customers.csv")
-summary = {(r["audience"], r["metric"]): r["value"] for r in rows_csv(ROOT / "prep/06-survey/summary_MOCK.csv")}
-status = Counter(r["data_status"] for r in couriers + customers)
-companies = Counter(r["company"] for r in couriers)
+summary = {(r["audience"], r["metric"].replace("courier", "shipper").replace("Courier", "Shipper")): r["value"] for r in rows_csv(ROOT / "prep/06-survey/summary_MOCK.csv")}
+status = Counter(r["data_status"] for r in shippers + customers)
+companies = Counter(r["company"] for r in shippers)
 placeholder = status.get("REAL", 0) == 0
 sv = lambda a, k: summary.get((a, k), "–")
 
@@ -121,7 +121,7 @@ contents = f"""
  ["Return fee the seller pays per failed order", "up to ₫40,000", "Sourced", "Shopee policy §7.1; cap since 1 Apr 2025 (GHN)"],
  ["Orders refused at the door, nationwide", "8–12%", "Sourced", "VECOM via Nguoi Lao Dong, 19 Jul 2025"],
  ["Delivery windows a Shopee buyer can choose", "0", "Sourced", "Shopee Help Center 79559"],
- ["Loss per area per month (20 couriers, 4,000 orders a day)", f"≈ {m(MID)}", "Modelled", "Team cost model, §10"],
+ ["Loss per area per month (20 shippers, 4,000 orders a day)", f"≈ {m(MID)}", "Modelled", "Team cost model, §10"],
  ["Alodi running cost per area per month", m(BEST['cost_month'], 1), "Estimate", "OpenAI list prices, SIP, ZNS, ops, §10"],
  ["Net saving per area per month, best-in-class", f"{m(BEST['net_month'], 1)} ({net_pct:.0%})", "Projected", "Shipsy best-in-class rescue range (vendor)"],
  ["Time-to-context target", "< 10 s", "Measured on stage", "PRD §2.3"],
@@ -134,10 +134,10 @@ contents = f"""
 c1 = chapter(1, "Executive summary", "A failed delivery is a time negotiation that happens off the system. Alodi brings it back in.", f"""
 <div class="cols">
 <p><b>Problem.</b> Sellers pay up to ₫40,000 in return shipping for every failed Shopee order, 8–12% of orders are refused at the door, and buyers
-cannot choose a delivery window. When a courier can’t reach a buyer, the context that would fix the next attempt is compressed into one error code.
-For one area of 20 couriers and 4,000 orders a day, that costs about {m(MID)} a month (modelled).</p>
-<p><b>Product.</b> The courier taps one button: No answer, Rescheduled or Refused. Alodi messages the buyer at once and calls if there is silence
-(60 minutes, then 2 hours, only 08:00–20:30). GPT-Live-1 holds the call, the Decisions API on GPT-6 Luna triages every answer, and GPT-5.6 Terra
+cannot choose a delivery window. When a shipper can’t reach a buyer, the context that would fix the next attempt is compressed into one error code.
+For one area of 20 shippers and 4,000 orders a day, that costs about {m(MID)} a month (modelled).</p>
+<p><b>Product.</b> The shipper taps one button: No answer, Rescheduled or Refused. Alodi messages the buyer at once and calls if there is silence
+(60 minutes, then 2 hours, only 08:00–20:30). GPT-Live-1 holds the call, the Decisions API on GPT-6 Luna triages every answer, and GPT-6.1 Terra
 orchestrates the case and writes a context card with when, where and who. Refusals, labels and returns always go to a person.</p>
 <p><b>Proof.</b> Three outcomes are measured on stage: time-to-context under 10 seconds, per-field F1 of at least 0.90, and zero high-stakes actions
 without a person. Money is projected: at best-in-class rescue Alodi saves {m(BEST['net_month'], 1)} a month per area ({net_pct:.0%} of the loss)
@@ -146,11 +146,11 @@ after a running cost of {m(BEST['cost_month'], 1)}.</p>
 national rollout by 2028.</p>
 </div>
 {sub("1.1", "At a glance")}
-{kf([(m(MID), "lost a month in one area today", "Modelled"), ("1 tap", "from the courier starts a rescue", "Product"), ("< 10 s", "from the buyer’s answer to the courier’s card", "Target · measured on stage"), (m(BEST['net_month']), f"net saving a month, {net_pct:.0%} of the loss", "Projected")])}
+{kf([(m(MID), "lost a month in one area today", "Modelled"), ("1 tap", "from the shipper starts a rescue", "Product"), ("< 10 s", "from the buyer’s answer to the shipper’s card", "Target · measured on stage"), (m(BEST['net_month']), f"net saving a month, {net_pct:.0%} of the loss", "Projected")])}
 {sub("1.2", "Why now")}
 <ul class="cols"><li><b>The cost moved to sellers.</b> Since April 2025 Shopee sellers pay return shipping on failed orders, up to ₫40,000 each.</li>
 <li><b>Volume keeps growing.</b> The four largest marketplaces sold ₫429.7T in 2025, up 34.75% (Metric); call teams cannot grow that fast.</li>
-<li><b>The models are ready.</b> GPT-Live-1 makes a natural voice call possible, the Decisions API makes triage cheap, GPT-5.6 Terra handles the orchestration.</li>
+<li><b>The models are ready.</b> GPT-Live-1 makes a natural voice call possible, the Decisions API makes triage cheap, GPT-6.1 Terra handles the orchestration.</li>
 <li><b>The rules are clear.</b> Shopee’s 2–3 contacts within 5 days give the agent a fixed frame to work inside.</li></ul>
 """)
 
@@ -158,7 +158,7 @@ c2 = chapter(2, "The problem", "Nothing is broken in the route. The context dies
 {kf([("₫40,000", "return fee per failed order", "Shopee §7.1 · GHN · Sourced"), ("8–12%", "refused at the door, nationwide", "VECOM · Sourced"), ("0", "delivery windows a buyer can choose", "Shopee 79559 · Sourced"), ("3 in 90 days", "failed COD orders before COD is switched off", "Shopee 79196 · Sourced")])}
 {sub("2.1", "Why it persists")}
 <ul class="cols">
-<li><b>Time is negotiated off the system.</b> Shopee does not support choosing a delivery time, so buyer and courier agree by phone.</li>
+<li><b>Time is negotiated off the system.</b> Shopee does not support choosing a delivery time, so buyer and shipper agree by phone.</li>
 <li><b>One error code replaces the context.</b> “No answer” or “rescheduled” loses when, where and who; the second attempt repeats the first.</li>
 <li><b>People don’t scale.</b> Phoning 320 failed buyers twice a day for four minutes takes about five full-time callers per area (estimate).</li>
 <li><b>The frame is fixed.</b> Shopee allows 2–3 contact attempts and a reschedule within 5 days (Help Center 79569).</li>
@@ -166,8 +166,8 @@ c2 = chapter(2, "The problem", "Nothing is broken in the route. The context dies
 {sub("2.2", "One area, one month")}
 {table(["Loss item", "Formula", "~Per month", "Type"], [
  ["Return fees paid by sellers", "4,000 × 8% = 320 failed a day; 75% not rescued × ₫40,000 × 30", m(L['items']['Return fees paid by sellers'][0], 1), "Derived"],
- ["Courier pay for redelivery", "320 × 1.5 attempts × ₫6,000–8,000 × 30", f"{m(L['items']['Courier pay for redelivery attempts'][0], 1)}–{m(L['items']['Courier pay for redelivery attempts'][1], 1)}", "Derived"],
- ["Courier time at unanswered doors", "320 × 5 min × courier hourly cost × 30", f"{m(DOOR[0], 1)}–{m(DOOR[1], 1)}", "Modelled"],
+ ["Shipper pay for redelivery", "320 × 1.5 attempts × ₫6,000–8,000 × 30", f"{m(L['items']['Shipper pay for redelivery attempts'][0], 1)}–{m(L['items']['Shipper pay for redelivery attempts'][1], 1)}", "Derived"],
+ ["Shipper time at unanswered doors", "320 × 5 min × shipper hourly cost × 30", f"{m(DOOR[0], 1)}–{m(DOOR[1], 1)}", "Modelled"],
  ["CS calling buyers back", "320 × 2 calls × 4 min × ₫35,000/h × 30", m(L['items']['Hub / CS staff calling buyers back'][0], 1), "Estimate"],
  ["<b>Total</b>", "midpoint of low and high", f"<b>{m(L['total'][0])}–{m(L['total'][1])} · ≈ {m(MID)}</b>", "Modelled"],
 ])}
@@ -179,18 +179,18 @@ c3 = chapter(3, "What we heard: the survey", "We asked both sides of the same mi
 {'The response files in the repository are still the generated placeholders (prep/06-survey, seed 30102026). The values below show what the survey measures and are replaced by the interview export before they are quoted as findings.' if placeholder else 'Real interview responses.'}</div>
 <div class="cols2">
 <div>{sub("3.1", f"Buyers · n = {len(customers)}")}
-{table(["Question", "~Value"], [["Want to choose a delivery window", sv('customer', 'Want to choose a delivery window (agree or strongly agree)')], ["Called the courier back and couldn’t reach them", sv('customer', 'Called back and could not reach the courier, sometimes or more')], ["Courier called while busy, often", sv('customer', 'Courier called while busy, often or very often')], ["Comfortable with an automated call", sv('customer', 'Comfortable with an automated call (agree or strongly agree)')], ["Would use an Alodi-like service", sv('customer', 'Would use an Alodi-like service: Yes')]])}</div>
-<div>{sub("3.2", f"Couriers · n = {len(couriers)}")}
+{table(["Question", "~Value"], [["Want to choose a delivery window", sv('customer', 'Want to choose a delivery window (agree or strongly agree)')], ["Called the shipper back and couldn’t reach them", sv('customer', 'Called back and could not reach the shipper, sometimes or more')], ["Shipper called while busy, often", sv('customer', 'Shipper called while busy, often or very often')], ["Comfortable with an automated call", sv('customer', 'Comfortable with an automated call (agree or strongly agree)')], ["Would use an Alodi-like service", sv('customer', 'Would use an Alodi-like service: Yes')]])}</div>
+<div>{sub("3.2", f"Shippers · n = {len(shippers)}")}
 {table(["Question", "~Value"], [["Calls to buyers a day (mean)", sv('courier', 'Mean calls to buyers per day')], ["Share of calls unanswered (mean %)", sv('courier', 'Mean unanswered call share (%)')], ["Buyers call while riding, often", sv('courier', 'Buyers call while riding, often or very often')], ["Would like an Alodi-like system", sv('courier', 'Would like an Alodi-like system: Yes')], ["Minutes saved a day expected (mean)", sv('courier', 'Mean expected minutes saved per day (Yes answers)')]])}</div>
 </div>
-{note(f"Courier sample: {', '.join(f'{k} {v}' for k, v in companies.most_common())}. Instrument: 16 buyer and 15 courier questions in Vietnamese and English (prep/06-survey/codebook.csv). Names and phone numbers are dropped before saving (Vietnam PDPL).")}
+{note(f"Shipper sample: {', '.join(f'{k} {v}' for k, v in companies.most_common())}. Instrument: 16 buyer and 15 shipper questions in Vietnamese and English (prep/06-survey/codebook.csv). Names and phone numbers are dropped before saving (Vietnam PDPL).")}
 """)
 
 c4 = chapter(4, "Alodi", "The AI agent that rescues failed deliveries. Autonomous where the rules are clear; human where they aren’t.", f"""
 {sub("4.1", "The flow, in eight steps")}
 <ol class="steps8">
 <li><b>Load orders and windows</b><span>every morning, per area</span></li><li><b>Ask for a window</b><span>≥ 2 options from the route planner</span></li>
-<li><b>Note to the courier</b><span>no reply: deliver as planned</span></li><li><b>Deliver, tap the outcome</b><span>A / B / Refused, 2-minute undo</span></li>
+<li><b>Note to the shipper</b><span>no reply: deliver as planned</span></li><li><b>Deliver, tap the outcome</b><span>A / B / Refused, 2-minute undo</span></li>
 <li><b>Flow A · no answer</b><span>chat → 60′ call → +2 h call → CS</span></li><li><b>Flow B · rescheduled</b><span>10 s memo → ASR → mask → JSON</span></li>
 <li><b>Save the appointment</b><span>context card for the next attempt</span></li><li><b>CS decides</b><span>a person labels and returns</span></li>
 </ol>
@@ -199,13 +199,13 @@ c4 = chapter(4, "Alodi", "The AI agent that rescues failed deliveries. Autonomou
 """)
 
 c5 = chapter(5, "The product", "Four screens and one agent, kept in sync on a fast-forward clock.", table(["Surface", "Who uses it", "What it does"], [
- ["Courier app", "Courier, on a phone", "One tap (No answer · Rescheduled · Refused), 10-second voice memo, context card for the next attempt"],
+ ["Shipper app", "Shipper, on a phone", "One tap (No answer · Rescheduled · Refused), 10-second voice memo, context card for the next attempt"],
  ["Buyer channel", "Buyer, on a laptop in the demo", "Chat with quick replies; the AI call"],
  ["Ops console", "Dispatcher and CS, on an iPad", "Live case, extracted fields with confidence, audit trail, label approval"],
  ["Hub dashboard", "Hub lead", "A simulated 4,000-order day: rescue pipeline by step, failures by hour, policy guard, 20 routes, CS queue"],
 ]) + sub("5.1", "Demo scenarios on route R07") + table(["Scenario", "What happens", "Expected outcome"], [
  ["<b>A_main</b>", "No reply; tap A 10:02; chat; AI call 1 at 11:04 answered", "1 Nov 17:00–20:00 (0.94), Tower B security (0.88), wife (0.91); auto-applied"],
- ["<b>B_memo</b>", "Tap B 10:40; 9-second courier memo", "1 Nov 08:00–10:00 (0.93), Tower A reception (0.90); auto-applied"],
+ ["<b>B_memo</b>", "Tap B 10:40; 9-second shipper memo", "1 Nov 08:00–10:00 (0.93), Tower A reception (0.90); auto-applied"],
  ["<b>REFUSE</b>", "Tap Refused 11:10", "No buyer contact; suggested label; CS approves the return"],
  ["<b>A_lowconf</b>", "Tap A 12:20; call 1 gets a vague answer", "0.52 / 0.41; confirm in chat; CS applies 14:00–17:00"],
  ["<b>A_noanswer</b>", "Tap A 14:30; calls at 15:32 and 17:32 missed", "Escalated after two calls; no third call"],
@@ -213,28 +213,28 @@ c5 = chapter(5, "The product", "Four screens and one agent, kept in sync on a fa
 
 c6 = chapter(6, "Architecture", "An agent layer between the buyer and the carrier. It replaces nothing and fails open.", """
 <div class="arch">
-  <div class="col"><h4>Carrier + buyer</h4><div>Route planner · SPX</div><div>Order system · SPX</div><div>Courier tap</div><div>Buyer chat · Shopee / Zalo</div><div>AI call · GPT-Live-1 over SIP</div></div>
-  <div class="core"><h4>alodi · agent layer</h4><div><b>Alodi Agent</b> · GPT-5.6 Terra, Agents SDK</div><div><b>Triage</b> · Decisions API on GPT-6 Luna</div><div><b>Policy guard</b> · rules in code, masks PII</div><div><b>Scheduler</b> · Temporal timers</div><p>PostgreSQL · Redis · MinIO · gpt-oss-20b fallback</p></div>
-  <div class="col"><h4>Back to the carrier</h4><div>Context card → courier</div><div>CS queue → a person</div><div>Ops dashboard</div></div>
+  <div class="col"><h4>Carrier + buyer</h4><div>Route planner · SPX</div><div>Order system · SPX</div><div>Shipper tap</div><div>Buyer chat · Shopee / Zalo</div><div>AI call · GPT-Live-1 over SIP</div></div>
+  <div class="core"><h4>alodi · agent layer</h4><div><b>Alodi Agent</b> · GPT-6.1 Terra, Agents SDK</div><div><b>Triage</b> · Decisions API on GPT-6 Luna</div><div><b>Policy guard</b> · rules in code, masks PII</div><div><b>Scheduler</b> · Temporal timers</div><p>PostgreSQL · Redis · MinIO · gpt-oss-20b fallback</p></div>
+  <div class="col"><h4>Back to the carrier</h4><div>Context card → shipper</div><div>CS queue → a person</div><div>Ops dashboard</div></div>
 </div>
 """ + table(["Component", "Demo (31 Oct)", "Production (per area)"], [
  ["Clients", "Next.js PWA on a phone, iPad console, laptop buyer view", "SPX driver app, a screen in the SPX dashboard, Shopee Chat / Zalo"],
  ["API + realtime", "FastAPI, REST + WebSocket", "FastAPI behind Caddy"],
- ["Agent", "State machine + tool calling", "GPT-5.6 Terra on the Agents SDK; workers on a Temporal queue"],
- ["Models", "OpenAI API, OpenAI TTS, AssemblyAI", "GPT-Live-1, Decisions API (GPT-6 Luna), GPT-5.6 Terra; gpt-oss-20b and PhoWhisper locally"],
+ ["Agent", "State machine + tool calling", "GPT-6.1 Terra on the Agents SDK; workers on a Temporal queue"],
+ ["Models", "OpenAI API, OpenAI TTS, AssemblyAI", "GPT-Live-1, Decisions API (GPT-6 Luna), GPT-6.1 Terra; gpt-oss-20b and PhoWhisper locally"],
  ["Data", "SQLite, recordings folder", "PostgreSQL, Redis, Temporal, MinIO (encrypted, 30-day TTL)"],
  ["Hosting", "One VM, Docker Compose", "OpenAI cloud + one workstation with two 16 GB GPUs per area; Kubernetes per region at scale"],
 ]) + note("Source: PRD §16, §16.7, §18.8. The same interfaces run in demo and production; only implementations swap."))
 
-c7 = chapter(7, "OpenAI at the core", "GPT-Live-1 talks to the buyer, the Decisions API triages, GPT-5.6 Terra orchestrates. Codex builds it.", f"""
+c7 = chapter(7, "OpenAI at the core", "GPT-Live-1 talks to the buyer, the Decisions API triages, GPT-6.1 Terra orchestrates. Codex builds it.", f"""
 <p>With OpenAI’s stack, Alodi talks to buyers through <b>GPT-Live-1</b>, OpenAI’s full-duplex voice model, so the call feels like a conversation rather than
 an IVR. Every incoming signal is first sorted by the <b>Decisions API on GPT-6 Luna</b>: which case it is, which window the buyer chose, and how confident that
-is. Once the information is classified and trimmed, <b>GPT-5.6 Terra</b> orchestrates the workflow between the order data, the buyer and the courier in the
-shortest time, applies company policy through the guard, and cuts the back-and-forth between buyer and courier to a single context card.</p>
+is. Once the information is classified and trimmed, <b>GPT-6.1 Terra</b> orchestrates the workflow between the order data, the buyer and the shipper in the
+shortest time, applies company policy through the guard, and cuts the back-and-forth between buyer and shipper to a single context card.</p>
 {table(["Component", "Role in Alodi", "Endpoint · price", "Demo", "Production"], [
  ["<b>GPT-Live-1</b>", "Real-time voice calls with the buyer; listens while it speaks and delegates reasoning to the Terra agent", "v1/live/sessions · $0.05 a minute", "In-browser call + TTS", "AI calls over the SIP line"],
  ["<b>Decisions API</b> on <b>GPT-6 Luna</b>", "Triage of every message: case type, chosen window, confidence (predicate, choice and score questions with probabilities)", "/v1/decisions · $0.10 per 1M input tokens", "–", "First step for every signal"],
- ["<b>GPT-5.6 Terra</b>", "Orchestration and extraction for escalated cases (~20% of traffic, estimate); Structured Outputs for the card", "Responses API · $2 / $12 per 1M tokens", "OpenAI API", "Agent brain"],
+ ["<b>GPT-6.1 Terra</b>", "Orchestration and extraction for escalated cases (~20% of traffic, estimate); Structured Outputs for the card", "Responses API · $1 / $5 per 1M tokens", "OpenAI API", "Agent brain"],
  ["<b>Agents SDK</b>", "One run per order: tools, CS handoff, guardrails, tracing", "Python SDK", "State machine", "Framework around Terra"],
  ["<b>gpt-oss-20b</b>", "Offline fallback on the area server (~16 GB with MXFP4)", "vLLM or Ollama · open weights", "–", "Fallback"],
  ["<b>Evals</b>", "Graders on the held-out set; gate every prompt, schema or model change", "OpenAI platform", "Codex loop", "Release gate"],
@@ -250,7 +250,7 @@ log next to the audit trail.</p>
 """)
 
 c8 = chapter(8, "Data, privacy and rules", "Text to the cloud is masked; calls run only after the recording notice.", """<ul class="cols">
-<li>Phone numbers, names and house numbers are masked before any text reaches GPT-5.6 Terra, the Decisions API or the local fallback.</li>
+<li>Phone numbers, names and house numbers are masked before any text reaches GPT-6.1 Terra, the Decisions API or the local fallback.</li>
 <li>AI calls run on GPT-Live-1 only after the buyer hears the recording notice; refusal ends the call and continues by chat or CS.</li>
 <li>Raw audio and transcripts are encrypted with a 30-day TTL; every change to an order’s context is versioned with the actor and time.</li>
 <li>Opt-out is checked before every scheduled job; no real number is dialled in the demo (TEST-0001 … TEST-2000).</li>
@@ -261,8 +261,8 @@ c8 = chapter(8, "Data, privacy and rules", "Text to the cloud is masked; calls r
 <tr><td>Buyer phone, name, address</td><td>Personal</td><td>orders (phone encrypted)</td><td>Carrier policy</td><td>Masked only</td></tr>
 <tr><td>Live call audio</td><td>Personal, sensitive</td><td>GPT-Live-1 session</td><td>Session only</td><td>Yes, to OpenAI after the recording notice</td></tr>
 <tr><td>Recorded call and memo audio</td><td>Personal, sensitive</td><td>Recordings store (MinIO)</td><td>30 days</td><td>No</td></tr>
-<tr><td>Masked transcript and chat text</td><td>Pseudonymised</td><td>recordings, events</td><td>30 days</td><td>To the Decisions API and GPT-5.6 Terra</td></tr>
-<tr><td>Extracted JSON, context card</td><td>Operational</td><td>rescue_result</td><td>Order lifetime</td><td>Yes, to the courier app and SPX</td></tr>
+<tr><td>Masked transcript and chat text</td><td>Pseudonymised</td><td>recordings, events</td><td>30 days</td><td>To the Decisions API and GPT-6.1 Terra</td></tr>
+<tr><td>Extracted JSON, context card</td><td>Operational</td><td>rescue_result</td><td>Order lifetime</td><td>Yes, to the shipper app and SPX</td></tr>
 <tr><td>Event log and traces</td><td>Operational</td><td>events</td><td>Monthly partitions</td><td>Aggregates only</td></tr>
 </tbody></table>
 <h3><span>8.2</span>Rights and controls</h3>
@@ -276,8 +276,8 @@ c9 = chapter(9, "Evaluation and outcomes", "Three numbers measured on stage, one
  ["Safe-autonomy run", f"Replay every sample plus the simulated day; simulation: {DAY['extraction']['auto_applied']} auto-applied of {fa['total']} failures"],
 ]) + sub("9.1", "Acceptance criteria for the demo") + table(["ID", "Given → then"], [
  ["AC-01", "4,000 orders and no opt-outs → every buyer gets 4 windows plus “can’t receive today”"], ["AC-04", "Rescue chat at 10:04, no reply → call 1 at 11:04, call 2 at 13:04"], ["AC-05", "A call due at 20:42 → no call; moved to 08:00 next day; policy_block logged"],
- ["AC-06", "Buyer replies while call 1 is pending → call cancelled, extraction runs on the reply"], ["AC-07", "Fields at 0.94 / 0.88 / 0.91 → auto-applied, card on the courier app within 10 s"],
- ["AC-08", "Any field below 0.85 → confirm in chat; still unclear → CS queue, low_confidence"], ["AC-09", "Courier taps Refused → no buyer contact; suggested label not applied"],
+ ["AC-06", "Buyer replies while call 1 is pending → call cancelled, extraction runs on the reply"], ["AC-07", "Fields at 0.94 / 0.88 / 0.91 → auto-applied, card on the shipper app within 10 s"],
+ ["AC-08", "Any field below 0.85 → confirm in chat; still unclear → CS queue, low_confidence"], ["AC-09", "Shipper taps Refused → no buyer contact; suggested label not applied"],
  ["AC-12", "Buyer writes “stop” → all pending contact cancelled"], ["AC-14", "Any model request → no unmasked phone or house number in the logged prompt"],
 ]) + note("Source: PRD §2.3, §23, §24 (AC-01 to AC-15). Numbers on today’s /metrics page are mock until the eval runs."))
 
@@ -296,7 +296,7 @@ c10 = chapter(10, "Economics", f"One area loses {m(MID)} a month. Alodi costs {m
  ["Server pays back in"] + [f"~{r['hardware_payback_months'] * 4.35:.0f} weeks" for _, r in sc],
 ])}</div>
 </div>
-{kf([("416", "CS calls a day by the agent", "≈ 28 staff-hours · Projected"), ("96", "fewer wasted trips a day", "Projected"), ("24 min", "back per courier a day", "Projected"), (f"{m(R['hardware_one_time'][0])}–{m(R['hardware_one_time'][1])}", "one-time area server", "Listed price + estimate")])}
+{kf([("416", "CS calls a day by the agent", "≈ 28 staff-hours · Projected"), ("96", "fewer wasted trips a day", "Projected"), ("24 min", "back per shipper a day", "Projected"), (f"{m(R['hardware_one_time'][0])}–{m(R['hardware_one_time'][1])}", "one-time area server", "Listed price + estimate")])}
 {note(f"OpenAI lines use list prices from developers.openai.com (31 Oct 2026); the 20% Terra escalation share is an estimate. Best-in-class uses the top of Shipsy’s 50–65% range (vendor). The AWS-managed alternative costs {m(AWS['cost_month'], 1)} a month. All savings are projected until a pilot measures Alodi’s own rescue rate; every formula is in alodi-numbers.pdf.")}
 """)
 
@@ -308,29 +308,29 @@ c12 = chapter(12, "Roadmap", "From a stage demo to a national rollout.", table([
  ["Shadow mode", "Q1 2027", "One area, real events, no buyer contact", "Agent vs CS decisions compared; thresholds tuned; DPIA done"], ["Controlled channels", "Q2 2027", "Real chat and GPT-Live-1 calls for risky orders", "0 rule violations; rescue rate measured"],
  ["Region", "H2 2027", "5–20 hubs", "Cost per case and latency on target"], ["National", "2028", "20–100 hubs, second region", "Break-even; 99.9% availability"],
 ]) + sub("12.1", "What a pilot needs from a carrier partner") + table(["Need", "Why", "When"], [
- ["One area: 20 couriers, about 4,000 orders a day", "Shadow mode compares agent and CS decisions on real events", "Q1 2027"],
+ ["One area: 20 shippers, about 4,000 orders a day", "Shadow mode compares agent and CS decisions on real events", "Q1 2027"],
  ["Routing and order APIs (read)", "Feasible windows and today’s orders", "Q1 2027"],
- ["Driver-app integration for the tap and the card", "The courier never leaves the app they already use", "Q1 2027"],
+ ["Driver-app integration for the tap and the card", "The shipper never leaves the app they already use", "Q1 2027"],
  ["Shopee Chat API and approved Zalo ZNS templates", "Real buyer messages for risky orders", "Q2 2027"],
  ["A SIP trunk with a verified brand name", "Buyers answer calls they can identify", "Q2 2027"],
- ["OpenAI organisation access: GPT-Live-1, Decisions API, GPT-5.6 Terra", "The production stack", "Q1 2027"],
+ ["OpenAI organisation access: GPT-Live-1, Decisions API, GPT-6.1 Terra", "The production stack", "Q1 2027"],
  ["CS time to label shadow-mode cases", "Ground truth for thresholds and evals", "Q1 2027"],
  ["Data protection impact and transfer assessments", "PDPL and Decree 53 before any buyer contact", "Before Q2 2027"],
 ]) + note("Source: PRD §26, §28."))
 
 c13 = chapter(13, "Risks and assumptions", "What could make the numbers wrong, and what we do about it.", '<div class="cols2"><div>' + table(["Risk", "Mitigation"], [
  ["Buyers ignore unknown callers", "Chat first; verified brand name; call only after silence"], ["GPT-Live-1 Vietnamese quality unproven", "Test before the pilot; PhoWhisper and local fallback stay"],
- ["ASR mishears Vietnamese addresses", "Read-back confirmation; 0.85 threshold"], ["Wrong auto-applied appointment", "Threshold plus calibration; courier can still call; audit log"],
+ ["ASR mishears Vietnamese addresses", "Read-back confirmation; 0.85 threshold"], ["Wrong auto-applied appointment", "Threshold plus calibration; shipper can still call; audit log"],
  ["Wrong label harms a buyer", "Labels only by a person"], ["Cross-border personal data", "Masked text only; transfer impact assessment for call audio"],
  ["Mock numbers shown as results", "Labels mock, simulated, projected everywhere"],
-]) + '</div><div>' + table(["Key assumption", "Status"], [["One area = 20 couriers, 4,000 orders a day", "Estimate; check with courier interviews"], ["8% first-attempt failure", "VECOM low end · Sourced"], ["25% baseline rescue", "Shipsy · Vendor"], ["Alodi lifts rescue to 65%", "Projected; measured only in a pilot"], ["20% of LLM traffic escalated to Terra", "Estimate; measured in shadow mode"], ["₫26,000 = $1", "Estimate"]]) + '</div></div>' + note("Source: PRD §26, §27."))
+]) + '</div><div>' + table(["Key assumption", "Status"], [["One area = 20 shippers, 4,000 orders a day", "Estimate; check with shipper interviews"], ["8% first-attempt failure", "VECOM low end · Sourced"], ["25% baseline rescue", "Shipsy · Vendor"], ["Alodi lifts rescue to 65%", "Projected; measured only in a pilot"], ["20% of LLM traffic escalated to Terra", "Estimate; measured in shadow mode"], ["₫26,000 = $1", "Estimate"]]) + '</div></div>' + note("Source: PRD §26, §27."))
 
 c14 = chapter(14, "Team and project assets", "Team Develarper: four people, one agent, built with Codex.", table(["Name", "Role", "Focus"], [["Nomura Yoshio", "Team Lead · Presenter", "Product, demo script, pitch"], ["Long Quan Ton", "AI Engineer · Solution Architect", "Orchestrator, voice agent, eval loop"], ["Khanh Tuong Huynh", "AI Engineer · Deployment", "Context extractor, ASR, policy guard"], ["Thanh Loi Tran", "Data Engineer · Backend", "Order Context Object, APIs, metrics log"]]) + sub("14.1", "Project assets") + table(["Asset", "Where", "What it holds"], [
  ["Landing page, demo and dashboard", "web/", "Next.js app: landing, four-screen demo, hub dashboard, metrics"],
  ["Product requirements", "prep/02-technical/PRD.md", "Business analysis, UML, API, architecture, OpenAI stack, cost model, eval, risks"],
  ["Cost model", "prep/02-technical/cost-model/cost_model.py", "Every money figure in this report, with typed inputs"],
  ["Numbers proof", "alodi-numbers.pdf", "Formulas, inputs and sources for the loss and the savings"],
- ["Mock data pack", "prep/02-technical/mock-data/", "One fictional hub: 20 couriers, 4,000 orders, scenarios, eval samples"],
+ ["Mock data pack", "prep/02-technical/mock-data/", "One fictional hub: 20 shippers, 4,000 orders, scenarios, eval samples"],
  ["Survey instrument", "prep/06-survey/", "Codebook in Vietnamese and English; response files"],
  ["Pitch deck and film", "prep/01-pitch/", "12-slide deck, two-minute demo film, scripts"],
  ["Brand kit and design system", "prep/03-design/, prep/04-brand/", "Tokens, components, logos, marks, fonts"],
@@ -341,20 +341,20 @@ SRC = [
  ("GHN, who pays for Shopee returns", "₫40,000 cap per order since 1 Apr 2025 (₫20,000 express)", "ghn.vn/blogs/tip-ban-hang/tra-hang-shopee-ai-chiu-phi", "Verified; secondary source"),
  ("Nguoi Lao Dong, 19 Jul 2025", "VECOM 8–12%, up to 20% remote; Tran Anh Tung 10–15%, 25–30% in sale season", "tuoitre.vn/nld/nhuc-nhoi-nan-bom-hang-19625071822023801.htm", "Verified"),
  ("Shopee Help Center 79559 · 79569 · 79196", "No delivery-time choice · 2–3 contacts, 5 days · COD lock after 3 failures in 90 days", "help.shopee.vn/portal/4/article/…", "Verified"),
- ("GHN, courier pay per order", "₫6,000–8,000 per delivered order (average)", "ghn.vn/blogs/tip-ban-hang/mot-don-hang-shipper-shopee-duoc-bao-nhieu-tien", "Verified; not an official Shopee figure"),
+ ("GHN, shipper pay per order", "₫6,000–8,000 per delivered order (average)", "ghn.vn/blogs/tip-ban-hang/mot-don-hang-shipper-shopee-duoc-bao-nhieu-tien", "Verified; not an official Shopee figure"),
  ("Shipsy, NDR management", "Industry rescue 20–30%, best-in-class 50–65%", "shipsy.ai/insights/what-is-ndr-non-delivery-report-management", "Verified; vendor claim"),
  ("Metric, e-commerce report 2025", "₫429.7T across four marketplaces; +34.75%", "via daibieunhandan.vn, vneconomy.vn", "Verified via press; single provider"),
  ("OpenAI, GPT-Live-1 model page", "gpt-live-1; v1/live/sessions; $0.05 a minute; delegates to a backend agent", "developers.openai.com/api/docs/models/gpt-live-1", "Verified 31 Oct 2026; languages not listed"),
- ("OpenAI, GPT-5.6 Terra model page", "gpt-5.6-terra; 1.05M context; $2 / $12 per 1M tokens; Responses API", "developers.openai.com/api/docs/models/gpt-5.6-terra", "Verified 31 Oct 2026"),
+ ("OpenAI, GPT-6.1 Terra model page", "gpt-6.1-terra; 1.05M context; $1 / $5 per 1M tokens; Responses API", "developers.openai.com/api/docs/models/gpt-6.1-terra", "Verified 31 Oct 2026"),
  ("OpenAI, Decisions API", "/v1/decisions on gpt-6-luna; predicate, choice, score questions; $0.10 per 1M input tokens", "openai.com/index/decisions-api · Vercel AI Gateway listing", "Verified via listings; official page not machine-readable"),
  ("OpenAI, gpt-oss-20b", "Runs within 16 GB with MXFP4", "Azure AI catalog · vLLM recipes", "Verified"),
- ("Glints, Phong Vu, Viettel reseller, oazns.vn, EVN", "Courier income, GPU prices, SIP, ZNS and power tariffs", "see PRD §18.8", "Listed prices, checked by the team"),
+ ("Glints, Phong Vu, Viettel reseller, oazns.vn, EVN", "Shipper income, GPU prices, SIP, ZNS and power tariffs", "see PRD §18.8", "Listed prices, checked by the team"),
 ]
 c15 = chapter(15, "Sources and verification", "Every external figure, where it comes from, and how far we checked it.", table(["Source", "What we use", "Where", "Check"], [[f"<b>{e(a)}</b>", e(b), f"<span class=url>{e(c)}</span>", e(d)] for a, b, c, d in SRC], "src") + note("31 Oct 2026: ₫40,000 recited to Shopee §7.1 plus GHN; OpenAI stack and running cost updated."))
 
 CSS = font_css + """
 @page { size: A4; margin: 20mm 18mm 20mm;
-  @bottom-left { content: "Alodi · Project report · v0.4"; font-family: 'Geist'; font-size: 7.5pt; color: #8a91a6; }
+  @bottom-left { content: "Alodi · Project report · v0.5"; font-family: 'Geist'; font-size: 7.5pt; color: #8a91a6; }
   @bottom-right { content: counter(page) " / " counter(pages); font-family: 'Geist'; font-size: 7.5pt; color: #8a91a6; }
   @top-right { content: "Team Develarper · 31 Oct 2026"; font-family: 'Geist'; font-size: 7.5pt; color: #b0b5c3; }
 }
@@ -404,6 +404,7 @@ table.comp { font-size: 8pt; } table.src, table.oa { font-size: 8.4pt; } .url { 
 """
 
 doc = f"<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Alodi · Project report</title><style>{CSS}</style></head><body>{cover}{contents}{c1}{c2}{c3}{c4}{c5}{c6}{c7}{c8}{c9}{c10}{c11}{c12}{c13}{c14}{c15}</body></html>"
+doc = doc.replace("courier", "shipper").replace("Courier", "Shipper")
 out_html = HERE / "alodi-report.html"
 out_pdf = HERE / "alodi-report.pdf"
 out_html.write_text(doc, encoding="utf-8")

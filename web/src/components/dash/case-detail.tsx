@@ -91,7 +91,7 @@ function Json({ oco, prev }: { oco: OrderContext; prev: OrderContext | null }) {
   );
 }
 
-const ACTOR: Record<AuditEntry["actor"], string> = { agent: "Agent", buyer: "Buyer", shipper: "Courier", cs: "CS", system: "System" };
+const ACTOR: Record<AuditEntry["actor"], string> = { agent: "Agent", buyer: "Buyer", shipper: "Shipper", cs: "CS", system: "System" };
 
 function Audit({ items }: { items: AuditEntry[] }) {
   const list = [...items].reverse().slice(0, 10);
@@ -169,7 +169,7 @@ export function LiveCaseDetail({ state: s, engine }: { state: DemoState; engine:
       {s.card && (
         <div className="relative overflow-hidden rounded-xl border border-[var(--d-border)] bg-[var(--d-surface)] p-4 pl-5">
           <span className="absolute inset-y-0 left-0 w-1 bg-[var(--d-primary)]" />
-          <div className="d-overline">Context card sent to courier</div>
+          <div className="d-overline">Context card sent to shipper</div>
           <div className="d-num mt-1.5 text-[22px]">{s.card.window}</div>
           <div className="text-[14px] d-text2">{s.card.drop}</div>
           {s.card.alt && <div className="text-[14px] d-text2">{s.card.alt}</div>}
@@ -238,7 +238,7 @@ export function MockCaseDetail({ c, resolved, onResolve }: { c: MockCase; resolv
         <span className={`d-chip ${stageChip(stage)}`}>{STAGE_LABEL[stage]}</span>
         <h3 className="d-title mt-3 text-[28px]">{c.buyer}</h3>
         <p className="mt-1 text-[13px] d-muted">
-          {c.id} · {c.district} · {c.cod ? `₫${c.cod.toLocaleString("en-US")}` : "Prepaid"} · courier {c.courier}
+          {c.id} · {c.district} · {c.cod ? `₫${c.cod.toLocaleString("en-US")}` : "Prepaid"} · shipper {c.shipper}
         </p>
       </div>
       <Steps stage={stage} />

@@ -301,8 +301,8 @@ body {
   filter: grayscale(0.55) sepia(0.12) contrast(1.05) brightness(0.95);
 }
 
-/* Courier logo strip: greyscale at rest, brand colour on hover */
-.courier-logo img {
+/* Shipper logo strip: greyscale at rest, brand colour on hover */
+.shipper-logo img {
   filter: grayscale(1) contrast(1.1);
   opacity: 0.55;
   transition:
@@ -310,7 +310,7 @@ body {
     opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.courier-logo:hover img {
+.shipper-logo:hover img {
   filter: none;
   opacity: 1;
   transform: translateY(-2px);
@@ -930,3 +930,26 @@ html.theme-vt::view-transition-new(root) {
     scroll-behavior: auto !important;
   }
 }
+
+/* Demo gate (/start) */
+.gate { position: relative; min-height: 100dvh; display: grid; place-items: center; overflow: hidden; font-family: var(--font-sans); color: #1f2a44; background: radial-gradient(70% 60% at 50% 45%, #ffffff 0%, #f6f3f1 100%); }
+.gate-stage { position: absolute; inset: 2% 3% 4%; pointer-events: none; }
+.gate-person { position: absolute; display: grid; justify-items: center; gap: 8px; translate: -50% -50%; }
+.gate-person img { border-radius: 999px; box-shadow: 0 0 0 4px #fff, 0 18px 40px -18px rgba(31, 42, 68, 0.45); }
+.gate-person span { font-size: 13px; font-weight: 500; color: #3a4358; background: rgba(255, 255, 255, 0.85); padding: 3px 10px; border-radius: 999px; }
+.gate-center { position: relative; z-index: 2; display: grid; justify-items: center; gap: 18px; width: min(900px, calc(100vw - 32px)); text-align: center; }
+.gate-center h1 { font-size: clamp(40px, 5.2vw, 72px); font-weight: 500; line-height: 1.05; letter-spacing: -0.03em; }
+.gate-center h1 em { font-style: normal; color: #f05a00; }
+.gate-center > p { font-size: 19px; color: #3a4358; }
+.gate-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: min(720px, 100%); margin-top: 18px; }
+.gate-choice { display: inline-flex; align-items: center; justify-content: center; gap: 16px; height: 88px; padding: 0 24px; border-radius: 22px; border: 1px solid #e0dcd9; background: #fff; color: #1f2a44; cursor: pointer; box-shadow: 0 18px 40px -28px rgba(31, 42, 68, 0.5); }
+.gate-choice b { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+.gate-choice-dark { background: #1f2a44; border-color: #1f2a44; color: #fff; }
+.gate-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: rgba(255, 255, 255, 0.12); }
+.gate-faces { display: flex; }
+.gate-faces img { border-radius: 999px; box-shadow: 0 0 0 2px #fff; }
+.gate-faces img + img { margin-left: -10px; }
+.gate-iris { position: fixed; z-index: 50; border-radius: 999px; animation: gate-iris 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes gate-iris { from { transform: scale(0); } to { transform: scale(1); } }
+@media (max-width: 760px) { .gate-choices { grid-template-columns: 1fr; } .gate-stage { display: none; } }
+@media (prefers-reduced-motion: reduce) { .gate-iris { animation: none; } }

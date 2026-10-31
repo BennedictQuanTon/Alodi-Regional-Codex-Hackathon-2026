@@ -37,7 +37,7 @@ export function SingleView({ view }: { view: "shipper" | "buyer" | "console" }) 
         <div className="absolute left-1/2 top-[45%] flex justify-center" style={{ width: W, height: H - 90, transform: `translate(-50%, -50%) scale(${scale})` }}>
           <Enter i={0} className={phone ? "" : "h-full w-full"}>
             {view === "shipper" && (
-              <ViewTransition name="phone-courier" share="morph" default="none">
+              <ViewTransition name="phone-shipper" share="morph" default="none">
                 <PhoneFrame clock={state.clock}>
                   <ShipperApp state={state} engine={engine} />
                 </PhoneFrame>

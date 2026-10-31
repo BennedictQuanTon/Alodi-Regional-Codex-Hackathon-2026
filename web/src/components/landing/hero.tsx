@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { Mark } from "@/components/site/brand";
-import { COURIER_LOGOS } from "@/lib/content";
+import { SHIPPER_LOGOS } from "@/lib/content";
 import { Reveal, RevealText } from "./motion";
 
 const W = 1440;
@@ -21,7 +21,7 @@ const INPUTS: { label: string; kind: "dot" | "check" | "square"; chip: string }[
   { label: "Voice memo", kind: "dot", chip: "MEMO" },
   { label: "Carrier OMS", kind: "square", chip: "EVENT" },
 ];
-const OUTPUTS = ["Courier card", "Dispatcher", "CS queue", "Order context", "Metrics log"];
+const OUTPUTS = ["Shipper card", "Dispatcher", "CS queue", "Order context", "Metrics log"];
 
 const IN_Y = INPUTS.map((_, i) => 44 + i * 64);
 const OUT_Y = OUTPUTS.map((_, i) => 56 + i * 90);
@@ -256,13 +256,13 @@ export function Hero() {
           <RevealText as="h1" text="Failed Deliveries, Rescued in One Tap" className="t-display text-balance" stagger={0.06} />
           <Reveal delay={0.08}>
             <p className="mx-auto mt-8 max-w-[580px] text-[18px] leading-[1.35] text-graphite md:text-[20px]">
-              Alodi messages and calls the buyer the moment a delivery fails, then hands the next courier structured
+              Alodi messages and calls the buyer the moment a delivery fails, then hands the next shipper structured
               context — so the second drop lands.
             </p>
           </Reveal>
           <Reveal delay={0.14}>
             <div className="mt-11 flex flex-wrap items-center justify-center gap-4">
-              <Link href="/demo" className="btn btn-dark">
+              <Link href="/start" className="btn btn-dark">
                 Watch the demo
               </Link>
               <Link href="/console" className="btn btn-ghost">
@@ -282,18 +282,18 @@ export function Hero() {
   );
 }
 
-/** Logo strip: couriers whose riders we interviewed. Greyscale at rest, brand colour on hover (DESIGN.md logo strip). */
+/** Logo strip: shippers whose riders we interviewed. Greyscale at rest, brand colour on hover (DESIGN.md logo strip). */
 export function SourceStrip() {
   return (
     <section className="py-10">
       <div className="container-page">
         <div className="grid items-center gap-8 border-y border-ash py-10 md:grid-cols-[200px_1fr] md:gap-12">
           <div className="t-eyebrow text-smoke">
-            Couriers we
+            Shippers we
             <br className="hidden md:block" /> interviewed
           </div>
           <ul className="flex flex-wrap items-center justify-between gap-x-10 gap-y-8">
-            {COURIER_LOGOS.map((l, i) => (
+            {SHIPPER_LOGOS.map((l, i) => (
               <motion.li
                 key={l.name}
                 initial={{ opacity: 0, y: 8 }}
@@ -301,7 +301,7 @@ export function SourceStrip() {
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ delay: i * 0.06, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               >
-                <a href={l.url} target="_blank" rel="noreferrer" title={l.name} className="courier-logo block">
+                <a href={l.url} target="_blank" rel="noreferrer" title={l.name} className="shipper-logo block">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={l.src} alt={l.name} style={{ height: 30, width: 30 * l.ratio }} className="object-contain" />
                 </a>

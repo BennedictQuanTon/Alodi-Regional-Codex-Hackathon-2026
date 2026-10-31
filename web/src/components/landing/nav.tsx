@@ -64,7 +64,7 @@ export function Nav() {
           <Link href="/console" className="btn btn-dark">
             Dashboard <Chevron />
           </Link>
-          <Link href="/demo" className="btn btn-primary">
+          <Link href="/start" className="btn btn-primary">
             Watch demo <Chevron />
           </Link>
         </div>
