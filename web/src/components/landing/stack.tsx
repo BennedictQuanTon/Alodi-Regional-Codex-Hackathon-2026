@@ -17,7 +17,7 @@ const HUB = { x: W / 2, y: H / 2, w: 300, h: 92 };
 const WORKERS: Worker[] = [
   { x: 170, y: 70, name: "Triage", tool: "decide", model: "Decisions API · GPT-6 Luna" },
   { x: 550, y: 52, name: "Voice", tool: "live call", model: "GPT-Live-1" },
-  { x: 930, y: 70, name: "Rescue chat", tool: "send_chat", model: "GPT-5.6 Terra" },
+  { x: 930, y: 70, name: "Rescue chat", tool: "send_chat", model: "GPT-6.1 Terra" },
   { x: 170, y: 370, name: "Window", tool: "ask_window", model: "Decisions API · choice" },
   { x: 550, y: 388, name: "Extractor", tool: "extract", model: "Terra · Structured Outputs" },
   { x: 930, y: 370, name: "Guardrails", tool: "guard", model: "code + SDK guardrails" },
@@ -94,7 +94,7 @@ function AgentMesh() {
           Alodi Agent
         </text>
         <text x={HUB.x - HUB.w / 2 + 74} y={HUB.y + 18} fontSize="12" fill="rgba(255,255,255,0.6)" fontFamily="var(--font-mono)">
-          Agents SDK · GPT-5.6 Terra
+          Agents SDK · GPT-6.1 Terra
         </text>
       </motion.g>
     </svg>
@@ -178,7 +178,7 @@ function OpenAICore() {
       </div>
       <ul className="grid gap-2 p-4 md:hidden">
         <li className="flex items-center gap-2 rounded-[14px] bg-[var(--oa-ink)] px-4 py-3 text-white">
-          <TechIcon icon="siOpenai" size={16} mono /> Alodi Agent · Agents SDK · GPT-5.6 Terra
+          <TechIcon icon="siOpenai" size={16} mono /> Alodi Agent · Agents SDK · GPT-6.1 Terra
         </li>
         {WORKERS.map((w) => (
           <li key={w.name} className="flex items-center justify-between gap-3 rounded-[14px] border border-[var(--oa-line)] px-4 py-3 text-[14px]">
@@ -252,7 +252,7 @@ export function Stack() {
           </div>
           <Reveal delay={0.1}>
             <p className="max-w-[440px] text-[18px] leading-[1.4] text-graphite lg:ml-auto">
-              GPT-Live-1 talks to the buyer, GPT-6 Luna triages through the Decisions API, GPT-5.6 Terra orchestrates. Codex builds it.
+              GPT-Live-1 talks to the buyer, GPT-6 Luna triages through the Decisions API, GPT-6.1 Terra orchestrates. Codex builds it.
             </p>
           </Reveal>
         </div>

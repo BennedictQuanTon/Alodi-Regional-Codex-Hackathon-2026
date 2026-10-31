@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import type { ReactNode } from "react";
 import type { DemoEngine } from "@/lib/demo/engine";
 import { ORDER, SCENARIOS, fmtClock } from "@/lib/demo/scenarios";
 import type { DemoState } from "@/lib/demo/types";
@@ -25,7 +26,7 @@ function Hint({ on }: { on: boolean }) {
   return <span className="pointer-events-none absolute -inset-[5px] animate-pulse rounded-[inherit] border-2 border-[var(--ui-accent)]" aria-hidden />;
 }
 
-export function ShipperApp({ state: s, engine }: { state: DemoState; engine: DemoEngine }) {
+export function ShipperApp({ state: s, engine, memoPanel }: { state: DemoState; engine: DemoEngine; memoPanel?: ReactNode }) {
   const waiting = s.waitingFor?.action;
   const hintKey = SCENARIOS.find((x) => x.id === s.scenario)?.key;
   const stops = s.shipper.day === 1 ? STOPS_D1 : STOPS_D0;
@@ -156,7 +157,7 @@ export function ShipperApp({ state: s, engine }: { state: DemoState; engine: Dem
               </div>
             )}
 
-            {s.shipper.screen === "memo" && <MemoView state={s} engine={engine} />}
+            {s.shipper.screen === "memo" && (memoPanel ?? <MemoView state={s} engine={engine} />)}
 
             {s.shipper.screen === "context" && s.card && (
               <div className="pt-2">

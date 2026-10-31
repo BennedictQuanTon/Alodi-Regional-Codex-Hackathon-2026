@@ -28,6 +28,16 @@ people.
 
 ## Run
 
+The local backend uses Python 3.12 and runs without AI keys:
+
+```bash
+uv sync --project api --frozen --python 3.12
+uv run --project api --frozen --python 3.12 alodi-api  # http://localhost:8000/health
+```
+
+First demo startup seeds 4,000 fictional orders on 20 routes. Existing data is
+retained on restart. The frontend below still uses its scripted demo engine.
+
 ```bash
 cd web
 npm install
@@ -42,15 +52,30 @@ npm run dev        # http://localhost:3000
 | `/console` | Operations dashboard: KPIs, rescue trend, failure reasons, exception queue, case detail |
 | `/metrics` | Output metrics and a projected-savings calculator |
 | `/script` | Demo script |
+| `/dev/integrated` | Real local database/workflow, scheduler, GPT calls and courier memo workspace |
+| `/dev/ai` | Standalone AI fixture lab (separate backend; does not apply to the real workflow) |
 
 Numbers on `/metrics` and the dashboard are *mock* until the eval runs;
 savings are *projected*.
+
+Run the integrated backend on Windows from the repository root with
+`.\scripts\start-api.ps1` (Python 3.12 and `uv` required). It installs the locked
+API and AI packages together, migrates SQLite, and seeds synthetic demo orders
+without replacing an existing database. The default `.env.example` uses stub
+responses. Set server-only `AI_MODE=live` and `OPENAI_API_KEY` for GPT Live calls,
+GPT Transcribe memos, and GPT-6.1 Terra extraction. FFmpeg and FFprobe are required
+for uploaded memos. Open `/dev/integrated`, select the backend URL (default
+`http://127.0.0.1:8000`), and connect. The original `/demo` remains a scripted UI.
+See [the AI setup and integration contract](ai/README.md) for checks and limits.
 
 ## Repository
 
 ```
 web/                  Next.js app (landing, demo, dashboard)
   src/lib/demo/       scenario engine: state machine, fast-forward clock, scenarios
+api/                  FastAPI backend, migrations and tests
+ai/                   GPT voice, memo and extraction package; authoritative Part 1 bridge in api/app/ai_bridge.py
+scripts/              local startup helpers (Windows PowerShell)
 prep/
   01-pitch/           live demo plan, pitch script, slides, charts, demo film
   02-technical/       PRD, architecture and flow diagrams, cost model, mock data pack
@@ -58,7 +83,6 @@ prep/
   04-brand/           logo, marks, app icons, fonts
   05-assets/          team portraits, source and tech logos
   06-survey/          survey codebook and mock responses
-docs/                 demo script, C4 architecture diagram
 CLAUDE.md             project rules (type, colour, language, banned patterns)
 ```
 

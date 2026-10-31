@@ -1,0 +1,3 @@
+from .runtime import create_app
+
+app = create_app(fixture=True)

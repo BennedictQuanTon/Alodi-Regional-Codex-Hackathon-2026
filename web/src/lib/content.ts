@@ -105,7 +105,7 @@ export const TLDR = {
     { k: "Starts with", v: "One tap: No answer · Rescheduled · Refused" },
     { k: "Does", v: "Chats now, calls if silent, extracts a context card" },
     { k: "Never", v: "Labels or returns an order without a person" },
-    { k: "Built on", v: "GPT-Live-1, the Decisions API on GPT-6 Luna and GPT-5.6 Terra; built with Codex" },
+    { k: "Built on", v: "GPT-Live-1, the Decisions API on GPT-6 Luna and GPT-6.1 Terra; built with Codex" },
   ],
 };
 
@@ -254,19 +254,20 @@ export const TECH_DEMO: Tech[] = [
   { name: "FastAPI", note: "REST + WebSocket hub", icon: "siFastapi" },
   { name: "Pydantic", note: "Extraction schema", icon: "siPydantic" },
   { name: "OpenAI API", note: "Tool calling · Structured Outputs", icon: "siOpenai" },
-  { name: "AssemblyAI", note: "Speech to text", icon: "/logos/assemblyai-mark.svg" },
+  { name: "GPT Live", note: "Vietnamese calls · WebRTC", icon: "siOpenai" },
+  { name: "GPT Transcribe", note: "Vietnamese voice memos", icon: "siOpenai" },
   { name: "Presidio", note: "PII masking", mono: "Pr" },
   { name: "SQLite", note: "Demo database", icon: "siSqlite" },
   { name: "Caddy", note: "HTTPS / WSS", icon: "siCaddy" },
   { name: "Docker", note: "Compose, one VM", icon: "siDocker" },
 ];
 
-// Production per area (PRD §16.7, §18.8.2): OpenAI GPT-Live-1, Decisions API (GPT-6 Luna) and GPT-5.6 Terra,
+// Production per area (PRD §16.7, §18.8.2): OpenAI GPT-Live-1, Decisions API (GPT-6 Luna) and GPT-6.1 Terra,
 // with one local workstation for the gpt-oss-20b fallback, PhoWhisper memos and the data stores.
 export const TECH_PROD: Tech[] = [
   { name: "GPT-Live-1", note: "Real-time voice calls", icon: "siOpenai" },
   { name: "Decisions API", note: "Triage on GPT-6 Luna", icon: "siOpenai" },
-  { name: "GPT-5.6 Terra", note: "Orchestration", icon: "siOpenai" },
+  { name: "GPT-6.1 Terra", note: "Orchestration", icon: "siOpenai" },
   { name: "gpt-oss-20b", note: "Local fallback", icon: "siOpenai" },
   { name: "Ollama / vLLM", note: "Model serving", icon: "siOllama" },
   { name: "PhoWhisper", note: "Vietnamese ASR", icon: "/logos/vinai-mark.png" },
@@ -366,7 +367,7 @@ export const COURIER_LOGOS = [
 export const FAQ = [
   {
     q: "Does the demo call real phone numbers?",
-    a: "No. The AI call runs in the browser. In production it uses a branded call line: fixed phrases are pre-recorded, dynamic parts use TTS, and calls stay under about 90 seconds.",
+    a: "No. The voice lab runs in the browser: a fixed disclosure plays first, then GPT Live handles Vietnamese speech within the configured call limit. A branded phone line is a production integration.",
   },
   {
     q: "Why doesn’t the agent label “suspected bomb” orders itself?",
@@ -374,7 +375,7 @@ export const FAQ = [
   },
   {
     q: "How is personal data handled?",
-    a: "AI calls run on GPT-Live-1 only after the recording consent in the opening line. Text sent to GPT-5.6 Terra and the Decisions API is masked first: no phone numbers, names or house numbers. Raw audio and transcripts are kept 30 days, encrypted.",
+    a: "AI calls run on GPT-Live-1 only after the recording consent in the opening line. Text sent to GPT-6.1 Terra and the Decisions API is masked first: no phone numbers, names or house numbers. Raw audio and transcripts are kept 30 days, encrypted.",
   },
   {
     q: "Do you need to fine-tune a model?",

@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { DemoEngine } from "@/lib/demo/engine";
 import { ORDER, fmtClock } from "@/lib/demo/scenarios";
 import type { DemoState } from "@/lib/demo/types";
@@ -11,7 +11,7 @@ import { Waveform } from "./phone";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Buyer phone: marketplace-style chat + the AI call screen. */
-export function BuyerPhone({ state: s, engine }: { state: DemoState; engine: DemoEngine }) {
+export function BuyerPhone({ state: s, engine, voicePanel }: { state: DemoState; engine: DemoEngine; voicePanel?: ReactNode }) {
   const scroller = useRef<HTMLDivElement>(null);
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
@@ -75,7 +75,7 @@ export function BuyerPhone({ state: s, engine }: { state: DemoState; engine: Dem
         </span>
       </div>
 
-      <AnimatePresence>{showCall && <CallScreen state={s} engine={engine} />}</AnimatePresence>
+      {voicePanel ? <div className="absolute inset-0 z-20 overflow-y-auto bg-[var(--ui-alt)] px-4 pb-6 pt-14">{voicePanel}</div> : <AnimatePresence>{showCall && <CallScreen state={s} engine={engine} />}</AnimatePresence>}
     </div>
   );
 }
