@@ -1,331 +1,198 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
-import { useRef, useState } from "react";
-import { SourceNote } from "@/components/site/brand";
+import Image from "next/image";
+import { animate, motion, useInView, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { PHOTOS } from "@/lib/content";
 import { RevealText } from "./motion";
 
+// Three principles, three cards. Each card: an open-licence photo carrying the title, one line,
+// and a small figure that draws itself once in view. No pinned scroll.
+
 const EASE = [0.22, 1, 0.36, 1] as const;
+const VIEW = { once: true, margin: "-80px" } as const;
 
-const CHAPTERS = [
-  {
-    k: "01",
-    title: "The rules already exist",
-    body: "Shopee’s redelivery process fixes the frame: 2–3 contacts, reschedule within 5 days. Alodi plays entirely inside it.",
-  },
-  {
-    k: "02",
-    title: "A hard autonomy boundary",
-    body: "The agent messages, calls and applies confident context. Anything that touches money or a buyer’s record goes to a person.",
-  },
-  {
-    k: "03",
-    title: "Evals, not vibes",
-    body: "Codex changes one thing per round against a held-out set. The curve is the proof, scored next to safe autonomy.",
-  },
+/* ---------- 01 · inside the rules --------------------------------------- */
+
+const BEATS = [
+  { t: "Tap", s: "10:02" },
+  { t: "Chat", s: "now" },
+  { t: "Call", s: "+60′" },
+  { t: "Call", s: "+2 h" },
+  { t: "CS", s: "person" },
 ];
 
-/* ---------- chapter 1: the redelivery frame ---------------------------- */
-
-type Mark = { at: number; label: string; sub: string; tone: "orange" | "navy" | "warn" | "ink" };
-
-const DAY0: Mark[] = [
-  { at: 0.04, label: "Courier tap", sub: "10:02", tone: "orange" },
-  { at: 0.3, label: "Chat sent", sub: "10:02", tone: "navy" },
-  { at: 0.62, label: "AI call 1", sub: "11:02", tone: "navy" },
-  { at: 0.96, label: "AI call 2", sub: "13:02", tone: "navy" },
-];
-const LATER: Mark[] = [
-  { at: 0.04, label: "Cycle 2", sub: "day 1", tone: "navy" },
-  { at: 0.5, label: "Hand to CS", sub: "after cycle 2", tone: "warn" },
-  { at: 0.96, label: "Hard limit", sub: "day 5", tone: "ink" },
-];
-
-function Track({ title, ticks, marks, p, offset }: { title: string; ticks: string[]; marks: Mark[]; p: number; offset: number }) {
-  const local = Math.max(0, Math.min(1, (p - offset) / 0.5));
-  const shown = Math.floor(local * (marks.length + 0.6));
+function RulesFigure() {
+  const reduce = useReducedMotion();
+  const W = 320;
+  const x = (i: number) => 10 + (i / (BEATS.length - 1)) * (W - 20);
   return (
-    <div>
-      <div className="flex items-baseline justify-between">
-        <span className="text-[12px] uppercase text-navy">{title}</span>
-        <span className="text-[11px] text-smoke">{ticks.join(" · ")}</span>
-      </div>
-      <div className="relative mt-5 h-[110px] md:h-[86px]">
-        <div className="absolute inset-x-0 top-[7px] h-[3px] rounded-full bg-ash-soft">
-          <motion.div className="h-full rounded-full bg-navy" animate={{ width: `${local * 100}%` }} transition={{ duration: 0.3 }} />
-        </div>
-        {marks.map((m, i) => {
-          const edge = i === 0 ? "left-[-6px] text-left" : i === marks.length - 1 ? "right-[-6px] text-right" : "left-1/2 -translate-x-1/2 text-center";
-          return (
-            <motion.div
-              key={m.label}
-              className="absolute top-0 w-0"
-              style={{ left: `${m.at * 100}%` }}
-              initial={false}
-              animate={{ opacity: i < shown ? 1 : 0, y: i < shown ? 0 : 10 }}
-              transition={{ duration: 0.45, ease: EASE }}
-            >
-              <span
-                className={`block size-[17px] -translate-x-1/2 rounded-full border-[3px] border-paper ${
-                  m.tone === "orange" ? "bg-orange" : m.tone === "warn" ? "bg-warn" : m.tone === "ink" ? "bg-ink" : "bg-navy"
-                }`}
-              />
-              <span className={`absolute block w-max ${i % 2 ? "top-[52px] md:top-7" : "top-7"} ${edge}`}>
-                <span className="block whitespace-nowrap text-[12px] md:text-[13px]">{m.label}</span>
-                <span className="block whitespace-nowrap text-[11px] text-smoke">{m.sub}</span>
-              </span>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
+    <svg viewBox={`0 0 ${W} 120`} className="w-full overflow-visible" role="img" aria-label="Tap, chat now, call after 60 minutes, call two hours later, then a person, all inside five days">
+      <line x1={10} x2={W - 10} y1={24} y2={24} stroke="var(--color-ash)" />
+      <motion.line x1={10} x2={W - 10} y1={24} y2={24} stroke="var(--color-navy)" strokeWidth={1.5} initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={VIEW} transition={{ duration: 1.4, ease: EASE }} />
+      {!reduce && (
+        <circle r={3.5} cy={24} fill="var(--color-orange)">
+          <animate attributeName="cx" values={`10;${W - 10}`} dur="4s" repeatCount="indefinite" />
+        </circle>
+      )}
+      {BEATS.map((b, i) => (
+        <motion.g key={i} initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={VIEW} transition={{ delay: 0.3 + i * 0.15, duration: 0.5, ease: EASE }}>
+          <circle cx={x(i)} cy={24} r={i === 0 ? 6 : 4.5} fill={i === 0 ? "var(--color-orange)" : i === BEATS.length - 1 ? "var(--color-paper)" : "var(--color-navy)"} stroke="var(--color-navy)" strokeWidth={i === BEATS.length - 1 ? 1.5 : 0} />
+          <text x={x(i)} y={52} textAnchor={i === 0 ? "start" : i === BEATS.length - 1 ? "end" : "middle"} dx={i === 0 ? -6 : i === BEATS.length - 1 ? 6 : 0} fontSize="13" fill="var(--color-navy)" fontFamily="var(--font-sans)">
+            {b.t}
+          </text>
+          <text x={x(i)} y={68} textAnchor={i === 0 ? "start" : i === BEATS.length - 1 ? "end" : "middle"} dx={i === 0 ? -6 : i === BEATS.length - 1 ? 6 : 0} fontSize="11" fill="var(--color-smoke)" fontFamily="var(--font-sans)">
+            {b.s}
+          </text>
+        </motion.g>
+      ))}
+      <motion.g initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={VIEW} transition={{ delay: 1.2, duration: 0.6 }}>
+        <line x1={10} x2={W - 10} y1={98} y2={98} stroke="var(--color-ash)" />
+        <rect x={10} y={96} width={(W - 20) * 0.4} height={4} rx={2} fill="var(--color-orange)" />
+        <text x={10} y={116} fontSize="11" fill="var(--color-smoke)" fontFamily="var(--font-sans)">
+          day 0
+        </text>
+        <text x={W - 10} y={116} textAnchor="end" fontSize="11" fill="var(--color-smoke)" fontFamily="var(--font-sans)">
+          day 5 · Shopee’s limit
+        </text>
+      </motion.g>
+    </svg>
   );
 }
 
-function FrameVisual({ p }: { p: number }) {
-  return (
-    <div className="flex h-full flex-col justify-between">
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          ["2–3", "contacts per order"],
-          ["5", "days to reschedule"],
-          ["40K", "VND lost per failure"],
-        ].map(([n, l], i) => (
-          <motion.div key={l} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.08, ease: EASE }} className="rounded-[12px] bg-parchment p-4">
-            <div className="t-number text-[44px]">{n}</div>
-            <div className="mt-2 text-[12px] uppercase text-smoke">{l}</div>
-          </motion.div>
-        ))}
-      </div>
-      <div className="space-y-8 px-3">
-        <Track title="Day 0 · rescue cycle 1" ticks={["10:00", "14:00"]} marks={DAY0} p={p} offset={0} />
-        <Track title="Days 1–5 · still inside Shopee’s window" ticks={["day 1", "day 5"]} marks={LATER} p={p} offset={0.45} />
-      </div>
-      <SourceNote>Shopee Help Center, article 79569 · Return & Refund Policy §7.1</SourceNote>
-    </div>
-  );
-}
-
-/* ---------- chapter 2: the boundary ------------------------------------ */
+/* ---------- 02 · the hard line ----------------------------------------- */
 
 const ACTIONS = [
-  { t: "Ask for a delivery window", who: "agent" },
-  { t: "Label a refusal “suspected bomb”", who: "human" },
-  { t: "Call between 08:00 and 20:30", who: "agent" },
-  { t: "Return to seller", who: "human" },
-  { t: "Apply context ≥ 0.85", who: "agent" },
-  { t: "Resolve conflicting answers", who: "human" },
-];
+  { t: "Ask for a window", side: "agent" },
+  { t: "Label a refusal", side: "person" },
+  { t: "Call 08:00–20:30", side: "agent" },
+  { t: "Return to seller", side: "person" },
+  { t: "Apply ≥ 0.85", side: "agent" },
+  { t: "Settle a conflict", side: "person" },
+] as const;
 
-function Lane({ items, side, shown }: { items: typeof ACTIONS; side: "agent" | "human"; shown: number }) {
-  const isShown = (a: (typeof ACTIONS)[number]) => ACTIONS.indexOf(a) < shown;
+function LineFigure() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, VIEW);
+  const reduce = useReducedMotion();
+  const sorted = inView || reduce;
   return (
-    <div className={`flex flex-col gap-3 rounded-[14px] p-4 ${side === "agent" ? "bg-[#fdeee4]" : "bg-navy text-parchment"}`}>
-      <div className="flex items-center justify-between text-[12px] uppercase">
-        <span>{side === "agent" ? "Agent acts" : "Human decides"}</span>
-        <span className={side === "agent" ? "text-orange-deep" : "text-peach"}>{items.filter(isShown).length}/3</span>
-      </div>
-      {items.map((a) => (
-        <motion.div
-          key={a.t}
-          initial={false}
-          animate={isShown(a) ? { opacity: 1, x: 0, scale: 1 } : { opacity: 0, x: side === "agent" ? 60 : -60, scale: 0.94 }}
-          transition={{ duration: 0.55, ease: EASE }}
-          className={`rounded-[10px] px-3.5 py-3 text-[14px] ${side === "agent" ? "bg-paper shadow-[0_0_0_1px_rgba(240,90,0,0.35)]" : "bg-white/10 shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"}`}
-        >
-          {a.t}
-        </motion.div>
-      ))}
+    <div ref={ref} className="relative h-[120px]">
+      <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-orange to-transparent" />
+      <motion.span
+        className="absolute left-1/2 size-2 -translate-x-1/2 rounded-full bg-orange shadow-[0_0_12px_3px_rgba(240,90,0,0.45)]"
+        animate={reduce ? undefined : { top: ["4%", "92%", "4%"] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      />
+      {ACTIONS.map((a, i) => {
+        const row = Math.floor(i / 2);
+        const agent = a.side === "agent";
+        return (
+          <motion.div
+            key={a.t}
+            className={`absolute whitespace-nowrap rounded-full px-3 py-1 text-[12px] ${agent ? "bg-parchment text-navy shadow-[0_0_0_1px_rgba(31,42,68,0.12)]" : "bg-navy text-parchment"}`}
+            style={{ top: row * 40 + (agent ? 0 : 14) }}
+            initial={false}
+            animate={sorted ? { left: agent ? "0%" : "100%", x: agent ? "0%" : "-100%", opacity: 1 } : { left: "50%", x: "-50%", opacity: 0.4 }}
+            transition={{ delay: sorted ? 0.25 + i * 0.1 : 0, type: "spring", stiffness: 140, damping: 20 }}
+          >
+            {a.t}
+          </motion.div>
+        );
+      })}
     </div>
   );
 }
 
-function BoundaryVisual({ p }: { p: number }) {
-  const shown = Math.floor(p * (ACTIONS.length + 1.2));
-  const agent = ACTIONS.filter((a) => a.who === "agent");
-  const human = ACTIONS.filter((a) => a.who === "human");
-  return (
-    <div className="flex h-full flex-col">
-      <div className="relative grid flex-1 grid-cols-2 gap-6">
-        <Lane items={agent} side="agent" shown={shown} />
-        <Lane items={human} side="human" shown={shown} />
-        <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-orange to-transparent" />
-        <motion.div
-          className="pointer-events-none absolute left-1/2 top-0 size-3 -translate-x-1/2 rounded-full bg-orange shadow-[0_0_18px_4px_rgba(240,90,0,0.6)]"
-          animate={{ top: ["0%", "96%", "0%"] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-      <p className="mt-5 text-[13px] text-smoke">The line in the middle is enforced by the policy guard, not by the prompt.</p>
-    </div>
-  );
-}
-
-/* ---------- chapter 3: the eval loop ----------------------------------- */
+/* ---------- 03 · proven by evals --------------------------------------- */
 
 const ROUNDS = [0.59, 0.68, 0.75, 0.81, 0.86, 0.88, 0.88];
-const STEPS = ["Held-out set", "Codex edit", "Per-field F1", "Keep best"];
 
-function LoopVisual({ p }: { p: number }) {
+function EvalFigure() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, VIEW);
   const reduce = useReducedMotion();
-  const idx = Math.min(ROUNDS.length - 1, Math.floor(p * ROUNDS.length));
-  const f1 = ROUNDS[idx];
-  const R = 128;
-  const W = 300;
-  const pts = ROUNDS.slice(0, idx + 1).map((v, i) => `${(i / (ROUNDS.length - 1)) * 220},${70 - ((v - 0.5) / 0.45) * 64}`);
+  const [v, setV] = useState(reduce ? 0.88 : 0.59);
+  useEffect(() => {
+    if (!inView || reduce) return;
+    const c = animate(0.59, 0.88, { duration: 1.8, ease: EASE, onUpdate: setV });
+    return () => c.stop();
+  }, [inView, reduce]);
+  const W = 200;
+  const H = 70;
+  const px = (i: number) => (i / (ROUNDS.length - 1)) * W;
+  const py = (r: number) => H - ((r - 0.5) / 0.45) * H;
+  const line = ROUNDS.map((r, i) => `${i ? "L" : "M"}${px(i)},${py(r)}`).join(" ");
   return (
-    <div className="grid h-full items-center gap-6 md:grid-cols-[1fr_0.9fr]">
-      <div className="relative mx-auto" style={{ width: W, height: W }}>
-        <svg viewBox={`0 0 ${W} ${W}`} className="absolute inset-0" aria-hidden>
-          <circle cx={W / 2} cy={W / 2} r={R} fill="none" stroke="var(--color-ash)" strokeDasharray="3 6" />
-          <motion.circle
-            cx={W / 2}
-            cy={W / 2}
-            r={R}
-            fill="none"
-            stroke="var(--color-orange)"
-            strokeWidth={3}
-            strokeLinecap="round"
-            initial={false}
-            animate={{ pathLength: (p * ROUNDS.length) % 1 || (p > 0.98 ? 1 : 0.02) }}
-            transform={`rotate(-90 ${W / 2} ${W / 2})`}
-          />
-          {!reduce && (
-            <circle r={6} fill="var(--color-orange)">
-              <animateMotion dur="3.2s" repeatCount="indefinite" path={`M${W / 2},${W / 2 - R} a${R},${R} 0 1,1 -0.01,0`} />
-            </circle>
-          )}
-        </svg>
-        {STEPS.map((s, i) => {
-          const a = (i / STEPS.length) * Math.PI * 2 - Math.PI / 2;
-          return (
-            <div
-              key={s}
-              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-paper px-3 py-1.5 text-[12px] uppercase shadow-[0_0_0_1px_rgba(31,42,68,0.15)]"
-              style={{ left: W / 2 + Math.cos(a) * R, top: W / 2 + Math.sin(a) * R }}
-            >
-              {s}
-            </div>
-          );
-        })}
-        <div className="absolute inset-0 grid place-items-center text-center">
-          <div>
-            <div className="text-[12px] uppercase text-smoke">Held-out F1</div>
-            <motion.div key={f1} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="t-number text-[64px]">
-              {f1.toFixed(2)}
-            </motion.div>
-            <div className="text-[13px] text-orange-deep">round v{idx}</div>
-          </div>
-        </div>
-      </div>
+    <div ref={ref} className="flex h-[120px] items-end gap-5">
       <div>
-        <svg viewBox="-6 -6 236 86" className="w-full" aria-label={`F1 rises from 0.59 to ${f1.toFixed(2)}`}>
-          <line x1="0" x2="220" y1="70" y2="70" stroke="var(--color-ash)" />
-          <polyline points={pts.join(" ")} fill="none" stroke="var(--color-orange)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
-          {pts.length > 0 && <circle cx={pts.at(-1)!.split(",")[0]} cy={pts.at(-1)!.split(",")[1]} r="4.5" fill="var(--color-orange)" stroke="var(--color-paper)" strokeWidth="2" />}
-        </svg>
-        <div className="mt-2 flex justify-between text-[11px] text-smoke">
-          <span>v0</span>
-          <span>v6</span>
-        </div>
-        <p className="mt-6 text-[13px] leading-[1.5] text-graphite">One prompt or schema change per round. Stop when held-out F1 stops rising. Illustrative curve until the real eval runs.</p>
+        <div className="t-number text-[56px] leading-none">{v.toFixed(2)}</div>
+        <div className="mt-2 whitespace-nowrap text-[12px] text-smoke">held-out F1</div>
       </div>
+      <svg viewBox={`-6 -8 ${W + 12} ${H + 14}`} className="mb-1 min-w-0 flex-1" aria-hidden>
+        <defs>
+          <linearGradient id="eval-fill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stopColor="#f05a00" stopOpacity="0.22" />
+            <stop offset="1" stopColor="#f05a00" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <motion.path d={`${line} L${W},${H} L0,${H} Z`} fill="url(#eval-fill)" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={VIEW} transition={{ delay: 0.8, duration: 0.8 }} />
+        <motion.path d={line} fill="none" stroke="#f05a00" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={VIEW} transition={{ duration: 1.8, ease: EASE }} />
+        <circle cx={px(ROUNDS.length - 1)} cy={py(0.88)} r={4} fill="#f05a00" />
+      </svg>
     </div>
   );
 }
 
 /* ---------- section ------------------------------------------------------ */
 
-function Visual({ chapter, p }: { chapter: number; p: number }) {
-  return (
-    <div className="relative h-full overflow-hidden rounded-[18px] border border-ash bg-paper p-6 md:p-8">
-      <div className="wash -right-24 -top-24 h-72 w-72 opacity-60" style={{ background: "radial-gradient(circle, rgba(255,148,115,0.7), transparent 70%)" }} />
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={chapter}
-          className="relative h-full"
-          initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          exit={{ opacity: 0, y: -16, filter: "blur(8px)" }}
-          transition={{ duration: 0.55, ease: EASE }}
-        >
-          {chapter === 0 && <FrameVisual p={p} />}
-          {chapter === 1 && <BoundaryVisual p={p} />}
-          {chapter === 2 && <LoopVisual p={p} />}
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
+const PRINCIPLES = [
+  { k: "01", title: "Play inside the rules", line: "Shopee allows 2–3 contacts within 5 days. Alodi never steps outside.", photo: PHOTOS.street, pos: "50% 80%", Figure: RulesFigure },
+  { k: "02", title: "Draw a hard line", line: "The agent asks and calls. Money and a buyer’s record go to a person.", photo: PHOTOS.phone, pos: "50% 45%", Figure: LineFigure },
+  { k: "03", title: "Prove it with evals", line: "Codex changes one thing per round. The held-out set decides.", photo: PHOTOS.laptop, pos: "50% 50%", Figure: EvalFigure },
+];
 
 export function Approach() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const [state, setState] = useState({ chapter: 0, p: 0 });
-
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    const scaled = Math.min(2.999, Math.max(0, v * 3));
-    const chapter = Math.floor(scaled);
-    const p = Math.round((scaled - chapter) * 50) / 50;
-    setState((prev) => (prev.chapter === chapter && prev.p === p ? prev : { chapter, p }));
-  });
-
-  const jump = (i: number) => {
-    const el = ref.current;
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    const span = el.offsetHeight - window.innerHeight;
-    window.scrollTo({ top: top + span * ((i + 0.05) / 3), behavior: "smooth" });
-  };
-
   return (
-    <section id="approach" ref={ref} className="relative scroll-mt-28 lg:h-[340vh]">
-      <div className="lg:sticky lg:top-[84px] lg:flex lg:h-[calc(100dvh-84px)] lg:items-center">
-        <div className="container-page grid gap-10 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:py-0">
-          <div className="flex flex-col justify-center">
-            <div className="t-eyebrow">Our approach</div>
-            <RevealText text="Autonomous where the rules are clear. Human where they aren’t." className="t-h2 mt-6 max-w-[620px]" />
-            <ol className="mt-10 space-y-2">
-              {CHAPTERS.map((c, i) => {
-                const active = state.chapter === i;
-                return (
-                  <li key={c.k}>
-                    <button
-                      onClick={() => jump(i)}
-                      className={`w-full rounded-[14px] p-5 text-left transition-[background-color,opacity] duration-500 ${active ? "bg-paper shadow-[0_0_0_1px_rgba(31,42,68,0.1)]" : "opacity-45 hover:opacity-75"}`}
-                    >
-                      <div className="flex items-baseline gap-4">
-                        <span className="text-[13px] text-orange-deep">{c.k}</span>
-                        <span className="t-h4">{c.title}</span>
-                      </div>
-                      <div className="grid transition-[grid-template-rows] duration-500" style={{ gridTemplateRows: active ? "1fr" : "0fr" }}>
-                        <p className="t-body-sans overflow-hidden pl-9 text-[15px] leading-[1.45] text-graphite">
-                          <span className="block pt-2">{c.body}</span>
-                        </p>
-                      </div>
-                      <div className="ml-9 mt-4 h-[2px] overflow-hidden rounded-full bg-ash-soft">
-                        <div
-                          className="h-full origin-left bg-orange transition-transform duration-200"
-                          style={{ transform: `scaleX(${state.chapter > i ? 1 : active ? state.p : 0})` }}
-                        />
-                      </div>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-          {/* desktop: one pinned stage that morphs; mobile: stacked visuals */}
-          <div className="hidden h-[620px] lg:block">
-            <Visual chapter={state.chapter} p={state.p} />
-          </div>
-          <div className="space-y-4 lg:hidden">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-[560px]">
-                <Visual chapter={i} p={1} />
+    <section id="approach" className="scroll-mt-28 py-20 md:py-24">
+      <div className="container-page">
+        <div className="t-eyebrow">Our approach</div>
+        <RevealText text="Autonomous where the rules are clear. Human where they aren’t." className="t-h1 mt-5 max-w-[900px]" stagger={0.03} />
+
+        <div className="mt-10 grid gap-3 lg:grid-cols-3">
+          {PRINCIPLES.map((p, i) => (
+            <motion.article
+              key={p.k}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={VIEW}
+              transition={{ delay: i * 0.1, duration: 0.8, ease: EASE }}
+              className="group flex flex-col overflow-hidden rounded-[24px] border border-ash bg-paper"
+            >
+              <div className="relative h-[240px] overflow-hidden">
+                <Image
+                  src={p.photo.src}
+                  alt={p.photo.alt}
+                  fill
+                  sizes="(min-width: 1024px) 33vw, 100vw"
+                  className="photo-tone object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+                  style={{ objectPosition: p.pos }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-6">
+                  <span className="text-[12px] font-medium tracking-[0.08em] text-orange">{p.k}</span>
+                  <h3 className="t-h3 mt-2 !text-parchment">{p.title}</h3>
+                </div>
+                <span className="absolute right-4 top-4 rounded-full bg-ink/40 px-2.5 py-1 text-[10px] text-parchment/70 backdrop-blur-sm">{p.photo.credit}</span>
               </div>
-            ))}
-          </div>
+              <div className="flex flex-1 flex-col p-6">
+                <p className="t-body-sans text-[15px] leading-[1.45] text-graphite">{p.line}</p>
+                <div className="mt-auto pt-8">
+                  <p.Figure />
+                </div>
+              </div>
+            </motion.article>
+          ))}
         </div>
       </div>
     </section>

@@ -1,4 +1,24 @@
 .DS_Store
+
+# secrets: only .env.example files are shared
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# local data and environments
+*.sqlite
+*.sqlite3
+*.db
+recordings/
+.venv/
+node_modules/
+.next/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
 # reference reels from other creators: too big for GitHub, not ours to publish
 /*.MP4
 

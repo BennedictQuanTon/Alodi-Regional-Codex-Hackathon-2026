@@ -1,5 +1,5 @@
 import { Approach } from "@/components/landing/approach";
-import { ClosingCta, Competitors, Faq, Footer, Roadmap, Sources } from "@/components/landing/closing";
+import { ClosingCta, Competitors, Faq, Footer, Sources } from "@/components/landing/closing";
 import { Hero, SourceStrip } from "@/components/landing/hero";
 import { ScrollProgress, SmoothScroll } from "@/components/landing/motion";
 import { Stack } from "@/components/landing/stack";
@@ -7,6 +7,7 @@ import { Team } from "@/components/landing/team";
 import { AnnouncementBar, Nav } from "@/components/landing/nav";
 import { Problem } from "@/components/landing/problem";
 import { Features, Outcomes, Product } from "@/components/landing/product";
+import { Tldr } from "@/components/landing/tldr";
 import { HowItWorks } from "@/components/landing/works";
 
 export default function Home() {
@@ -21,12 +22,12 @@ export default function Home() {
         <SourceStrip />
         <Problem />
         <Approach />
-        <Product />
+        <Tldr />
         <HowItWorks />
         <Features />
+        <Product />
         <Outcomes />
         <Stack />
-        <Roadmap />
         <Competitors />
         <Team />
         <Faq />

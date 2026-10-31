@@ -6,9 +6,9 @@ import { Chevron, LogoLink } from "@/components/site/brand";
 
 const LINKS = [
   { href: "#problem", label: "Problem" },
-  { href: "#approach", label: "Approach" },
+  { href: "#product", label: "Architecture" },
   { href: "#how-it-works", label: "Product" },
-  { href: "#competitors", label: "Competitors" },
+  { href: "#tech", label: "OpenAI" },
   { href: "#team", label: "Team" },
 ];
 
@@ -54,7 +54,7 @@ export function Nav() {
           <LogoLink size="text-[34px]" />
           <nav className="hidden items-center gap-8 xl:flex">
             {LINKS.map((l) => (
-              <a key={l.href} href={l.href} className="text-[18px] uppercase tracking-[0.01em] hover:text-orange-deep">
+              <a key={l.href} href={l.href} className="text-[14px] font-medium uppercase tracking-[0.06em] hover:text-orange-deep">
                 {l.label}
               </a>
             ))}
