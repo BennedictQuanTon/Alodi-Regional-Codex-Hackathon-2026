@@ -145,6 +145,13 @@ after a running cost of {m(BEST['cost_month'], 1)}.</p>
 <p><b>Next.</b> A full build in November 2026, shadow mode at one area in Q1 2027 with no buyer contact, then controlled real channels, a region and a
 national rollout by 2028.</p>
 </div>
+{sub("1.1", "At a glance")}
+{kf([(m(MID), "lost a month in one area today", "Modelled"), ("1 tap", "from the courier starts a rescue", "Product"), ("< 10 s", "from the buyer’s answer to the courier’s card", "Target · measured on stage"), (m(BEST['net_month']), f"net saving a month, {net_pct:.0%} of the loss", "Projected")])}
+{sub("1.2", "Why now")}
+<ul class="cols"><li><b>The cost moved to sellers.</b> Since April 2025 Shopee sellers pay return shipping on failed orders, up to ₫40,000 each.</li>
+<li><b>Volume keeps growing.</b> The four largest marketplaces sold ₫429.7T in 2025, up 34.75% (Metric); call teams cannot grow that fast.</li>
+<li><b>The models are ready.</b> GPT-Live-1 makes a natural voice call possible, the Decisions API makes triage cheap, GPT-5.6 Terra handles the orchestration.</li>
+<li><b>The rules are clear.</b> Shopee’s 2–3 contacts within 5 days give the agent a fixed frame to work inside.</li></ul>
 """)
 
 c2 = chapter(2, "The problem", "Nothing is broken in the route. The context dies in a phone call.", f"""
@@ -196,9 +203,13 @@ c5 = chapter(5, "The product", "Four screens and one agent, kept in sync on a fa
  ["Buyer channel", "Buyer, on a laptop in the demo", "Chat with quick replies; the AI call"],
  ["Ops console", "Dispatcher and CS, on an iPad", "Live case, extracted fields with confidence, audit trail, label approval"],
  ["Hub dashboard", "Hub lead", "A simulated 4,000-order day: rescue pipeline by step, failures by hour, policy guard, 20 routes, CS queue"],
- ["Control screen", "Presenter", "Scenario picker, play, pause, fast-forward"],
- ["Landing page and documents", "Judges, partners", "The story, the architecture, outcomes, alodi-numbers.pdf and this report"],
-]) + sub("5.1", "The simulated day behind the dashboard") + kf([(f"{DAY['orders']:,}", "orders", "fixed seed · Simulated"), (str(fa['total']), f"failed first time · A {fa['A']} · B {fa['B']} · refused {fa['C']}", "Simulated"), (str(DAY['rescheduled_with_card']), "rescued with a context card", "Simulated"), (str(DAY['cs_queue']['total']), "handed to customer service", "Simulated")]))
+]) + sub("5.1", "Demo scenarios on route R07") + table(["Scenario", "What happens", "Expected outcome"], [
+ ["<b>A_main</b>", "No reply; tap A 10:02; chat; AI call 1 at 11:04 answered", "1 Nov 17:00–20:00 (0.94), Tower B security (0.88), wife (0.91); auto-applied"],
+ ["<b>B_memo</b>", "Tap B 10:40; 9-second courier memo", "1 Nov 08:00–10:00 (0.93), Tower A reception (0.90); auto-applied"],
+ ["<b>REFUSE</b>", "Tap Refused 11:10", "No buyer contact; suggested label; CS approves the return"],
+ ["<b>A_lowconf</b>", "Tap A 12:20; call 1 gets a vague answer", "0.52 / 0.41; confirm in chat; CS applies 14:00–17:00"],
+ ["<b>A_noanswer</b>", "Tap A 14:30; calls at 15:32 and 17:32 missed", "Escalated after two calls; no third call"],
+]) + sub("5.2", "The simulated day behind the dashboard") + kf([(f"{DAY['orders']:,}", "orders", "fixed seed · Simulated"), (str(fa['total']), f"failed first time · A {fa['A']} · B {fa['B']} · refused {fa['C']}", "Simulated"), (str(DAY['rescheduled_with_card']), "rescued with a context card", "Simulated"), (str(DAY['cs_queue']['total']), "handed to customer service", "Simulated")]))
 
 c6 = chapter(6, "Architecture", "An agent layer between the buyer and the carrier. It replaces nothing and fails open.", """
 <div class="arch">
@@ -236,7 +247,6 @@ log next to the audit trail.</p>
 {sub("7.2", "Open points")}
 <ul><li>OpenAI’s GPT-Live-1 model page does not list supported languages, so Vietnamese call quality is tested before the pilot; PhoWhisper and the local fallback stay until it passes.</li>
 <li>Call audio is personal data that cannot be masked; the GPT-Live-1 path needs a transfer impact assessment under the PDPL before production.</li></ul>
-{note("Sources: developers.openai.com model pages for GPT-Live-1 and GPT-5.6 Terra; openai.com/index/decisions-api; checked 31 Oct 2026. PRD §16.7.")}
 """)
 
 c8 = chapter(8, "Data, privacy and rules", "Text to the cloud is masked; calls run only after the recording notice.", """<ul class="cols">
@@ -245,13 +255,31 @@ c8 = chapter(8, "Data, privacy and rules", "Text to the cloud is masked; calls r
 <li>Raw audio and transcripts are encrypted with a 30-day TTL; every change to an order’s context is versioned with the actor and time.</li>
 <li>Opt-out is checked before every scheduled job; no real number is dialled in the demo (TEST-0001 … TEST-2000).</li>
 <li>Constraints: Vietnam PDPL (from 1 Jan 2026), Decree 53/2022 on data location, Shopee’s 2–3 contacts within 5 days.</li>
-<li>Cross-border transfer: call audio to OpenAI requires a transfer impact assessment; the offline fallback keeps the area working without the cloud.</li></ul>""")
+<li>Cross-border transfer: call audio to OpenAI requires a transfer impact assessment; the offline fallback keeps the area working without the cloud.</li></ul>
+<h3><span>8.1</span>Data classification and retention</h3>
+<table><thead><tr><th>Data</th><th>Class</th><th>Where</th><th>Retention</th><th>Leaves the trusted zone?</th></tr></thead><tbody>
+<tr><td>Buyer phone, name, address</td><td>Personal</td><td>orders (phone encrypted)</td><td>Carrier policy</td><td>Masked only</td></tr>
+<tr><td>Live call audio</td><td>Personal, sensitive</td><td>GPT-Live-1 session</td><td>Session only</td><td>Yes, to OpenAI after the recording notice</td></tr>
+<tr><td>Recorded call and memo audio</td><td>Personal, sensitive</td><td>Recordings store (MinIO)</td><td>30 days</td><td>No</td></tr>
+<tr><td>Masked transcript and chat text</td><td>Pseudonymised</td><td>recordings, events</td><td>30 days</td><td>To the Decisions API and GPT-5.6 Terra</td></tr>
+<tr><td>Extracted JSON, context card</td><td>Operational</td><td>rescue_result</td><td>Order lifetime</td><td>Yes, to the courier app and SPX</td></tr>
+<tr><td>Event log and traces</td><td>Operational</td><td>events</td><td>Monthly partitions</td><td>Aggregates only</td></tr>
+</tbody></table>
+<h3><span>8.2</span>Rights and controls</h3>
+<ul class="cols"><li><b>Consent.</b> The recording notice is the first line of every call; declining ends the call.</li><li><b>Opt-out.</b> “Stop” cancels every pending message and call for the order.</li>
+<li><b>Audit.</b> Every write to the order context records who changed what and when.</li><li><b>Minimisation.</b> Models receive the masked fields they need, nothing else.</li></ul>
+<p class="note">Source: PRD §16.6, §17.3, updated for the GPT-Live-1 call path.</p>""")
 
 c9 = chapter(9, "Evaluation and outcomes", "Three numbers measured on stage, one projected.", kf([("< 10 s", "time-to-context, median", "event log · Measured"), ("≥ 0.90", "extraction F1 per field", "held-out set · Measured"), ("< 2%", "wrong auto-applies", "eval replay · Measured"), ("0", "labels, returns or calls out of hours without a person", "Measured")]) + table(["Eval item", "Spec"], [
  ["Starting set", "47 dev samples (35 templated, 12 hard cases)"], ["Final set", "≥ 200 samples: chat 45%, call 30%, memo 25%; 30% held out by a different teammate"],
  ["Scoring", "Precision, recall, F1 per field; calibration: ≥ 95% correct above 0.85 confidence"], ["Loop", "Codex proposes one change per round; keep it if F1 rises without hurting calibration; stop when held-out stalls"],
  ["Safe-autonomy run", f"Replay every sample plus the simulated day; simulation: {DAY['extraction']['auto_applied']} auto-applied of {fa['total']} failures"],
-]) + note("Source: PRD §2.3, §23. Numbers on today’s /metrics page are mock until the eval runs."))
+]) + sub("9.1", "Acceptance criteria for the demo") + table(["ID", "Given → then"], [
+ ["AC-01", "4,000 orders and no opt-outs → every buyer gets 4 windows plus “can’t receive today”"], ["AC-04", "Rescue chat at 10:04, no reply → call 1 at 11:04, call 2 at 13:04"], ["AC-05", "A call due at 20:42 → no call; moved to 08:00 next day; policy_block logged"],
+ ["AC-06", "Buyer replies while call 1 is pending → call cancelled, extraction runs on the reply"], ["AC-07", "Fields at 0.94 / 0.88 / 0.91 → auto-applied, card on the courier app within 10 s"],
+ ["AC-08", "Any field below 0.85 → confirm in chat; still unclear → CS queue, low_confidence"], ["AC-09", "Courier taps Refused → no buyer contact; suggested label not applied"],
+ ["AC-12", "Buyer writes “stop” → all pending contact cancelled"], ["AC-14", "Any model request → no unmasked phone or house number in the logged prompt"],
+]) + note("Source: PRD §2.3, §23, §24 (AC-01 to AC-15). Numbers on today’s /metrics page are mock until the eval runs."))
 
 sc = [("Conservative", CONS), ("Base", BASE), ("Best-in-class", BEST)]
 cost_rows = [[e(k), m(v, 2)] for k, v in BEST["cost_items"].items()] + [["<b>Total running cost</b>", f"<b>{m(BEST['cost_month'], 1)}</b>"]]
@@ -266,9 +294,9 @@ c10 = chapter(10, "Economics", f"One area loses {m(MID)} a month. Alodi costs {m
  ["Share of the loss"] + [f"{r['net_pct']:.0%}" for _, r in sc],
  ["Net a year"] + [f"₫{r['net_year'] / 1e9:.2f}B" for _, r in sc],
  ["Server pays back in"] + [f"~{r['hardware_payback_months'] * 4.35:.0f} weeks" for _, r in sc],
-])}
-{kf([("416", "CS calls a day by the agent", "≈ 28 staff-hours · Projected"), ("96", "fewer wasted trips a day", "Projected"), ("24 min", "back per courier a day", "Projected"), (f"{m(R['hardware_one_time'][0])}–{m(R['hardware_one_time'][1])}", "one-time area server", "Listed price + estimate")])}</div>
+])}</div>
 </div>
+{kf([("416", "CS calls a day by the agent", "≈ 28 staff-hours · Projected"), ("96", "fewer wasted trips a day", "Projected"), ("24 min", "back per courier a day", "Projected"), (f"{m(R['hardware_one_time'][0])}–{m(R['hardware_one_time'][1])}", "one-time area server", "Listed price + estimate")])}
 {note(f"OpenAI lines use list prices from developers.openai.com (31 Oct 2026); the 20% Terra escalation share is an estimate. Best-in-class uses the top of Shipsy’s 50–65% range (vendor). The AWS-managed alternative costs {m(AWS['cost_month'], 1)} a month. All savings are projected until a pilot measures Alodi’s own rescue rate; every formula is in alodi-numbers.pdf.")}
 """)
 
@@ -279,7 +307,16 @@ c12 = chapter(12, "Roadmap", "From a stage demo to a national rollout.", table([
  ["MVP demo", "31 Oct 2026", "Four screens on mock data", "AC-01 to AC-15 pass in rehearsal"], ["Full build", "Nov 2026", "Server engine, real call audio, ≥ 200 eval samples", "Measured metrics on /metrics"],
  ["Shadow mode", "Q1 2027", "One area, real events, no buyer contact", "Agent vs CS decisions compared; thresholds tuned; DPIA done"], ["Controlled channels", "Q2 2027", "Real chat and GPT-Live-1 calls for risky orders", "0 rule violations; rescue rate measured"],
  ["Region", "H2 2027", "5–20 hubs", "Cost per case and latency on target"], ["National", "2028", "20–100 hubs, second region", "Break-even; 99.9% availability"],
-]) + note("Source: PRD §28."))
+]) + sub("12.1", "What a pilot needs from a carrier partner") + table(["Need", "Why", "When"], [
+ ["One area: 20 couriers, about 4,000 orders a day", "Shadow mode compares agent and CS decisions on real events", "Q1 2027"],
+ ["Routing and order APIs (read)", "Feasible windows and today’s orders", "Q1 2027"],
+ ["Driver-app integration for the tap and the card", "The courier never leaves the app they already use", "Q1 2027"],
+ ["Shopee Chat API and approved Zalo ZNS templates", "Real buyer messages for risky orders", "Q2 2027"],
+ ["A SIP trunk with a verified brand name", "Buyers answer calls they can identify", "Q2 2027"],
+ ["OpenAI organisation access: GPT-Live-1, Decisions API, GPT-5.6 Terra", "The production stack", "Q1 2027"],
+ ["CS time to label shadow-mode cases", "Ground truth for thresholds and evals", "Q1 2027"],
+ ["Data protection impact and transfer assessments", "PDPL and Decree 53 before any buyer contact", "Before Q2 2027"],
+]) + note("Source: PRD §26, §28."))
 
 c13 = chapter(13, "Risks and assumptions", "What could make the numbers wrong, and what we do about it.", '<div class="cols2"><div>' + table(["Risk", "Mitigation"], [
  ["Buyers ignore unknown callers", "Chat first; verified brand name; call only after silence"], ["GPT-Live-1 Vietnamese quality unproven", "Test before the pilot; PhoWhisper and local fallback stay"],
@@ -288,7 +325,16 @@ c13 = chapter(13, "Risks and assumptions", "What could make the numbers wrong, a
  ["Mock numbers shown as results", "Labels mock, simulated, projected everywhere"],
 ]) + '</div><div>' + table(["Key assumption", "Status"], [["One area = 20 couriers, 4,000 orders a day", "Estimate; check with courier interviews"], ["8% first-attempt failure", "VECOM low end · Sourced"], ["25% baseline rescue", "Shipsy · Vendor"], ["Alodi lifts rescue to 65%", "Projected; measured only in a pilot"], ["20% of LLM traffic escalated to Terra", "Estimate; measured in shadow mode"], ["₫26,000 = $1", "Estimate"]]) + '</div></div>' + note("Source: PRD §26, §27."))
 
-c14 = chapter(14, "Team", "Team Develarper.", table(["Name", "Role", "Focus"], [["Nomura Yoshio", "Team Lead · Presenter", "Product, demo script, pitch"], ["Long Quan Ton", "AI Engineer · Solution Architect", "Orchestrator, voice agent, eval loop"], ["Khanh Tuong Huynh", "AI Engineer · Deployment", "Context extractor, ASR, policy guard"], ["Thanh Loi Tran", "Data Engineer · Backend", "Order Context Object, APIs, metrics log"]]))
+c14 = chapter(14, "Team and project assets", "Team Develarper: four people, one agent, built with Codex.", table(["Name", "Role", "Focus"], [["Nomura Yoshio", "Team Lead · Presenter", "Product, demo script, pitch"], ["Long Quan Ton", "AI Engineer · Solution Architect", "Orchestrator, voice agent, eval loop"], ["Khanh Tuong Huynh", "AI Engineer · Deployment", "Context extractor, ASR, policy guard"], ["Thanh Loi Tran", "Data Engineer · Backend", "Order Context Object, APIs, metrics log"]]) + sub("14.1", "Project assets") + table(["Asset", "Where", "What it holds"], [
+ ["Landing page, demo and dashboard", "web/", "Next.js app: landing, four-screen demo, hub dashboard, metrics"],
+ ["Product requirements", "prep/02-technical/PRD.md", "Business analysis, UML, API, architecture, OpenAI stack, cost model, eval, risks"],
+ ["Cost model", "prep/02-technical/cost-model/cost_model.py", "Every money figure in this report, with typed inputs"],
+ ["Numbers proof", "alodi-numbers.pdf", "Formulas, inputs and sources for the loss and the savings"],
+ ["Mock data pack", "prep/02-technical/mock-data/", "One fictional hub: 20 couriers, 4,000 orders, scenarios, eval samples"],
+ ["Survey instrument", "prep/06-survey/", "Codebook in Vietnamese and English; response files"],
+ ["Pitch deck and film", "prep/01-pitch/", "12-slide deck, two-minute demo film, scripts"],
+ ["Brand kit and design system", "prep/03-design/, prep/04-brand/", "Tokens, components, logos, marks, fonts"],
+]) + sub("14.2", "How we work") + "<p>Every change goes through a pull request with lint and build checks in CI. Codex helps specify, build and review; a person merges. Figures are generated from code (cost model, mock data, survey files), so the landing page, the deck and this report cannot drift apart.</p>")
 
 SRC = [
  ("Shopee Return & Refund Policy §7.1–7.2", "Seller pays return shipping on failed orders; none when the carrier is at fault", "help.shopee.vn/portal/4/article/77251", "Verified 31 Oct 2026 (republished 30 Oct 2026, effective 6 Nov 2026; no amount stated)"),
@@ -304,7 +350,7 @@ SRC = [
  ("OpenAI, gpt-oss-20b", "Runs within 16 GB with MXFP4", "Azure AI catalog · vLLM recipes", "Verified"),
  ("Glints, Phong Vu, Viettel reseller, oazns.vn, EVN", "Courier income, GPU prices, SIP, ZNS and power tariffs", "see PRD §18.8", "Listed prices, checked by the team"),
 ]
-c15 = chapter(15, "Sources and verification", "Every external figure, where it comes from, and how far we checked it.", table(["Source", "What we use", "Where", "Check"], [[f"<b>{e(a)}</b>", e(b), f"<span class=url>{e(c)}</span>", e(d)] for a, b, c, d in SRC], "src") + note("Corrections on 31 Oct 2026: the ₫40,000 figure is now cited to Shopee §7.1 plus GHN (an earlier VTV citation described a promotional support cap); the OpenAI stack and running cost were updated to GPT-Live-1, the Decisions API and GPT-5.6 Terra."))
+c15 = chapter(15, "Sources and verification", "Every external figure, where it comes from, and how far we checked it.", table(["Source", "What we use", "Where", "Check"], [[f"<b>{e(a)}</b>", e(b), f"<span class=url>{e(c)}</span>", e(d)] for a, b, c, d in SRC], "src") + note("31 Oct 2026: ₫40,000 recited to Shopee §7.1 plus GHN; OpenAI stack and running cost updated."))
 
 CSS = font_css + """
 @page { size: A4; margin: 20mm 18mm 20mm;
@@ -314,7 +360,7 @@ CSS = font_css + """
 }
 @page :first { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } @top-right { content: none; } }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: 'Geist', sans-serif; color: #1f2a44; font-size: 9.4pt; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font-family: 'Geist', sans-serif; color: #1f2a44; font-size: 10pt; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 b { font-weight: 600; }
 .cover { width: 210mm; height: 297mm; background: #121a2c; color: #f6f3f1; padding: 22mm 20mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; }
 .ctop svg { height: 12mm; width: auto; }
@@ -323,36 +369,38 @@ h1 { font-family: 'Be Vietnam Pro'; font-size: 64pt; line-height: 1; letter-spac
 .tag { font-size: 20pt; margin: 3mm 0 0; color: #f6f3f1; } .abs { font-size: 11.5pt; color: #c9cfdc; max-width: 140mm; margin-top: 8mm; }
 .meta { margin: 0; border-top: 1px solid rgba(255,255,255,.18); } .meta div { display: grid; grid-template-columns: 34mm 1fr; padding: 2.6mm 0; border-bottom: 1px solid rgba(255,255,255,.1); }
 .meta dt { font-size: 8pt; text-transform: uppercase; letter-spacing: .06em; color: #8a91a6; } .meta dd { margin: 0; font-size: 9.5pt; color: #e3e6ee; }
-h2 { font-weight: 600; font-size: 17pt; letter-spacing: -0.02em; line-height: 1.15; margin: 9mm 0 1.5mm; padding-top: 4mm; border-top: 1.5px solid #1f2a44; break-after: avoid; }
+h2 { font-weight: 600; font-size: 20pt; letter-spacing: -0.02em; line-height: 1.15; margin: 9mm 0 2mm; padding-top: 4.5mm; border-top: 1.5px solid #1f2a44; break-after: avoid; }
 h2 span { color: #f05a00; margin-right: 3mm; } h2.plain { border-top: 0; padding-top: 0; margin-top: 0; }
 .front h2.plain:not(:first-child) { margin-top: 8mm; }
-h3 { font-size: 10.5pt; font-weight: 600; margin: 5mm 0 1.5mm; break-after: avoid; } h3 span { color: #c94b00; margin-right: 2mm; font-weight: 500; }
+h3 { font-size: 11.5pt; font-weight: 600; margin: 5.5mm 0 2mm; break-after: avoid; } h3 span { color: #c94b00; margin-right: 2mm; font-weight: 500; }
 h4 { margin: 0 0 2mm; font-size: 7.6pt; text-transform: uppercase; letter-spacing: .06em; color: #6b7183; }
-.lead { font-size: 11pt; color: #4a5268; margin: 0 0 3mm; break-after: avoid; }
-p { margin: 0 0 2.5mm; }
-.toc { columns: 3; font-size: 10pt; padding-left: 5mm; margin: 2mm 0 0; line-height: 1.75; }
-ul { padding-left: 4.5mm; margin: 0 0 2mm; } li { margin-bottom: 1.2mm; }
+.lead { font-size: 12.5pt; line-height: 1.4; color: #4a5268; margin: 0 0 4.5mm; break-after: avoid; }
+p { margin: 0 0 3mm; }
+.toc { columns: 3; font-size: 11pt; padding-left: 5mm; margin: 2mm 0 0; line-height: 1.75; }
+ul { padding-left: 5mm; margin: 0 0 3mm; } li { margin-bottom: 1.8mm; }
 .cols { columns: 2; column-gap: 8mm; } .cols p, .cols li { break-inside: avoid; }
 .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; align-items: start; }
-table { width: 100%; border-collapse: collapse; margin: 2mm 0 3mm; font-size: 8.4pt; break-inside: avoid; }
-th { text-align: left; font-weight: 600; font-size: 7.2pt; text-transform: uppercase; letter-spacing: .04em; color: #6b7183; padding: 1.6mm 2mm; border-bottom: 1px solid #1f2a44; }
-td { padding: 1.6mm 2mm; border-bottom: 1px solid #e6e2df; vertical-align: top; } td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table { width: 100%; border-collapse: collapse; margin: 2.5mm 0 4mm; font-size: 9pt; break-inside: avoid; }
+th { text-align: left; font-weight: 600; font-size: 8pt; text-transform: uppercase; letter-spacing: .04em; color: #6b7183; padding: 2mm 2.2mm; border-bottom: 1px solid #1f2a44; }
+td { padding: 2mm 2.2mm; border-bottom: 1px solid #e6e2df; vertical-align: top; } td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 tbody tr:nth-child(even) td { background: #faf8f6; }
-table.comp { font-size: 7.2pt; } table.src, table.oa { font-size: 7.8pt; } .url { color: #6b7183; word-break: break-all; }
-.note { font-size: 7.9pt; color: #6b7183; border-left: 2px solid #f05a00; padding-left: 3mm; margin: 2mm 0 3mm; }
-.kf { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #1f2a44; border-bottom: 1px solid #e6e2df; margin: 2mm 0 3mm; break-inside: avoid; }
+table.comp { font-size: 8pt; } table.src, table.oa { font-size: 8.4pt; } .url { color: #6b7183; word-break: break-all; }
+.note { font-size: 9pt; color: #6b7183; border-left: 2px solid #f05a00; padding-left: 3.5mm; margin: 3mm 0 4mm; }
+.kf { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #1f2a44; border-bottom: 1px solid #e6e2df; margin: 3mm 0 5mm; break-inside: avoid; }
 .cols2 .kf { grid-template-columns: 1fr 1fr; }
-.kf div { padding: 2.6mm 3mm 2.6mm 0; } .kf div + div { padding-left: 3mm; border-left: 1px solid #e6e2df; }
+.kf div { padding: 3.2mm 3.2mm 3.2mm 0; } .kf div + div { padding-left: 3mm; border-left: 1px solid #e6e2df; }
 .cols2 .kf div:nth-child(3) { border-left: 0; padding-left: 0; border-top: 1px solid #e6e2df; } .cols2 .kf div:nth-child(4) { border-top: 1px solid #e6e2df; }
-.kf b { display: block; font-size: 15pt; font-weight: 500; letter-spacing: -0.02em; } .kf span { display: block; font-size: 8pt; margin-top: .5mm; } .kf i { display: block; font-style: normal; font-size: 7pt; color: #8a91a6; margin-top: .5mm; }
+.kf b { display: block; font-size: 19pt; font-weight: 500; letter-spacing: -0.02em; } .kf span { display: block; font-size: 9.6pt; margin-top: 1mm; } .kf i { display: block; font-style: normal; font-size: 8pt; color: #8a91a6; margin-top: 1mm; }
 .steps8 { display: grid; grid-template-columns: repeat(4, 1fr); padding: 0; list-style: none; counter-reset: s; border-top: 1px solid #1f2a44; margin: 1mm 0 3mm; break-inside: avoid; }
-.steps8 li { counter-increment: s; padding: 2.4mm 3mm 2.4mm 0; border-bottom: 1px solid #e6e2df; margin: 0; } .steps8 li::before { content: "0" counter(s); color: #f05a00; font-size: 7.6pt; font-weight: 600; display: block; }
-.steps8 b { display: block; font-size: 9pt; } .steps8 span { font-size: 7.8pt; color: #6b7183; }
+.steps8 li { counter-increment: s; padding: 3mm 3.2mm 3mm 0; border-bottom: 1px solid #e6e2df; margin: 0; } .steps8 li::before { content: "0" counter(s); color: #f05a00; font-size: 7.6pt; font-weight: 600; display: block; }
+.steps8 b { display: block; font-size: 10.6pt; } .steps8 span { font-size: 9.2pt; color: #6b7183; }
 .arch { display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 4mm; margin: 2mm 0 3mm; break-inside: avoid; }
-.arch .col div { border: 1px solid #cecac8; border-radius: 2.5mm; padding: 1.8mm 3mm; margin-bottom: 1.6mm; font-size: 8.2pt; background: #fbf9f7; }
+.arch .col div { border: 1px solid #cecac8; border-radius: 2.5mm; padding: 2.4mm 3.2mm; margin-bottom: 1.8mm; font-size: 9pt; background: #fbf9f7; }
 .arch .core { background: #121a2c; color: #f6f3f1; border-radius: 3.5mm; padding: 3.5mm; } .arch .core h4 { color: #f05a00; font-family: 'Be Vietnam Pro'; text-transform: none; font-size: 12pt; letter-spacing: -0.02em; }
-.arch .core div { background: rgba(255,255,255,.07); border-radius: 2mm; padding: 1.6mm 3mm; margin-bottom: 1.6mm; font-size: 8pt; } .arch .core p { font-size: 7.6pt; color: #a7aec0; margin: 2mm 0 0; }
-.status { font-size: 8.2pt; padding: 2.6mm 3.5mm; border-radius: 2.5mm; background: #e7f3ec; margin: 1mm 0 3mm; } .status.warn { background: #fbe3d4; }
+.arch .core div { background: rgba(255,255,255,.07); border-radius: 2mm; padding: 2.3mm 3.2mm; margin-bottom: 1.8mm; font-size: 8.8pt; } .arch .core p { font-size: 7.6pt; color: #a7aec0; margin: 2mm 0 0; }
+.ch { break-before: page; }
+.ch > h2 { margin-top: 0; }
+.status { font-size: 9.4pt; padding: 3.5mm 4mm; border-radius: 2.5mm; background: #e7f3ec; margin: 1mm 0 3mm; } .status.warn { background: #fbe3d4; }
 """
 
 doc = f"<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Alodi · Project report</title><style>{CSS}</style></head><body>{cover}{contents}{c1}{c2}{c3}{c4}{c5}{c6}{c7}{c8}{c9}{c10}{c11}{c12}{c13}{c14}{c15}</body></html>"
