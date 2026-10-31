@@ -929,16 +929,3 @@ html.theme-vt::view-transition-new(root) {
 .gate-faces img { border-radius: 999px; box-shadow: 0 0 0 2px #fff; }
 .gate-faces img + img { margin-left: -10px; }
 @media (max-width: 760px) { .gate-choices { grid-template-columns: 1fr; } .gate-stage { display: none; } }
-
-/* Live demo notice on the gate */
-.sorry-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(18, 26, 44, 0.45); backdrop-filter: blur(6px); }
-.sorry { position: relative; display: grid; justify-items: center; gap: 14px; width: min(560px, 100%); padding: 36px 36px 32px; border-radius: 28px; background: #fff; color: #1f2a44; text-align: center; box-shadow: 0 40px 100px -30px rgba(18, 26, 44, 0.6); }
-.sorry-face { border-radius: 999px; box-shadow: 0 0 0 4px #fff, 0 18px 40px -18px rgba(31, 42, 68, 0.45); }
-.sorry h2 { font-size: 34px; font-weight: 600; line-height: 1.12; letter-spacing: -0.025em; }
-.sorry h2 em { display: block; font-style: normal; color: #f05a00; }
-.sorry p { font-size: 16px; line-height: 1.45; color: #3a4358; }
-.sorry-actions { width: 100%; margin-top: 8px; }
-.sorry-go { width: 100%; height: 64px; }
-.sorry-go b { font-size: 19px; }
-.sorry-close { position: absolute; top: 14px; right: 18px; width: 36px; height: 36px; border: 0; border-radius: 999px; background: none; color: #3a4358; font-size: 26px; line-height: 1; cursor: pointer; }
-.sorry-close:hover { background: #f1f2f5; }

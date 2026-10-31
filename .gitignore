@@ -45,3 +45,6 @@ dist/
 /.env
 /ai/.venv/
 /data/
+
+# Office lock files
+~$*

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { COMPETITORS, FAQ, SOURCES } from "@/lib/content";
+import { COMPETITORS, FAQ, SOURCES, LIVE_DEMO_URL } from "@/lib/content";
 import { Chevron, LogoLink, SourceNote, Wordmark } from "@/components/site/brand";
 import { Reveal, RevealText } from "./motion";
 
@@ -107,9 +107,9 @@ export function ClosingCta() {
             One shipper tap, one well-timed conversation, one context card for the next attempt.
           </p>
           <div className="mt-11 flex flex-wrap justify-center gap-4">
-            <Link href="/start" className="btn btn-dark">
+            <a href={LIVE_DEMO_URL} className="btn btn-dark">
               Watch the demo
-            </Link>
+            </a>
             <Link href="/console" className="btn btn-primary">
               Open dashboard <Chevron />
             </Link>

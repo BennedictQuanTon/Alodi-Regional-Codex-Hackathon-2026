@@ -57,7 +57,7 @@ npm run dev        # http://localhost:3000
 | `/dev/integrated` | Real local database/workflow, scheduler, GPT calls and shipper memo workspace |
 | `/dev/ai` | Standalone AI fixture lab (separate backend; does not apply to the real workflow) |
 
-**Deploy (Vercel):** set Root Directory to `web`, framework Next.js, no environment variables. On the website the Live demo button points people to the stage; on the machine that runs the live demo set `NEXT_PUBLIC_LIVE_READY=1` to open `/live`.
+**Deploy (Vercel):** set Root Directory to `web`, framework Next.js, no environment variables. Watch demo and Live demo open `LIVE_DEMO_URL` in `web/src/lib/content.ts`.
 
 Numbers on `/metrics` and the dashboard are *mock* until the eval runs;
 savings are *projected*.

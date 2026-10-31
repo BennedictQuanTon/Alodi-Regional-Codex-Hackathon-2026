@@ -113,6 +113,9 @@ export const TLDR = {
  * Demo video under the TL;DR. Drop the file in web/public/video/ and set `src` (and optionally `poster`).
  * Leave `src` empty to show the placeholder frame.
  */
+/** Where Watch demo and Live demo go. A temporary tunnel to the team's machine: update it here if the address changes. */
+export const LIVE_DEMO_URL = "https://produces-klein-solo-priorities.trycloudflare.com/live";
+
 export const DEMO_VIDEO = { src: "/video/alodi-story.mp4", poster: "/video/alodi-story.jpg" };
 
 export const HERO_STATS = [
