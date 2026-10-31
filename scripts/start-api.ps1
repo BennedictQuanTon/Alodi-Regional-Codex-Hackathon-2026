@@ -13,10 +13,10 @@ try {
         Copy-Item -LiteralPath ".env.example" -Destination ".env"
     }
 
-    & uv sync --frozen --python 3.12
+    & uv sync --project api --frozen --python 3.12
     if ($LASTEXITCODE -ne 0) { throw "Backend dependency installation failed." }
 
-    & uv run --frozen --python 3.12 alodi-api
+    & uv run --project api --frozen --python 3.12 alodi-api
     if ($LASTEXITCODE -ne 0) { throw "Backend startup failed." }
 }
 finally {

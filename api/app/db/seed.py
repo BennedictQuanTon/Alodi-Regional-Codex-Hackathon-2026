@@ -44,6 +44,7 @@ class HubRow(SeedRow):
     couriers: int
     orders: int
     stops_per_route: int
+    morning_run: time
 
 
 class CourierRow(SeedRow):
@@ -238,6 +239,7 @@ async def seed_database(
                     "city": pack.hub.city,
                     "service_area_wards": pack.hub.service_area_wards,
                     "delivery_date": pack.hub.date,
+                    "morning_run": pack.hub.morning_run,
                     "data_source": "synthetic",
                 }
             ],
@@ -314,6 +316,7 @@ async def seed_database(
                 generation_id=generation,
                 scenario=settings.demo_scenario,
                 clock_start=at,
+                business_time=at,
                 clock_speed=settings.demo_clock_speed,
                 seeded_at=at,
                 pack_fingerprint=pack.fingerprint,

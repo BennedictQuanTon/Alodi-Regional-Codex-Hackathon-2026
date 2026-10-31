@@ -8,7 +8,18 @@ from sqlalchemy import func, inspect, select, text
 from sqlalchemy.exc import IntegrityError, StatementError
 
 from app.db.migrate import migration_config, upgrade_database
-from app.db.models import Base, Event, IngressReceipt, Recording, RescueCase, ShipperEvent
+from app.db.models import (
+    AvailabilityReply,
+    Base,
+    DemoState,
+    Event,
+    Hub,
+    IngressReceipt,
+    Order,
+    Recording,
+    RescueCase,
+    ShipperEvent,
+)
 
 
 async def test_migration_matches_models_and_can_be_applied_again(database):
@@ -24,7 +35,7 @@ async def test_migration_matches_models_and_can_be_applied_again(database):
         await connection.run_sync(verify)
     await upgrade_database(database)
     async with database.sessions() as session:
-        assert await session.scalar(text("SELECT version_num FROM alembic_version")) == "0001"
+        assert await session.scalar(text("SELECT version_num FROM alembic_version")) == "0002"
 
 
 async def test_empty_database_migration_downgrade_upgrade(database):
@@ -176,3 +187,50 @@ async def test_naive_timestamp_is_rejected_and_rolled_back(seeded, settings):
             )
     async with database.sessions() as session:
         assert await session.scalar(select(func.count()).select_from(ShipperEvent)) == 0
+
+
+async def test_revision_two_upgrades_existing_seed_and_closes_unverified_legacy_questions(
+    seeded, settings
+):
+    database, summary = seeded
+    config = migration_config()
+    async with database.engine.begin() as connection:
+
+        def downgrade(sync_connection):
+            config.attributes["connection"] = sync_connection
+            command.downgrade(config, "0001")
+
+        await connection.run_sync(downgrade)
+        await connection.execute(
+            text("""INSERT INTO availability_reply
+            (tracking_id, asked_at, slots_offered, windows, channel)
+            VALUES ('SPXVN0123456789', '2026-10-30 23:32:00.000000',
+                    '["08:00/10:00"]', '[]', 'shopee_chat')""")
+        )
+    await upgrade_database(database)
+    async with database.sessions() as session:
+        assert await session.scalar(select(func.count()).select_from(Order)) == 4000
+        state = await session.get(DemoState, 1)
+        assert (
+            state.generation_id == summary.generation_id
+            and state.business_time == state.clock_start
+        )
+        question = await session.scalar(select(AvailabilityReply))
+        assert question.question_status == "cancelled" and question.offered_windows == []
+        assert question.service_date.isoformat() == "2026-10-31"
+        assert question.generation_id == summary.generation_id
+        hub = await session.scalar(select(Hub))
+        assert hub.morning_run.isoformat() == "06:30:00"
+        assert not (await session.execute(text("PRAGMA foreign_key_check"))).all()
+    from conftest import FixedClock
+
+    from app.morning import MorningService, WorkflowError
+    from app.schemas import MorningJobRequest
+
+    # Legacy questions must not become duplicate sends or a low-level SQL error.
+    service = MorningService(database, settings, clock=FixedClock())
+    with pytest.raises(WorkflowError) as error:
+        await service.load(MorningJobRequest(generation_id=summary.generation_id))
+    assert error.value.code == "existing_questions"
+    async with database.sessions() as session:
+        assert await session.scalar(select(func.count()).select_from(AvailabilityReply)) == 1

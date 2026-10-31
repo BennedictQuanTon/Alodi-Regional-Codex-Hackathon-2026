@@ -31,20 +31,21 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["api"]
+where = ["."]
+include = ["app*"]
 
 [tool.setuptools.package-data]
 "app.db.migrations" = ["script.py.mako"]
 
 [tool.pytest.ini_options]
-testpaths = ["api/tests"]
+testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-src = ["api"]
+src = ["."]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "ASYNC"]

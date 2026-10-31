@@ -74,7 +74,7 @@ async def test_explicit_reset_creates_new_generation_and_retains_migration(seede
     assert reset.created and reset.generation_id != initial.generation_id
     async with database.sessions() as session:
         assert await session.scalar(select(func.count()).select_from(Order)) == 4000
-        assert await session.scalar(text("SELECT version_num FROM alembic_version")) == "0001"
+        assert await session.scalar(text("SELECT version_num FROM alembic_version")) == "0002"
         assert (await session.get(Order, "SPXVN0123456789")).context_version == 0
         assert not (await session.execute(text("PRAGMA foreign_key_check"))).all()
 

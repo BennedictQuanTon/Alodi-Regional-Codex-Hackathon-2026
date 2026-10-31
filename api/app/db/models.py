@@ -61,6 +61,7 @@ class Hub(Base):
     city: Mapped[str] = mapped_column(String)
     service_area_wards: Mapped[list[str]] = mapped_column(JSON)
     delivery_date: Mapped[date] = mapped_column(Date)
+    morning_run: Mapped[time] = mapped_column(Time, default=time(6, 30))
     data_source: Mapped[str] = mapped_column(String, default="synthetic")
 
 
@@ -123,6 +124,13 @@ class Order(Base):
 class AvailabilityReply(Base):
     __tablename__ = "availability_reply"
     __table_args__ = (
+        Index(
+            "uq_availability_question", "generation_id", "tracking_id", "service_date", unique=True
+        ),
+        CheckConstraint(
+            "question_status IN ('queued','open','answered','expired','cancelled')",
+            name="question_status",
+        ),
         CheckConstraint(
             "answer_type IS NULL OR answer_type IN ('windows','cannot_today','no_reply')",
             name="answer_type",
@@ -131,11 +139,17 @@ class AvailabilityReply(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     tracking_id: Mapped[str] = mapped_column(ForeignKey("orders.tracking_id"), index=True)
-    asked_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    asked_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    service_date: Mapped[date] = mapped_column(Date)
+    generation_id: Mapped[str] = mapped_column(String)
+    cutoff_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    question_status: Mapped[str] = mapped_column(String)
+    offered_windows: Mapped[list[dict[str, str]]] = mapped_column(JSON)
     slots_offered: Mapped[list[str]] = mapped_column(JSON)
     answer_type: Mapped[str | None] = mapped_column(String)
     windows: Mapped[list[str]] = mapped_column(JSON, default=list)
     reason: Mapped[str | None] = mapped_column(Text)
+    available_date: Mapped[date | None] = mapped_column(Date)
     answered_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     channel: Mapped[str] = mapped_column(String)
 
@@ -294,6 +308,51 @@ class DemoState(Base):
     generation_id: Mapped[str] = mapped_column(String, unique=True)
     scenario: Mapped[str] = mapped_column(String)
     clock_start: Mapped[datetime] = mapped_column(UTCDateTime)
+    business_time: Mapped[datetime | None] = mapped_column(UTCDateTime)
     clock_speed: Mapped[float] = mapped_column(Float)
     seeded_at: Mapped[datetime] = mapped_column(UTCDateTime)
     pack_fingerprint: Mapped[str] = mapped_column(String)
+
+
+class MorningRun(Base):
+    __tablename__ = "morning_runs"
+    __table_args__ = (UniqueConstraint("generation_id", "hub_id", "service_date"),)
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    generation_id: Mapped[str] = mapped_column(String)
+    hub_id: Mapped[str] = mapped_column(ForeignKey("hubs.hub_id"))
+    service_date: Mapped[date] = mapped_column(Date)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    cutoff_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    cutoff_processed_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    orders_loaded: Mapped[int] = mapped_column(Integer)
+    questions_created: Mapped[int] = mapped_column(Integer)
+    policy_blocked: Mapped[int] = mapped_column(Integer)
+
+
+class Message(Base):
+    __tablename__ = "messages"
+    __table_args__ = (
+        UniqueConstraint("generation_id", "idempotency_key"),
+        CheckConstraint("status IN ('queued','sent','cancelled')", name="status"),
+        CheckConstraint("data_source = 'synthetic'", name="simulated_only"),
+        Index("ix_messages_dispatch", "generation_id", "status", "created_at"),
+    )
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    generation_id: Mapped[str] = mapped_column(String)
+    tracking_id: Mapped[str] = mapped_column(ForeignKey("orders.tracking_id"), index=True)
+    question_id: Mapped[int] = mapped_column(ForeignKey("availability_reply.id"))
+    kind: Mapped[str] = mapped_column(String)
+    template_key: Mapped[str] = mapped_column(String)
+    text: Mapped[str] = mapped_column(Text)
+    quick_replies: Mapped[list[dict[str, str]]] = mapped_column(JSON)
+    status: Mapped[str] = mapped_column(String, default="queued")
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    sent_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    cancelled_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    cancellation_reason: Mapped[str | None] = mapped_column(String)
+    context_version: Mapped[int] = mapped_column(Integer)
+    idempotency_key: Mapped[str] = mapped_column(String)
+    data_source: Mapped[str] = mapped_column(String, default="synthetic")
+    channel: Mapped[str] = mapped_column(String, default="demo_chat")
