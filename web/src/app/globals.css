@@ -815,77 +815,14 @@ body {
 ::view-transition {
   pointer-events: none;
 }
-@keyframes vt-fade {
-  from {
-    opacity: 0;
-    filter: blur(6px);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-  }
+/* One transition everywhere: a short cross-fade. */
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 180ms;
+  animation-timing-function: ease;
 }
-@keyframes vt-slide {
-  from {
-    translate: var(--vt-offset) 0;
-  }
-  to {
-    translate: 0 0;
-  }
-}
-@keyframes vt-rise {
-  from {
-    translate: 0 24px;
-    scale: 0.985;
-  }
-  to {
-    translate: 0 0;
-    scale: 1;
-  }
-}
-@keyframes vt-blur-mid {
-  40% {
-    filter: blur(4px);
-  }
-}
-::view-transition-old(.nav-forward) {
-  --vt-offset: -48px;
-  animation:
-    160ms ease-in both vt-fade reverse,
-    420ms cubic-bezier(0.22, 1, 0.36, 1) both vt-slide reverse;
-}
-::view-transition-new(.nav-forward) {
-  --vt-offset: 48px;
-  animation:
-    260ms ease-out 140ms both vt-fade,
-    520ms cubic-bezier(0.22, 1, 0.36, 1) both vt-slide;
-}
-::view-transition-old(.nav-back) {
-  --vt-offset: 48px;
-  animation:
-    160ms ease-in both vt-fade reverse,
-    420ms cubic-bezier(0.22, 1, 0.36, 1) both vt-slide reverse;
-}
-::view-transition-new(.nav-back) {
-  --vt-offset: -48px;
-  animation:
-    260ms ease-out 140ms both vt-fade,
-    520ms cubic-bezier(0.22, 1, 0.36, 1) both vt-slide;
-}
-::view-transition-old(.page-rise) {
-  animation: 180ms ease-in both vt-fade reverse;
-}
-::view-transition-new(.page-rise) {
-  animation:
-    320ms ease-out 120ms both vt-fade,
-    600ms cubic-bezier(0.22, 1, 0.36, 1) both vt-rise;
-}
-::view-transition-group(.morph) {
-  animation-duration: 620ms;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-}
-::view-transition-image-pair(.morph) {
-  animation-name: vt-blur-mid;
+::view-transition-group(*) {
+  animation-duration: 180ms;
 }
 /* Dashboard sidebar and demo nav stay put while content moves */
 ::view-transition-group(dash-side),
@@ -942,14 +879,12 @@ html.theme-vt::view-transition-new(root) {
 .gate-center h1 em { font-style: normal; color: #f05a00; }
 .gate-center > p { font-size: 19px; color: #3a4358; }
 .gate-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: min(720px, 100%); margin-top: 18px; }
-.gate-choice { display: inline-flex; align-items: center; justify-content: center; gap: 16px; height: 88px; padding: 0 24px; border-radius: 22px; border: 1px solid #e0dcd9; background: #fff; color: #1f2a44; cursor: pointer; box-shadow: 0 18px 40px -28px rgba(31, 42, 68, 0.5); }
+.gate-choice { transition: translate 150ms ease; display: inline-flex; align-items: center; justify-content: center; gap: 16px; height: 88px; padding: 0 24px; border-radius: 22px; border: 1px solid #e0dcd9; background: #fff; color: #1f2a44; cursor: pointer; box-shadow: 0 18px 40px -28px rgba(31, 42, 68, 0.5); }
+.gate-choice:hover { translate: 0 -2px; }
 .gate-choice b { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
 .gate-choice-dark { background: #1f2a44; border-color: #1f2a44; color: #fff; }
 .gate-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: rgba(255, 255, 255, 0.12); }
 .gate-faces { display: flex; }
 .gate-faces img { border-radius: 999px; box-shadow: 0 0 0 2px #fff; }
 .gate-faces img + img { margin-left: -10px; }
-.gate-iris { position: fixed; z-index: 50; border-radius: 999px; animation: gate-iris 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
-@keyframes gate-iris { from { transform: scale(0); } to { transform: scale(1); } }
 @media (max-width: 760px) { .gate-choices { grid-template-columns: 1fr; } .gate-stage { display: none; } }
-@media (prefers-reduced-motion: reduce) { .gate-iris { animation: none; } }
