@@ -1,48 +1,100 @@
 "use client";
 
 import { motion } from "motion/react";
-import { TLDR } from "@/lib/content";
-import { Figure } from "./motion";
+import { useRef, useState } from "react";
+import { DEMO_VIDEO, TLDR } from "@/lib/content";
+import { DropRing } from "@/components/site/brand";
+import { Reveal, RevealText } from "./motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** The whole pitch in four cells, right under the hero. */
+/** Demo video frame. Plays the file in DEMO_VIDEO.src; without one it shows a branded placeholder. */
+function VideoFrame() {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const has = Boolean(DEMO_VIDEO.src);
+  const play = () => {
+    if (!has || !ref.current) return;
+    ref.current.play();
+    setPlaying(true);
+  };
+  return (
+    <motion.figure
+      initial={{ opacity: 0, y: 24, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.9, ease: EASE }}
+      className="relative aspect-video overflow-hidden rounded-[28px] bg-ink"
+    >
+      {has ? (
+        <video ref={ref} src={DEMO_VIDEO.src} poster={DEMO_VIDEO.poster || undefined} controls={playing} playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover" />
+      ) : (
+        <>
+          <div className="wash left-1/2 top-1/2 h-[70%] w-[60%] -translate-x-1/2 -translate-y-1/2 opacity-60" style={{ background: "radial-gradient(circle, rgba(240,90,0,0.75), transparent 70%)" }} />
+          <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "linear-gradient(var(--color-parchment) 1px, transparent 1px), linear-gradient(90deg, var(--color-parchment) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+        </>
+      )}
+
+      {!playing && (
+        <button
+          type="button"
+          onClick={play}
+          disabled={!has}
+          aria-label={has ? "Play the demo video" : "Demo video coming soon"}
+          className="group absolute inset-0 flex flex-col items-center justify-center gap-6 text-parchment"
+        >
+          <span className="relative grid size-24 place-items-center rounded-full bg-parchment/10 backdrop-blur-md transition-transform duration-500 group-enabled:group-hover:scale-105 md:size-28">
+            <span className="pulse-ring absolute inset-0 rounded-full border border-orange" />
+            {has ? <span className="ml-1 text-[34px] leading-none text-parchment">▸</span> : <DropRing size={44} dot="var(--color-parchment)" />}
+          </span>
+          <span className="text-center">
+            <span className="block text-[13px] font-medium uppercase tracking-[0.08em] text-parchment/60">{has ? `Watch the demo · ${DEMO_VIDEO.length}` : "Demo video · coming soon"}</span>
+            <span className="mt-2 block text-[15px] text-parchment/80">{DEMO_VIDEO.caption}</span>
+          </span>
+        </button>
+      )}
+    </motion.figure>
+  );
+}
+
+/** TL;DR: what Alodi is, then the demo video. Sits right above "How Alodi works". */
 export function Tldr() {
   return (
-    <section id="tldr" className="pb-4 pt-6">
+    <section id="tldr" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.8, ease: EASE }}
-          className="relative overflow-hidden rounded-[24px] bg-ink text-parchment"
-        >
-          <div className="wash -right-24 -top-32 h-80 w-[420px] opacity-35" style={{ background: "radial-gradient(circle, rgba(240,90,0,0.9), transparent 70%)" }} />
-          <div className="relative grid md:grid-cols-[120px_1fr]">
-            <div className="flex items-center border-b border-white/10 px-7 py-5 md:border-b-0 md:border-r">
-              <span className="text-[13px] font-medium tracking-[0.08em] text-orange">TL;DR</span>
-            </div>
-            <ol className="grid sm:grid-cols-2 xl:grid-cols-4">
-              {TLDR.map((t, i) => (
-                <motion.li
-                  key={t.k}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ delay: 0.15 + i * 0.1, duration: 0.6, ease: EASE }}
-                  className={`px-7 py-6 ${i > 0 ? "border-t border-white/10 sm:border-t-0" : ""} ${i % 2 === 1 ? "sm:border-l" : ""} ${i >= 2 ? "sm:border-t xl:border-t-0" : ""} ${i > 0 ? "xl:border-l" : ""} border-white/10`}
-                >
-                  <div className="text-[11px] font-medium uppercase tracking-[0.08em] text-parchment/45">{t.k}</div>
-                  <div className={`t-number mt-3 text-[40px] leading-none ${i === 3 ? "text-orange" : ""}`}>
-                    <Figure value={t.value} />
-                  </div>
-                  <p className="mt-3 max-w-[240px] text-[14px] leading-[1.4] text-parchment/70">{t.line}</p>
-                </motion.li>
-              ))}
-            </ol>
+        <div className="grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+          <div>
+            <Reveal>
+              <div className="t-eyebrow flex items-center gap-3">
+                <span className="rounded-full bg-orange px-2.5 py-1 text-[11px] text-white">TL;DR</span>
+                Introducing Alodi
+              </div>
+            </Reveal>
+            <RevealText text={TLDR.headline} className="t-h1 mt-6" stagger={0.03} />
+            <Reveal delay={0.1}>
+              <p className="mt-6 max-w-[560px] text-[18px] leading-[1.45] text-graphite">{TLDR.body}</p>
+            </Reveal>
           </div>
-        </motion.div>
+          <dl className="self-end border-t border-ash">
+            {TLDR.facts.map((f, i) => (
+              <motion.div
+                key={f.k}
+                initial={{ opacity: 0, x: 12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ delay: 0.1 + i * 0.08, duration: 0.6, ease: EASE }}
+                className="grid grid-cols-[110px_1fr] gap-4 border-b border-ash py-4"
+              >
+                <dt className="text-[12px] font-medium uppercase tracking-[0.08em] text-orange-deep">{f.k}</dt>
+                <dd className="text-[15px] leading-[1.4] text-navy">{f.v}</dd>
+              </motion.div>
+            ))}
+          </dl>
+        </div>
+
+        <div className="mt-12">
+          <VideoFrame />
+        </div>
       </div>
     </section>
   );

@@ -96,13 +96,24 @@ export const SOURCES: Source[] = [
   },
 ];
 
-/** TL;DR under the hero: the whole pitch in four lines. */
-export const TLDR = [
-  { k: "Problem", value: "₫473M", line: "lost a month per area to failed deliveries" },
-  { k: "Alodi", value: "1 tap", line: "the agent chats, calls and hands back a context card" },
-  { k: "Boundary", value: "0", line: "high-stakes actions without a person" },
-  { k: "Result", value: "₫194M", line: "net saving a month, 41% of the loss (projected)" },
-];
+/** TL;DR: what Alodi is, in one sentence and five lines. Sits right above "How Alodi works". */
+export const TLDR = {
+  headline: "Alodi is the AI agent that rescues failed deliveries.",
+  body: "When a courier can’t reach the buyer, they tap one button. Alodi messages the buyer, calls if there’s silence, and hands the next courier a card with when, where and who to deliver to.",
+  facts: [
+    { k: "For", v: "Carriers like SPX, their couriers and buyers" },
+    { k: "Starts with", v: "One tap: No answer · Rescheduled · Refused" },
+    { k: "Does", v: "Chats now, calls if silent, extracts a context card" },
+    { k: "Never", v: "Labels or returns an order without a person" },
+    { k: "Built on", v: "OpenAI Agents SDK and gpt-oss-20b, shipped with Codex" },
+  ],
+};
+
+/**
+ * Demo video under the TL;DR. Drop the file in web/public/video/ and set `src` (and optionally `poster`).
+ * Leave `src` empty to show the placeholder frame.
+ */
+export const DEMO_VIDEO = { src: "", poster: "", length: "2:00", caption: "The full rescue, from the courier’s tap to the second drop" };
 
 export const HERO_STATS = [
   { value: "₫40,000", text: "return fee the seller pays on each failed order", source: "Shopee Return & Refund Policy §7.1, Mar 2026" },
