@@ -3,6 +3,7 @@
 import {
   motion,
   useAnimationFrame,
+  useInView,
   useMotionValue,
   useReducedMotion,
   useScroll,
@@ -42,9 +43,10 @@ export function VelocityMarquee({
   const dir = useRef(reverse ? 1 : -1);
   const [hover, setHover] = useState(false);
   const track = useRef<HTMLDivElement>(null);
+  const visible = useInView(track);
 
   useAnimationFrame((_, delta) => {
-    if (reduce || !track.current) return;
+    if (reduce || !visible || !track.current) return;
     const width = track.current.scrollWidth / 2 || 1;
     const f = factor.get();
     const initial = reverse ? 1 : -1;

@@ -1,7 +1,7 @@
 import { Approach } from "@/components/landing/approach";
 import { ClosingCta, Competitors, Faq, Footer, Sources } from "@/components/landing/closing";
 import { Hero, SourceStrip } from "@/components/landing/hero";
-import { ScrollProgress, SmoothScroll } from "@/components/landing/motion";
+import { PauseOffscreen, ScrollProgress, SmoothScroll } from "@/components/landing/motion";
 import { Stack } from "@/components/landing/stack";
 import { Team } from "@/components/landing/team";
 import { AnnouncementBar, Nav } from "@/components/landing/nav";
@@ -14,6 +14,7 @@ export default function Home() {
   return (
     <>
       <SmoothScroll />
+      <PauseOffscreen />
       <ScrollProgress />
       <AnnouncementBar />
       <Nav />
