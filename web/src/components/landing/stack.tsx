@@ -78,7 +78,7 @@ function AgentMesh() {
           <text x={w.x - NODE.w / 2 + 38} y={w.y - 10} fontSize="15" fontWeight={500} fill="#0d0d0d" fontFamily="var(--font-sans)">
             {w.name}
           </text>
-          <text x={w.x + NODE.w / 2 - 16} y={w.y - 10} fontSize="11" fill="#8f8f8f" textAnchor="end" fontFamily="var(--font-mono)">
+          <text x={w.x + NODE.w / 2 - 16} y={w.y - 10} fontSize="12" fill="#8f8f8f" textAnchor="end" fontFamily="var(--font-sans)">
             {w.tool}
           </text>
           <text x={w.x - NODE.w / 2 + 16} y={w.y + 18} fontSize="12" fill="#5d5d5d" fontFamily="var(--font-mono)">
@@ -102,21 +102,78 @@ function AgentMesh() {
 }
 
 const MESH_FOOT = [
-  ["Distributed", "each worker is a task on a Temporal queue; the agent survives restarts"],
+  ["Distributed", "each worker is a task on a Temporal queue; a restart never loses a case"],
   ["Local-first", "gpt-oss-20b on the area server; the cloud sees masked text only"],
   ["Gated", "OpenAI Evals on the held-out set before any prompt or model change"],
 ];
 
+// Build time: how the team ships the agent with Codex. High level; the demo uses part of it.
+const CODEX = [
+  { stage: "Specify", line: "PRD and rules become scripts", surface: "ChatGPT + Codex" },
+  { stage: "Build", line: "Pair-programming with AGENTS.md", surface: "Codex CLI · IDE" },
+  { stage: "Parallelise", line: "One task, one branch, one PR", surface: "Codex cloud" },
+  { stage: "Review", line: "Every PR reviewed before merge", surface: "Codex in GitHub" },
+  { stage: "Evaluate", line: "One change per round, held-out F1", surface: "Codex + Evals" },
+];
+
+function Label({ k, title }: { k: string; title: string }) {
+  return (
+    <div className="flex items-baseline gap-3 px-6 pt-6">
+      <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--oa-green)]">{k}</span>
+      <span className="text-[15px] font-medium text-[var(--oa-ink)]">{title}</span>
+    </div>
+  );
+}
+
+function CodexLoop() {
+  return (
+    <div className="relative px-6 pb-7 pt-6">
+      <div className="absolute left-[calc(1.5rem+18px)] right-[calc(1.5rem+18px)] top-[calc(1.5rem+18px)] hidden h-px bg-[var(--oa-line)] md:block" />
+      <motion.div
+        className="absolute left-[calc(1.5rem+18px)] top-[calc(1.5rem+18px)] hidden h-px origin-left bg-[var(--oa-green)] md:block"
+        style={{ right: "calc(1.5rem + 18px)" }}
+        initial={{ scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 1.4, ease: EASE }}
+      />
+      <ol className="relative grid gap-6 md:grid-cols-5 md:gap-4">
+        {CODEX.map((c, i) => (
+          <motion.li
+            key={c.stage}
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ delay: 0.2 + i * 0.12, duration: 0.5, ease: EASE }}
+            className="flex gap-4 md:block"
+          >
+            <span className="grid size-9 shrink-0 place-items-center rounded-full border border-[var(--oa-line)] bg-white text-[var(--oa-ink)]">
+              <TechIcon icon="siOpenai" size={16} mono />
+            </span>
+            <span className="block md:mt-4">
+              <span className="block text-[15px] font-medium text-[var(--oa-ink)]">{c.stage}</span>
+              <span className="mt-1 block text-[13px] leading-[1.4] text-[var(--oa-text-2)]">{c.line}</span>
+              <span className="mt-2 block text-[11px] uppercase tracking-[0.06em] text-[var(--oa-muted)]">{c.surface}</span>
+            </span>
+          </motion.li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 function OpenAICore() {
   return (
-    <div className="oa-panel overflow-hidden rounded-[24px] border border-[var(--oa-line)] bg-white">
+    <div className="oa-panel overflow-hidden rounded-[28px] border border-[var(--oa-line)] bg-white">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--oa-line)] px-6 py-4">
         <span className="flex items-center gap-2.5 text-[15px] font-medium">
-          <TechIcon icon="siOpenai" size={18} mono /> OpenAI at the core
+          <TechIcon icon="siOpenai" size={18} mono /> OpenAI, end to end
         </span>
-        <span className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--oa-muted)]">production design · the demo runs the OpenAI API</span>
+        <span className="text-[12px] text-[var(--oa-muted)]">production design · the demo runs the OpenAI API</span>
       </div>
-      <div className="hidden px-6 py-8 md:block">
+
+      <Label k="Runtime" title="One agent, six workers" />
+      <div className="hidden px-6 pb-4 pt-2 md:block">
         <AgentMesh />
       </div>
       <ul className="grid gap-2 p-4 md:hidden">
@@ -129,18 +186,21 @@ function OpenAICore() {
               <TechIcon icon="siOpenai" size={12} mono className="text-[var(--oa-green)]" />
               {w.name}
             </span>
-            <span className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--oa-muted)]">{w.model}</span>
+            <span className="text-[12px] text-[var(--oa-muted)]">{w.model}</span>
           </li>
         ))}
       </ul>
-      <dl className="grid border-t border-[var(--oa-line)] md:grid-cols-3">
+      <dl className="grid border-y border-[var(--oa-line)] bg-[var(--oa-subtle)] md:grid-cols-3">
         {MESH_FOOT.map(([k, v], i) => (
-          <div key={k} className={`px-6 py-5 ${i > 0 ? "border-t border-[var(--oa-line)] md:border-l md:border-t-0" : ""}`}>
-            <dt className="font-[family-name:var(--font-mono)] text-[11px] uppercase tracking-[0.04em] text-[var(--oa-green)]">{k}</dt>
-            <dd className="mt-1.5 text-[13px] leading-[1.45] text-[var(--oa-text-2)]">{v}</dd>
+          <div key={k} className={`px-6 py-4 ${i > 0 ? "border-t border-[var(--oa-line)] md:border-l md:border-t-0" : ""}`}>
+            <dt className="text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--oa-ink)]">{k}</dt>
+            <dd className="mt-1 text-[13px] leading-[1.45] text-[var(--oa-text-2)]">{v}</dd>
           </div>
         ))}
       </dl>
+
+      <Label k="Build time" title="Shipped with Codex, reviewed by people" />
+      <CodexLoop />
     </div>
   );
 }
@@ -186,13 +246,13 @@ export function Stack() {
         <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
           <div>
             <Reveal>
-              <div className="t-eyebrow">Tech stack</div>
+              <div className="t-eyebrow">OpenAI ecosystem · tech stack</div>
             </Reveal>
-            <RevealText text="One agent, six workers, OpenAI at the core." className="t-h1 mt-6 max-w-[760px]" stagger={0.035} />
+            <RevealText text="Built on OpenAI, from the first line to the last call." className="t-h1 mt-5 max-w-[820px]" stagger={0.035} />
           </div>
           <Reveal delay={0.1}>
             <p className="max-w-[440px] text-[18px] leading-[1.4] text-graphite lg:ml-auto">
-              Cloud APIs on demo day. One server per area in production, with the same interfaces.
+              The agent runs on OpenAI models; the team builds and reviews it with Codex.
             </p>
           </Reveal>
         </div>

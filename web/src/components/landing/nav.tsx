@@ -8,8 +8,7 @@ const LINKS = [
   { href: "#problem", label: "Problem" },
   { href: "#product", label: "Architecture" },
   { href: "#how-it-works", label: "Product" },
-  { href: "#tech", label: "Stack" },
-  { href: "#codex", label: "Codex" },
+  { href: "#tech", label: "OpenAI" },
   { href: "#team", label: "Team" },
 ];
 

@@ -3,26 +3,26 @@
 import { motion } from "motion/react";
 import { FEATURES, MONEY, NUMBERS_PDF, OUTPUT_METRICS } from "@/lib/content";
 import { Mark, SourceNote } from "@/components/site/brand";
-import { C4Architecture } from "./architecture";
+import { ArchitectureDiagram } from "./architecture";
 import { Figure, Reveal, RevealText } from "./motion";
 
 export function Product() {
   return (
     <section id="product" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-end">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
           <div>
             <div className="t-eyebrow">Architecture</div>
-            <RevealText text="An agent layer between the buyer and the carrier." className="t-h1 mt-6" />
+            <RevealText text="An agent layer between the buyer and the carrier." className="t-h1 mt-5 max-w-[820px]" />
           </div>
           <Reveal delay={0.1}>
-            <p className="text-[20px] leading-[1.35] text-graphite">
-              Production design in the C4 model. OpenAI runs the agent; the carrier keeps every system it already has.
+            <p className="max-w-[440px] text-[18px] leading-[1.4] text-graphite lg:ml-auto">
+              OpenAI runs the agent in the middle. The carrier keeps every system it already has.
             </p>
           </Reveal>
         </div>
         <div className="mt-10">
-          <C4Architecture />
+          <ArchitectureDiagram />
         </div>
       </div>
     </section>
@@ -54,67 +54,86 @@ export function Features() {
   );
 }
 
+const EASE = [0.22, 1, 0.36, 1] as const;
+const LOSS = 472.9;
+const GROSS = 214.7;
+const COST = 20.9;
+
+/** Proportional bar: the monthly loss, the part Alodi recovers, and the running cost taken out of it. */
+function MoneyBar() {
+  const pct = (v: number) => `${(v / LOSS) * 100}%`;
+  return (
+    <div>
+      <div className="relative h-3 overflow-hidden rounded-full bg-ash-soft">
+        <motion.div
+          className="absolute inset-y-0 left-0 flex overflow-hidden rounded-full"
+          initial={{ width: 0 }}
+          whileInView={{ width: pct(GROSS) }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 1.4, ease: EASE }}
+        >
+          <span className="h-full bg-orange" style={{ width: `${((GROSS - COST) / GROSS) * 100}%` }} />
+          <span className="h-full bg-navy" style={{ width: `${(COST / GROSS) * 100}%` }} />
+        </motion.div>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
+        {MONEY.map((m, i) => (
+          <motion.div
+            key={m.label}
+            initial={{ opacity: 0, y: 6 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ delay: 0.3 + i * 0.1, duration: 0.5, ease: EASE }}
+            className="flex items-start gap-2.5"
+          >
+            <span className={`mt-1.5 size-2 shrink-0 rounded-full ${i === 0 ? "bg-ash" : i === 1 ? "bg-orange/50" : i === 2 ? "bg-navy" : "bg-orange"}`} />
+            <span>
+              <span className={`t-number block text-[28px] leading-none ${i === 3 ? "text-orange-deep" : ""}`}>{m.value}</span>
+              <span className="mt-1.5 block text-[13px] text-graphite">{m.label}</span>
+            </span>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function Outcomes() {
   return (
     <section id="metrics" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
-          <div>
-            <Reveal>
-              <div className="t-eyebrow">Expected outcomes</div>
-            </Reveal>
-            <RevealText text="Four numbers we will be judged on." className="t-h1 mt-6 max-w-[760px]" stagger={0.035} />
-          </div>
-          <Reveal delay={0.1}>
-            <p className="max-w-[440px] text-[18px] leading-[1.4] text-graphite lg:ml-auto">
-              Three are measured on stage from the event log and the eval set. Money is projected, and every input is in the PDF.
-            </p>
-          </Reveal>
-        </div>
+        <Reveal>
+          <div className="t-eyebrow">Expected outcomes</div>
+        </Reveal>
+        <RevealText text="What we will be judged on." className="t-h1 mt-5" stagger={0.035} />
 
-        <div className="mt-10 grid border-y border-ash sm:grid-cols-2 xl:grid-cols-4">
-          {OUTPUT_METRICS.map((m, i) => (
-            <Reveal
-              key={m.metric}
-              delay={i * 0.07}
-              className={`flex flex-col py-10 sm:px-8 sm:first:pl-0 ${i > 0 ? "border-t border-ash sm:border-t-0" : ""} ${i % 2 === 1 ? "sm:border-l" : ""} ${i === 2 ? "sm:border-t xl:border-t-0" : ""} ${i === 3 ? "sm:border-t xl:border-t-0" : ""} ${i > 0 ? "xl:border-l" : ""}`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-[12px] font-medium uppercase tracking-[0.06em] text-navy">{m.metric}</span>
-                <span className={`text-[11px] font-medium uppercase tracking-[0.06em] ${m.kind === "Measured" ? "text-good" : "text-warn"}`}>{m.kind}</span>
-              </div>
-              <div className={`t-number mt-10 whitespace-nowrap text-[64px] leading-none md:text-[80px] ${i === 3 ? "text-orange-deep" : ""}`}>
-                <Figure value={m.target} />
-              </div>
-              <p className="mt-6 max-w-[260px] text-[14px] leading-[1.45] text-graphite">{m.how}</p>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal className="mt-4">
-          <div className="grid items-center gap-8 rounded-[24px] bg-ink px-7 py-7 text-parchment md:px-9 xl:grid-cols-[1fr_auto]">
-            <ol className="grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-4">
-              {MONEY.map((m, i) => (
-                <motion.li
-                  key={m.label}
-                  initial={{ opacity: 0, y: 8 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ delay: 0.1 + i * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        <Reveal className="mt-10">
+          <div className="overflow-hidden rounded-[24px] border border-ash">
+            <div className="grid sm:grid-cols-2 xl:grid-cols-4">
+              {OUTPUT_METRICS.map((m, i) => (
+                <div
+                  key={m.metric}
+                  className={`flex flex-col p-7 md:p-8 ${i > 0 ? "border-t border-ash sm:border-t-0" : ""} ${i % 2 === 1 ? "sm:border-l" : ""} ${i >= 2 ? "sm:border-t xl:border-t-0" : ""} ${i > 0 ? "xl:border-l" : ""}`}
                 >
-                  <div className="flex items-baseline gap-3">
-                    {i > 0 && <span className="text-[20px] text-parchment/30">{i === 2 ? "−" : i === 3 ? "=" : "→"}</span>}
-                    <span className={`t-number text-[40px] leading-none md:text-[44px] ${i === 3 ? "text-orange" : ""}`}>{m.value}</span>
+                  <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-smoke">{m.metric}</span>
+                  <div className={`t-number mt-8 whitespace-nowrap text-[64px] leading-none md:text-[76px] ${i === 3 ? "text-orange-deep" : ""}`}>
+                    <Figure value={m.target} />
                   </div>
-                  <div className="mt-2 text-[12px] uppercase tracking-[0.06em] text-parchment/55">{m.label}</div>
-                </motion.li>
+                  <p className="mt-5 max-w-[240px] text-[14px] leading-[1.45] text-graphite">{m.how}</p>
+                </div>
               ))}
-            </ol>
-            <a href={NUMBERS_PDF} target="_blank" rel="noreferrer" className="btn justify-self-start bg-parchment text-ink hover:bg-white">
-              The numbers, proved · PDF
-            </a>
+            </div>
+            <div className="grid items-end gap-8 border-t border-ash bg-paper p-7 md:p-8 xl:grid-cols-[1fr_auto] xl:gap-14">
+              <div>
+                <div className="mb-5 text-[12px] font-medium uppercase tracking-[0.08em] text-smoke">Where ₫194M a month comes from · one area</div>
+                <MoneyBar />
+              </div>
+              <a href={NUMBERS_PDF} target="_blank" rel="noreferrer" className="btn btn-dark justify-self-start">
+                The numbers, proved · PDF
+              </a>
+            </div>
           </div>
-          <SourceNote className="mt-4">Team cost model, PRD §18.8. One area, best-in-class rescue (25% → 65%, Shipsy vendor range). Base case ₫99M a month. Projected.</SourceNote>
+          <SourceNote className="mt-4">Team cost model, PRD §18.8. Best-in-class rescue, 25% → 65% (Shipsy vendor range). Base case ₫99M a month. Money is projected; the other three are measured on stage.</SourceNote>
         </Reveal>
       </div>
     </section>

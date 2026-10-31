@@ -1,5 +1,4 @@
 import { Approach } from "@/components/landing/approach";
-import { CodexEcosystem } from "@/components/landing/codex";
 import { ClosingCta, Competitors, Faq, Footer, Sources } from "@/components/landing/closing";
 import { Hero, SourceStrip } from "@/components/landing/hero";
 import { ScrollProgress, SmoothScroll } from "@/components/landing/motion";
@@ -8,6 +7,7 @@ import { Team } from "@/components/landing/team";
 import { AnnouncementBar, Nav } from "@/components/landing/nav";
 import { Problem } from "@/components/landing/problem";
 import { Features, Outcomes, Product } from "@/components/landing/product";
+import { Tldr } from "@/components/landing/tldr";
 import { HowItWorks } from "@/components/landing/works";
 
 export default function Home() {
@@ -20,14 +20,14 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <SourceStrip />
+        <Tldr />
         <Problem />
         <Approach />
         <HowItWorks />
-        <Product />
         <Features />
+        <Product />
         <Outcomes />
         <Stack />
-        <CodexEcosystem />
         <Competitors />
         <Team />
         <Faq />

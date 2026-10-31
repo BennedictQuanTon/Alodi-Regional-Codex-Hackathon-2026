@@ -96,6 +96,14 @@ export const SOURCES: Source[] = [
   },
 ];
 
+/** TL;DR under the hero: the whole pitch in four lines. */
+export const TLDR = [
+  { k: "Problem", value: "₫473M", line: "lost a month per area to failed deliveries" },
+  { k: "Alodi", value: "1 tap", line: "the agent chats, calls and hands back a context card" },
+  { k: "Boundary", value: "0", line: "high-stakes actions without a person" },
+  { k: "Result", value: "₫194M", line: "net saving a month, 41% of the loss (projected)" },
+];
+
 export const HERO_STATS = [
   { value: "₫40,000", text: "return fee the seller pays on each failed order", source: "Shopee Return & Refund Policy §7.1, Mar 2026" },
   { value: "8–12%", text: "of orders refused at the door, nationwide", source: "VECOM, Nguoi Lao Dong, 19 Jul 2025" },
@@ -172,18 +180,18 @@ export const FEATURES = [
 ];
 
 export const OUTPUT_METRICS = [
-  { metric: "Time-to-context", target: "< 10 s", kind: "Measured", how: "Buyer’s answer to the courier’s card, from the event log" },
-  { metric: "Extraction F1", target: "≥ 0.90", kind: "Measured", how: "Per field, on a held-out set of chat, call and memo samples" },
-  { metric: "Safe autonomy", target: "0", kind: "Measured", how: "Calls out of hours or labels without a person" },
-  { metric: "Net saving", target: "₫194M", kind: "Projected", how: "A month in one area, after running costs (41% of the loss)" },
+  { metric: "Time-to-context", target: "< 10 s", how: "Buyer’s answer to the courier’s card, from the event log" },
+  { metric: "Extraction F1", target: "≥ 0.90", how: "Per field, on a held-out set of chat, call and memo samples" },
+  { metric: "Safe autonomy", target: "0", how: "Calls out of hours or labels without a person" },
+  { metric: "Net saving", target: "₫194M", how: "A month in one area, after running costs (41% of the loss)" },
 ];
 
 /** The money chain behind the outcome row (PRD §18.8, best-in-class rescue; projected). */
 export const MONEY = [
   { value: "₫473M", label: "lost a month today" },
   { value: "₫215M", label: "recovered by Alodi" },
-  { value: "₫21M", label: "to run it" },
-  { value: "₫194M", label: "net saving, 41%" },
+  { value: "−₫21M", label: "to run it" },
+  { value: "₫194M", label: "net saving, 41% of the loss" },
 ];
 
 /** Downloadable proof of every number: formulas, inputs, sources (generated from prep/02-technical/cost-model). */
