@@ -1,16 +1,12 @@
 "use client";
 
-import { motion } from "motion/react";
 import { ViewTransition, useEffect, useRef, useState } from "react";
-import { BrandWipe } from "@/components/site/brand-wipe";
 import { useDemo } from "@/lib/demo/engine";
 import { BuyerPhone } from "./buyer-phone";
 import { ConsolePanel } from "./console-parts";
 import { DemoNav, Director, useLocalFlag } from "./director";
 import { PhoneFrame } from "./phone";
 import { ShipperApp } from "./shipper-app";
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Scale fixed-size content to fit the frame (so screen recordings work at any resolution). */
 export function useFit(baseW: number, baseH: number) {
@@ -29,18 +25,8 @@ export function useFit(baseW: number, baseH: number) {
   return { ref, scale };
 }
 
-/** Dashboard-style entrance: each column rises out of a soft blur, one after another. */
-export function Enter({ i, children, className = "" }: { i: number; children: React.ReactNode; className?: string }) {
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      transition={{ duration: 0.9, delay: 0.25 + i * 0.12, ease: EASE }}
-    >
-      {children}
-    </motion.div>
-  );
+export function Enter({ children, className = "" }: { i?: number; children: React.ReactNode; className?: string }) {
+  return <div className={className}>{children}</div>;
 }
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -90,7 +76,6 @@ export function DemoStage() {
         </div>
         <Director captions={captions} setCaptions={setCaptions} />
       </div>
-      <BrandWipe id="demo" tagline="One call. Delivered." />
     </div>
   );
 }

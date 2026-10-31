@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ViewTransition, useSyncExternalStore } from "react";
 import { flushSync } from "react-dom";
-import { BrandWipe } from "@/components/site/brand-wipe";
 import { Wordmark } from "@/components/site/brand";
 
 type Theme = "light" | "dark";
@@ -171,7 +170,6 @@ export function DashShell({ children, reviewCount = 116 }: { children: React.Rea
             <div>{children}</div>
           </ViewTransition>
         </main>
-        <BrandWipe id="dash" tagline="Operations, live." />
       </div>
     </div>
   );
