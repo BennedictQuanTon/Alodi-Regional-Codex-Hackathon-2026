@@ -1,5 +1,6 @@
 "use client";
 
+import { VOICE } from "./voice";
 import { useEffect, useSyncExternalStore } from "react";
 import { DEFAULT_FOR_KEY, SCENARIOS, initialState, stepsFor } from "./scenarios";
 import type { ActionKey, ChoiceKey, DemoState, ScenarioId } from "./types";
@@ -87,6 +88,8 @@ class DemoEngine {
     this.driver = true;
     this.post({ type: "takeover", from: this.tabId });
   }
+
+  private lastSaid: string | null = null;
 
   private clearTimers() {
     if (this.stepTimer) clearTimeout(this.stepTimer);
@@ -196,7 +199,12 @@ class DemoEngine {
 
     const from = s.clock;
     const to = s.animTo ?? step.to ?? from + (step.dt ?? 0);
-    const dur = Math.max(60, (step.ms ?? 1400) / s.speed);
+    // let a recorded call line finish before the next step moves on
+    const said = s.call.lines[s.call.lines.length - 1];
+    const fresh = said && said.id !== this.lastSaid;
+    if (said) this.lastSaid = said.id;
+    const hold = fresh ? (VOICE[said.text]?.ms ?? 0) + 350 : 0;
+    const dur = Math.max(60, Math.max(step.ms ?? 1400, hold) / s.speed);
     const start = performance.now();
     this.set({ ...s, animTo: to !== from ? to : null, caption: step.caption ?? s.caption });
 

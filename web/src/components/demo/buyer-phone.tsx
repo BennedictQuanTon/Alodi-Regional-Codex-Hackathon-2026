@@ -41,8 +41,16 @@ export function BuyerPhone({ state: s, engine, voicePanel }: { state: DemoState;
               {m.from === "system" ? (
                 <div className="mx-auto w-fit rounded-full bg-[var(--ui-canvas)] px-3 py-1 text-center text-[11px] ui-muted">{m.text}</div>
               ) : (
-                <div className={`flex ${m.from === "buyer" ? "justify-end" : "justify-start"}`}>
-                  <div className="max-w-[86%]">
+                <div className={`flex items-end gap-2 ${m.from === "buyer" ? "flex-row-reverse" : ""}`}>
+                  {m.from === "buyer" ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src="/people/buyer-joy.svg" alt="" width={30} height={30} className="mb-5 shrink-0 rounded-full" />
+                  ) : (
+                    <span className="mb-5 grid size-[30px] shrink-0 place-items-center rounded-full bg-[var(--ui-ink-strong)]">
+                      <DropRing size={18} dot="#fff" />
+                    </span>
+                  )}
+                  <div className="max-w-[78%]">
                     <div
                       className={`rounded-[18px] px-3.5 py-2.5 text-[14px] leading-snug ${
                         m.from === "buyer" ? "rounded-br-[6px] bg-[var(--ui-ink-strong)] text-white" : "rounded-bl-[6px] bg-white shadow-[var(--ui-shadow)]"
@@ -110,6 +118,14 @@ function CallScreen({ state: s, engine }: { state: DemoState; engine: DemoEngine
             <div className="text-[var(--ui-accent)]">
               <Waveform active bars={26} />
             </div>
+            <div className="mt-6 flex h-11 items-center justify-center">
+              {last?.who === "buyer" ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src="/people/buyer-joy.svg" alt="Minh" width={44} height={44} className="rounded-full" />
+              ) : last ? (
+                <DropRing size={36} dot="#fff" />
+              ) : null}
+            </div>
             <AnimatePresence mode="wait">
               {last && (
                 <motion.p
@@ -118,7 +134,7 @@ function CallScreen({ state: s, engine }: { state: DemoState; engine: DemoEngine
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.3 }}
-                  className={`mt-8 text-center text-[15px] leading-[1.45] ${last.who === "ai" ? "text-white/85" : "text-[#ffb48a]"}`}
+                  className={`mt-3 text-center text-[15px] leading-[1.45] ${last.who === "ai" ? "text-white/85" : "text-[#ffb48a]"}`}
                 >
                   {last.text}
                 </motion.p>

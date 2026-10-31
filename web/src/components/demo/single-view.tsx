@@ -1,6 +1,7 @@
 "use client";
 
 import { ViewTransition, useEffect, useState } from "react";
+import { BrandWipe } from "@/components/site/brand-wipe";
 import { useDemo } from "@/lib/demo/engine";
 import { BuyerPhone } from "./buyer-phone";
 import { ConsolePanel } from "./console-parts";
@@ -60,6 +61,7 @@ export function SingleView({ view }: { view: "shipper" | "buyer" | "console" }) 
         </div>
         {chrome ? <Director /> : <div className="absolute bottom-3 right-4 text-[11px] ui-muted opacity-60">H shows controls</div>}
       </div>
+      <BrandWipe />
     </div>
   );
 }

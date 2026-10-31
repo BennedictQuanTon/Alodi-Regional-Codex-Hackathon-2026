@@ -1,7 +1,7 @@
 "use client";
 
 import Lenis from "lenis";
-import { animate, motion, useInView, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import { animate, motion, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -10,7 +10,8 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export function SmoothScroll() {
   const reduce = useReducedMotion();
   useEffect(() => {
-    if (reduce) return;
+    // low-core machines keep the browser's own scrolling, which stays smooth under load
+    if (reduce || navigator.hardwareConcurrency <= 4) return;
     const lenis = new Lenis({ duration: 1.15, anchors: { offset: -96 }, easing: (t) => 1 - Math.pow(1 - t, 4) });
     let id = 0;
     const raf = (time: number) => {
@@ -26,10 +27,27 @@ export function SmoothScroll() {
   return null;
 }
 
+/** Looping SVG animations repaint even off screen, so each one only runs while it is visible. */
+export function PauseOffscreen() {
+  useEffect(() => {
+    const svgs = [...document.querySelectorAll("main svg")].filter((s) => s.querySelector("animate, animateMotion")) as SVGSVGElement[];
+    const io = new IntersectionObserver((es) => {
+      for (const e of es) {
+        const s = e.target as SVGSVGElement;
+        if (e.isIntersecting) s.unpauseAnimations();
+        else s.pauseAnimations();
+      }
+    });
+    svgs.forEach((s) => io.observe(s));
+    return () => io.disconnect();
+  }, []);
+  return null;
+}
+
 /** Thin orange reading-progress line pinned to the top of the viewport. */
 export function ScrollProgress() {
   const { scrollYProgress } = useScroll();
-  const x = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 });
+  const x = scrollYProgress;
   return <motion.div className="fixed inset-x-0 top-0 z-[60] h-[2px] origin-left bg-orange" style={{ scaleX: x }} aria-hidden />;
 }
 
@@ -51,8 +69,8 @@ export function Reveal({
   return (
     <Comp
       className={className}
-      initial={reduce ? false : { opacity: 0, y, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={reduce ? false : { opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-70px" }}
       transition={{ duration: 0.9, delay, ease: EASE }}
     >
@@ -88,7 +106,7 @@ export function RevealText({
       {words.map((w, i) => (
         <span key={i} className="inline-block overflow-hidden pb-[0.12em] align-top" aria-hidden>
           <motion.span
-            className="inline-block will-change-transform"
+            className="inline-block"
             initial={reduce ? false : { y: "105%", rotate: 4 }}
             animate={inView || reduce ? { y: "0%", rotate: 0 } : undefined}
             transition={{ duration: 0.9, delay: delay + i * stagger, ease: EASE }}

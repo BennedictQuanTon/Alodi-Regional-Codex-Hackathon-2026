@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { AREA_GAINS, FEATURES, NUMBERS_PDF, OUTPUT_METRICS } from "@/lib/content";
+import { FEATURES, NUMBERS_PDF } from "@/lib/content";
 import { Mark, SourceNote } from "@/components/site/brand";
 import { ArchitectureDiagram } from "./architecture";
 import { Figure, Reveal, RevealText } from "./motion";
@@ -56,18 +56,11 @@ export function Features() {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-function cellBorder(i: number) {
-  return `${i > 0 ? "border-t border-ash sm:border-t-0" : ""} ${i % 2 === 1 ? "sm:border-l" : ""} ${i >= 2 ? "sm:border-t xl:border-t-0" : ""} ${i > 0 ? "xl:border-l" : ""}`;
-}
-
-function RowLabel({ children, right }: { children: React.ReactNode; right?: string }) {
-  return (
-    <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ash px-7 py-3.5 md:px-8">
-      <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-navy">{children}</span>
-      {right && <span className="text-[12px] text-smoke">{right}</span>}
-    </div>
-  );
-}
+const JOURNEY = [
+  { id: "shipper", who: "Shipper", did: "One tap" },
+  { id: "buyer", who: "Buyer", did: "Answers" },
+  { id: "next", who: "Next shipper", did: "Sees the card" },
+];
 
 export function Outcomes() {
   const net = 187.4;
@@ -78,60 +71,77 @@ export function Outcomes() {
         <Reveal>
           <div className="t-eyebrow">Outcomes</div>
         </Reveal>
-        <RevealText text="What we will be judged on." className="t-h1 mt-5" stagger={0.035} />
+        <RevealText text="Less money lost. A second drop that just works." className="t-h1 mt-5 max-w-[900px]" stagger={0.03} />
 
-        <Reveal className="mt-10">
-          <div className="overflow-hidden rounded-[24px] border border-ash">
-            <RowLabel right="PRD §2.3 · §23">Measured on stage</RowLabel>
-            <div className="grid sm:grid-cols-2 xl:grid-cols-4">
-              {OUTPUT_METRICS.map((m, i) => (
-                <div key={m.metric} className={`flex flex-col p-7 md:p-8 ${cellBorder(i)}`}>
-                  <span className="text-[12px] uppercase tracking-[0.08em] text-smoke">{m.metric}</span>
-                  <div className="t-number mt-6 whitespace-nowrap text-[56px] leading-none md:text-[64px]">
-                    <Figure value={m.target} />
-                  </div>
-                  <p className="mt-4 max-w-[230px] text-[14px] leading-[1.45] text-graphite">{m.how}</p>
-                </div>
-              ))}
+        <div className="mt-10 grid gap-3 lg:grid-cols-[1.2fr_1fr]">
+          <Reveal className="flex flex-col justify-between rounded-[24px] bg-ink p-8 text-parchment md:p-10">
+            <div className="flex items-baseline justify-between gap-4 text-[12px] uppercase tracking-[0.08em] text-parchment/70">
+              <span>Saved a month, one area</span>
+              <span>Projected</span>
             </div>
-
-            <div className="border-t border-ash bg-paper">
-              <RowLabel right="PRD §18.8 · projected">What one area gets back</RowLabel>
-              <div className="grid sm:grid-cols-2 xl:grid-cols-4">
-                {AREA_GAINS.map((g, i) => (
-                  <div key={g.label} className={`flex flex-col p-7 md:p-8 ${cellBorder(i)}`}>
-                    <span className="text-[12px] uppercase tracking-[0.08em] text-smoke">a day</span>
-                    <div className="t-number mt-6 whitespace-nowrap text-[56px] leading-none md:text-[64px]">
-                      <Figure value={g.value} />
-                    </div>
-                    <p className="mt-4 text-[14px] leading-[1.45] text-graphite">{g.label}</p>
-                    <p className="mt-1 text-[12px] text-smoke">{g.note}</p>
-                  </div>
-                ))}
-                <div className={`flex flex-col p-7 md:p-8 ${cellBorder(3)}`}>
-                  <span className="text-[12px] uppercase tracking-[0.08em] text-smoke">a month, net</span>
-                  <div className="t-number mt-6 whitespace-nowrap text-[56px] leading-none text-orange-deep md:text-[64px]">
-                    <Figure value="₫187M" />
-                  </div>
-                  <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-ash-soft">
-                    <motion.div
-                      className="h-full rounded-full bg-orange"
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${(net / loss) * 100}%` }}
-                      viewport={{ once: true, margin: "-60px" }}
-                      transition={{ duration: 1.3, ease: EASE }}
-                    />
-                  </div>
-                  <p className="mt-2 text-[12px] text-smoke">40% of the ₫473M lost each month</p>
-                  <a href={NUMBERS_PDF} target="_blank" rel="noreferrer" className="mt-5 text-[13px] font-medium text-navy underline decoration-orange decoration-2 underline-offset-4 hover:text-orange-deep">
-                    See every formula · PDF →
-                  </a>
+            <div className="t-number mt-8 whitespace-nowrap text-[72px] leading-none text-orange sm:text-[96px]">
+              <Figure value="₫187M" />
+            </div>
+            <div className="mt-10 space-y-5" role="img" aria-label="Monthly loss per area: ₫473M today, ₫286M with Alodi, ₫187M saved">
+              <div>
+                <div className="flex justify-between text-[14px] text-parchment/80">
+                  <span>Lost today</span>
+                  <span className="tabular-nums">₫473M</span>
+                </div>
+                <motion.div className="mt-2 h-9 origin-left rounded-[6px] bg-parchment/30" initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 1, ease: EASE }} />
+              </div>
+              <div>
+                <div className="flex justify-between text-[14px] text-parchment/80">
+                  <span>With Alodi</span>
+                  <span className="tabular-nums">₫286M</span>
+                </div>
+                <div className="mt-2 flex h-9 gap-[3px]">
+                  <motion.div className="origin-left rounded-[6px] bg-parchment/30" style={{ width: `${((loss - net) / loss) * 100}%` }} initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 1, delay: 0.15, ease: EASE }} />
+                  <motion.div className="flex flex-1 origin-left items-center justify-center rounded-[6px] bg-orange text-[14px] font-medium text-white" initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.8, delay: 0.9, ease: EASE }}>
+                    −₫187M · 40%
+                  </motion.div>
                 </div>
               </div>
             </div>
-          </div>
-          <SourceNote className="mt-4">PRD §2.3, §23 targets; §18.8 team cost model, best-in-class rescue 25% → 65% (Shipsy vendor range); base case ₫92M a month.</SourceNote>
-        </Reveal>
+            <a href={NUMBERS_PDF} target="_blank" rel="noreferrer" className="mt-8 self-start text-[15px] font-medium text-parchment underline decoration-orange underline-offset-4">
+              See every formula · PDF →
+            </a>
+          </Reveal>
+
+          <Reveal delay={0.1} className="flex flex-col justify-between rounded-[24px] border border-ash bg-paper p-8 md:p-10">
+            <div className="flex items-baseline justify-between gap-4 text-[12px] uppercase tracking-[0.08em] text-smoke">
+              <span>From answer to card</span>
+              <span>Target</span>
+            </div>
+            <div className="t-number mt-8 whitespace-nowrap text-[72px] leading-none sm:text-[96px]">
+              <Figure value="< 10 s" />
+            </div>
+            <div className="mt-10" role="img" aria-label="From the buyer's answer at zero seconds to the card on the shipper's phone in under ten seconds">
+              <div className="relative h-9 overflow-hidden rounded-[6px] bg-ash-soft">
+                <motion.div className="h-full origin-left bg-navy" initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 1.4, ease: EASE }} />
+              </div>
+              <div className="mt-2 flex justify-between text-[12px] tabular-nums text-graphite">
+                {[0, 2, 4, 6, 8, 10].map((s) => (
+                  <span key={s}>{s} s</span>
+                ))}
+              </div>
+              <div className="mt-6 flex items-center justify-between gap-4">
+                {[JOURNEY[1], JOURNEY[2]].map((p, i) => (
+                  <div key={p.id} className={`flex items-center gap-3 ${i ? "flex-row-reverse text-right" : ""}`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`/people/${p.id}.svg`} alt="" width={52} height={52} className="rounded-full" />
+                    <div>
+                      <div className="text-[15px] font-medium text-navy">{p.did}</div>
+                      <div className="text-[13px] text-graphite">{p.who}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-6 text-[15px] leading-[1.45] text-graphite">No form to fill, no extra step. The next attempt simply knows when, where and who.</p>
+            </div>
+          </Reveal>
+        </div>
+        <SourceNote className="mt-4">Team cost model, PRD §18.8, best-in-class rescue 25% → 65% (Shipsy vendor range); time-to-context target, PRD §2.3.</SourceNote>
       </div>
     </section>
   );

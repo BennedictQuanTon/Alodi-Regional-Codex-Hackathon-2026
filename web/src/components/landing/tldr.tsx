@@ -1,59 +1,46 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DEMO_VIDEO, TLDR } from "@/lib/content";
-import { DropRing } from "@/components/site/brand";
 import { Reveal, RevealText } from "./motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** Demo video frame. Plays the file in DEMO_VIDEO.src; without one it shows a branded placeholder. */
+/** The story film: just the video, playing silently while in view, with one sound toggle. */
 function VideoFrame() {
   const ref = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
-  const has = Boolean(DEMO_VIDEO.src);
-  const play = () => {
-    if (!has || !ref.current) return;
-    ref.current.play();
-    setPlaying(true);
-  };
+  const [muted, setMuted] = useState(true);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) v.play().catch(() => {});
+      else v.pause();
+    }, { threshold: 0.4 });
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
   return (
-    <motion.figure
-      initial={{ opacity: 0, y: 24, scale: 0.98 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.9, ease: EASE }}
-      className="relative aspect-video overflow-hidden rounded-[28px] bg-ink"
-    >
-      {has ? (
-        <video ref={ref} src={DEMO_VIDEO.src} poster={DEMO_VIDEO.poster || undefined} controls={playing} playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover" />
-      ) : (
-        <>
-          <div className="wash left-1/2 top-1/2 h-[70%] w-[60%] -translate-x-1/2 -translate-y-1/2 opacity-60" style={{ background: "radial-gradient(circle, rgba(240,90,0,0.75), transparent 70%)" }} />
-          <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "linear-gradient(var(--color-parchment) 1px, transparent 1px), linear-gradient(90deg, var(--color-parchment) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
-        </>
-      )}
-
-      {!playing && (
-        <button
-          type="button"
-          onClick={play}
-          disabled={!has}
-          aria-label={has ? "Play the demo video" : "Demo video coming soon"}
-          className="group absolute inset-0 flex flex-col items-center justify-center gap-6 text-parchment"
-        >
-          <span className="relative grid size-24 place-items-center rounded-full bg-parchment/10 backdrop-blur-md transition-transform duration-500 group-enabled:group-hover:scale-105 md:size-28">
-            <span className="pulse-ring absolute inset-0 rounded-full border border-orange" />
-            {has ? <span className="ml-1 text-[34px] leading-none text-parchment">▸</span> : <DropRing size={44} dot="var(--color-parchment)" />}
-          </span>
-          <span className="text-center">
-            <span className="block text-[13px] font-medium uppercase tracking-[0.08em] text-parchment/60">{has ? `Watch the demo · ${DEMO_VIDEO.length}` : "Demo video · coming soon"}</span>
-            <span className="mt-2 block text-[15px] text-parchment/80">{DEMO_VIDEO.caption}</span>
-          </span>
-        </button>
-      )}
-    </motion.figure>
+    <div className="relative">
+      <video ref={ref} src={DEMO_VIDEO.src} poster={DEMO_VIDEO.poster} muted={muted} loop playsInline preload="metadata" className="block aspect-video w-full" />
+      <button
+        type="button"
+        onClick={() => setMuted((m) => !m)}
+        aria-label={muted ? "Turn sound on" : "Turn sound off"}
+        aria-pressed={!muted}
+        className="absolute bottom-4 right-4 grid size-12 place-items-center rounded-full bg-white text-navy shadow-[0_10px_30px_-12px_rgba(18,26,44,0.6)]"
+      >
+        <svg width="26" height="26" viewBox="0 0 16 16" aria-hidden>
+          <circle cx="8" cy="8" r="6.2" fill="none" stroke="#f05a00" strokeWidth="1.8" />
+          <g fill="currentColor">
+            <rect x="5.4" y={muted ? 7.35 : 6.9} width="1.3" height={muted ? 1.3 : 2.2} rx="0.65" />
+            <rect x="7.35" y={muted ? 7.35 : 5.9} width="1.3" height={muted ? 1.3 : 4.2} rx="0.65" />
+            <rect x="9.3" y={muted ? 7.35 : 6.9} width="1.3" height={muted ? 1.3 : 2.2} rx="0.65" />
+          </g>
+        </svg>
+      </button>
+    </div>
   );
 }
 

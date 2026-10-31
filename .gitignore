@@ -45,3 +45,13 @@ dist/
 /.env
 /ai/.venv/
 /data/
+
+# Office lock files
+~$*
+
+# Internal notes and specs stay local; only public docs are tracked
+*.md
+!/README.md
+!/ai/README.md
+!/prep/01-pitch/video/story/CREDITS.md
+!/prep/01-pitch/video/skit/CREDITS.md

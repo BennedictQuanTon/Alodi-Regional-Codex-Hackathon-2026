@@ -113,7 +113,7 @@ export const TLDR = {
  * Demo video under the TL;DR. Drop the file in web/public/video/ and set `src` (and optionally `poster`).
  * Leave `src` empty to show the placeholder frame.
  */
-export const DEMO_VIDEO = { src: "", poster: "", length: "2:00", caption: "The full rescue, from the shipper’s tap to the second drop" };
+export const DEMO_VIDEO = { src: "/video/alodi-story.mp4", poster: "/video/alodi-story.jpg" };
 
 export const HERO_STATS = [
   { value: "₫40,000", text: "return fee the seller pays on each failed order", source: "Shopee policy §7.1; ₫40,000 cap since Apr 2025 (GHN)" },
@@ -222,21 +222,6 @@ export const FEATURES = [
     body: "Never spend effort calling a buyer who refused at the door. A “suspected bomb” label is only a suggestion; a person approves it.",
     tint: "rgba(240,90,0,0.35)",
   },
-];
-
-/** Output metrics from PRD §2.3 and §23: measured on stage from the event log and the eval set. */
-export const OUTPUT_METRICS = [
-  { metric: "Time-to-context", target: "< 10 s", how: "Buyer’s answer to the card on the shipper’s phone, median" },
-  { metric: "Extraction F1", target: "≥ 0.90", how: "Per field, on a held-out set of chat, call and memo samples" },
-  { metric: "Wrong auto-applies", target: "< 2%", how: "Of the cases the agent closes on its own" },
-  { metric: "Without a person", target: "0", how: "Labels, returns or calls out of hours" },
-];
-
-/** What one area gets back each day (PRD §18.8 best-in-class case, SLIDES §3.4). Projected. */
-export const AREA_GAINS = [
-  { value: "416", label: "CS calls handled by the agent", note: "≈ 28 staff-hours" },
-  { value: "96", label: "fewer wasted shipper trips", note: "320 × 0.3 attempts" },
-  { value: "24 min", label: "back per shipper", note: "96 trips × 5 min ÷ 20" },
 ];
 
 /** Downloadable proof of every number: formulas, inputs, sources (generated from prep/02-technical/cost-model). */
@@ -349,9 +334,9 @@ export const COMPETITORS = {
 };
 
 export const TEAM = [
-  { name: "Nomura Yoshio", role: "Team Lead", role2: "Project Presenter", focus: "Product, demo script, pitch", photo: "/team/nomura-yoshio.jpg", pos: "50% 30%" },
-  { name: "Long Quan Ton", role: "AI Engineer", role2: "Solution Architect", focus: "Orchestrator, voice agent, eval loop", photo: "/team/long-quan-ton.jpg", pos: "53% 22%" },
-  { name: "Khanh Tuong Huynh", role: "AI Engineer", role2: "Deployment Engineer", focus: "Context extractor, ASR, policy guard", photo: "/team/khanh-tuong-huynh.jpg", pos: "50% 30%" },
+  { name: "Nomura Yoshio", role: "Team Lead", role2: "Project Presenter", focus: "Team, demo script, pitch", photo: "/team/nomura-yoshio.jpg", pos: "50% 30%" },
+  { name: "Long Quan Ton", role: "Product Manager", role2: "AI Engineer", focus: "Product, research, voice agent", photo: "/team/long-quan-ton.jpg", pos: "53% 22%" },
+  { name: "Khanh Tuong Huynh", role: "Applied AI", role2: "Software Engineer", focus: "Context extractor, ASR, policy guard", photo: "/team/khanh-tuong-huynh.jpg", pos: "50% 30%" },
   { name: "Thanh Loi Tran", role: "Data Engineer", role2: "Backend Developer", focus: "Order Context Object, APIs, metrics log", photo: "/team/thanh-loi-tran.jpg", pos: "50% 30%" },
 ];
 

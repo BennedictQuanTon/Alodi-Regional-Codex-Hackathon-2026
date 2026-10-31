@@ -183,7 +183,7 @@ export function Approach() {
                   <span className="text-[12px] font-medium tracking-[0.08em] text-orange">{p.k}</span>
                   <h3 className="t-h3 mt-2 !text-parchment">{p.title}</h3>
                 </div>
-                <span className="absolute right-4 top-4 rounded-full bg-ink/40 px-2.5 py-1 text-[10px] text-parchment/70 backdrop-blur-sm">{p.photo.credit}</span>
+                <span className="absolute right-4 top-4 rounded-full bg-ink/40 px-2.5 py-1 text-[10px] text-parchment/70">{p.photo.credit}</span>
               </div>
               <div className="flex flex-1 flex-col p-6">
                 <p className="t-body-sans text-[15px] leading-[1.45] text-graphite">{p.line}</p>

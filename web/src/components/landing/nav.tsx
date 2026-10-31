@@ -48,7 +48,7 @@ export function Nav() {
   }, []);
 
   return (
-    <header className={`sticky top-0 z-50 transition-colors duration-300 ${scrolled ? "bg-parchment/90 backdrop-blur-md" : ""}`}>
+    <header className={`sticky top-0 z-50 transition-colors duration-300 ${scrolled ? "bg-parchment/95" : ""}`}>
       <div className={`container-page flex items-center justify-between gap-6 transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${scrolled ? "h-[84px]" : "h-[120px]"}`}>
         <div className="flex items-center gap-10">
           <LogoLink size="text-[34px]" />
@@ -84,7 +84,7 @@ export function Nav() {
               {l.label}
             </a>
           ))}
-          <Link href="/demo" className="btn btn-primary mt-3">
+          <Link href="/start" className="btn btn-primary mt-3">
             Watch demo <Chevron />
           </Link>
         </div>
