@@ -2,15 +2,16 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { SourceNote } from "@/components/site/brand";
+import { TechIcon } from "@/components/site/logos";
 
-// C4 model of the current architecture (prep/02-technical/diagrams/alodi-architecture.png, PRD §16 and §18.8).
-// Every box shows Demo (31 Oct, mock data) → Production (inside the carrier) and the flow steps that use it.
+// C4 model of the production architecture (PRD §16, §16.7 OpenAI platform, §18.8 local-first deployment).
+// Neutral, technical palette (white, greys, ink) with OpenAI green reserved for OpenAI-powered parts.
+// Every box shows Demo (31 Oct, mock data) → Production and the flow steps that use it.
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-type Kind = "person" | "system" | "container" | "external" | "store";
-type Node = { name: string; kind: Kind; tech?: string; prod?: string; d: string; steps?: string };
+type Kind = "person" | "core" | "container" | "external" | "store" | "openai";
+type Node = { name: string; kind: Kind; tech?: string; prod?: string; d?: string; steps?: string };
 type Rel = { from: string; to: string; label: string };
 
 /* ---------- level 1 · system context ----------------------------------- */
@@ -23,67 +24,79 @@ const PEOPLE: Node[] = [
 ];
 
 const CARRIER: Node[] = [
-  { name: "Route planner", kind: "external", tech: "4 fixed windows (JSON)", prod: "SPX routing API", d: "Feasible delivery windows", steps: "1" },
-  { name: "OMS / order DB", kind: "external", tech: "Seed JSON, 4,000 orders", prod: "SPX order API", d: "Today’s orders, COD, address", steps: "1" },
-  { name: "Courier app backend", kind: "external", tech: "Next.js PWA", prod: "SPX driver app", d: "Button events in, context card out", steps: "3 · 4 · 7" },
-  { name: "CS ticketing + hotline", kind: "external", tech: "Ops console", prod: "Screen in SPX dashboard", d: "Escalations and call-backs", steps: "8" },
+  { name: "Route planner", kind: "external", tech: "4 fixed windows", prod: "SPX routing API", steps: "1" },
+  { name: "OMS / order DB", kind: "external", tech: "Seed JSON", prod: "SPX order API", steps: "1" },
+  { name: "Courier app backend", kind: "external", tech: "Next.js PWA", prod: "SPX driver app", steps: "3 · 4 · 7" },
+  { name: "CS ticketing + hotline", kind: "external", tech: "Ops console", prod: "SPX dashboard", steps: "8" },
 ];
 
 const SERVICES: Node[] = [
-  { name: "Chat channel", kind: "external", tech: "Simulated chat", prod: "Shopee Chat API · Zalo ZNS", d: "Window question and rescue chat", steps: "2 · 5" },
-  { name: "Call + TTS", kind: "external", tech: "WebRTC + OpenAI TTS", prod: "SIP brand name + Vietnamese TTS", d: "AI calls, at most two per cycle", steps: "5" },
-  { name: "Speech to text", kind: "external", tech: "AssemblyAI", prod: "PhoWhisper, self-hosted", d: "Call audio and voice memos", steps: "5 · 6" },
-  { name: "LLM", kind: "external", tech: "OpenAI API", prod: "gpt-oss-20b on the area server", d: "Tool calling, Structured Outputs", steps: "2 · 5 · 6" },
+  { name: "OpenAI platform", kind: "openai", tech: "Responses API · TTS", prod: "Fallback only, masked text", steps: "2 · 5 · 6" },
+  { name: "Chat channel", kind: "external", tech: "Simulated chat", prod: "Shopee Chat API · Zalo ZNS", steps: "2 · 5" },
+  { name: "Telco", kind: "external", tech: "In-browser call", prod: "Viettel SIP, brand name", steps: "5" },
+  { name: "Speech to text", kind: "external", tech: "AssemblyAI", prod: "PhoWhisper on the area server", steps: "5 · 6" },
 ];
 
 const L1_RELS: Rel[] = [
-  { from: "Courier", to: "Alodi", label: "taps No answer / Rescheduled / Refused (2-minute undo)" },
+  { from: "Courier", to: "Alodi", label: "taps No answer / Rescheduled / Refused, 2-minute undo" },
   { from: "Alodi", to: "Buyer", label: "asks for ≥ 2 windows, chats, calls only 08:00–20:30" },
   { from: "Alodi", to: "Courier", label: "pushes the context card for the next attempt" },
   { from: "Alodi", to: "Customer service", label: "escalates with a reason and a suggested label" },
   { from: "Alodi", to: "Route planner · OMS", label: "reads windows and today’s orders" },
-  { from: "Alodi", to: "LLM", label: "sends masked text only" },
+  { from: "Alodi", to: "OpenAI", label: "masked text only, hardest ~10% of requests" },
 ];
 
 /* ---------- level 2 · containers --------------------------------------- */
 
 const CLIENTS: Node[] = [
-  { name: "Courier app", kind: "container", tech: "Next.js PWA · phone", prod: "Inside the SPX driver app", d: "One tap, memo, context card", steps: "3 · 4 · 7" },
-  { name: "Ops / CS console", kind: "container", tech: "Next.js · iPad", prod: "Screen in the SPX dashboard", d: "Live cases, exception queue, approvals", steps: "8" },
-  { name: "Buyer channel", kind: "container", tech: "Next.js · laptop, demo only", prod: "Shopee Chat · Zalo · phone", d: "Chat with quick replies, the AI call", steps: "2 · 5" },
+  { name: "Courier app", kind: "container", tech: "Next.js PWA", prod: "SPX driver app", d: "One tap, memo, context card", steps: "3 · 4 · 7" },
+  { name: "Ops / CS console", kind: "container", tech: "Next.js", prod: "SPX dashboard screen", d: "Live cases, exception queue, approvals", steps: "8" },
+  { name: "Buyer channel", kind: "container", tech: "Next.js, demo only", prod: "Shopee Chat · Zalo · phone", d: "Quick replies, the AI call", steps: "2 · 5" },
 ];
 
 const BACKEND: Node[] = [
-  { name: "API + realtime hub", kind: "container", tech: "FastAPI · REST + WebSocket", prod: "Same, behind Caddy", d: "One source of truth, fans state out to every screen", steps: "1–8" },
-  { name: "Alodi Agent", kind: "system", tech: "State machine + LLM tool calling", prod: "Same", d: "Decides the next step from the order state and the latest event", steps: "2–8" },
-  { name: "Policy guard", kind: "container", tech: "Plain code, not a prompt", prod: "Same", d: "Quiet hours, call caps, opt-out, consent, 0.85 threshold", steps: "4–8" },
-  { name: "Scheduler", kind: "container", tech: "APScheduler + fast-forward clock", prod: "Redis + Temporal", d: "2′ undo, 60′ call 1, +2 h call 2; reloads the order first", steps: "4 · 5" },
-  { name: "PII masking", kind: "container", tech: "Regex + Presidio", prod: "Model gateway, trusted zone", d: "Phones, names, addresses masked before any model", steps: "6" },
+  { name: "API + realtime hub", kind: "container", tech: "FastAPI", prod: "FastAPI behind Caddy", d: "REST + WebSocket, one state for every screen", steps: "1–8" },
+  { name: "Alodi Agent", kind: "core", tech: "State machine + tool calling", prod: "OpenAI Agents SDK", d: "One run per order: tools, handoff to CS, traces", steps: "2–8" },
+  { name: "Model gateway", kind: "openai", tech: "OpenAI API", prod: "gpt-oss-20b on vLLM → OpenAI fallback", d: "One endpoint; masked text out", steps: "2 · 5 · 6" },
+  { name: "Policy guard", kind: "container", tech: "Plain code", prod: "Plain code + SDK guardrails", d: "Quiet hours, caps, opt-out, 0.85 threshold", steps: "4–8" },
+  { name: "Scheduler", kind: "container", tech: "Fast-forward clock", prod: "Redis + Temporal", d: "2′ undo, 60′, +2 h; reloads the order first", steps: "4 · 5" },
 ];
 
 const STORES: Node[] = [
-  { name: "Alodi DB", kind: "store", tech: "SQLite", prod: "PostgreSQL (HA)", d: "availability_reply · shipper_event · rescue_case · rescue_result", steps: "2–8" },
-  { name: "Recordings vault", kind: "store", tech: "Folder on the VM", prod: "MinIO / S3, encrypted", d: "Memo and call audio, 30-day TTL", steps: "6" },
-  { name: "Events log", kind: "store", tech: "Append-only table", prod: "Same", d: "Audit trail and the four key metrics", steps: "1–8" },
+  { name: "Alodi DB", kind: "store", tech: "SQLite", prod: "PostgreSQL", d: "Orders, events, rescue cases and results", steps: "2–8" },
+  { name: "Recordings vault", kind: "store", tech: "Folder", prod: "MinIO, encrypted", d: "Memo and call audio, 30-day TTL", steps: "6" },
+  { name: "Events + traces", kind: "store", tech: "Append-only table", prod: "+ Agents SDK traces", d: "Audit trail, four key metrics, eval input", steps: "1–8" },
 ];
 
 /* ---------- level 3 · agent components --------------------------------- */
 
 const TOOLS: Node[] = [
-  { name: "ask_window", kind: "container", tech: "tool", d: "≥ 2 windows from the route planner as quick replies", steps: "2" },
-  { name: "send_chat", kind: "container", tech: "tool", d: "Rescue message the moment the courier taps", steps: "2 · 5" },
-  { name: "ai_call", kind: "container", tech: "tool", d: "Recorded opening + TTS; ASR on the buyer; ≤ 90 s", steps: "5" },
-  { name: "extract", kind: "container", tech: "tool", d: "Strict JSON: window, drop-off, alt receiver, address fix, confidence", steps: "5 · 6" },
-  { name: "escalate", kind: "container", tech: "tool", d: "Opens a CS case with a reason and an optional label", steps: "8" },
+  { name: "ask_window", kind: "container", tech: "function tool", d: "≥ 2 windows from the route planner", steps: "2" },
+  { name: "send_chat", kind: "container", tech: "function tool", d: "Rescue message the moment of the tap", steps: "2 · 5" },
+  { name: "ai_call", kind: "container", tech: "function tool", d: "Recorded opening + TTS, ≤ 90 s", steps: "5" },
+  { name: "extract", kind: "openai", tech: "Structured Outputs", d: "Strict JSON with confidence per field", steps: "5 · 6" },
+  { name: "handoff_cs", kind: "container", tech: "handoff", d: "Opens a CS case with a reason", steps: "8" },
 ];
 
 const GUARD = [
   ["08:00–20:30", "calls only"],
   ["≤ 2", "calls per cycle"],
-  ["≤ 2", "redeliveries, 5-day horizon"],
-  ["≥ 0.85", "every field, or a person confirms"],
+  ["≤ 2", "redeliveries, 5 days"],
+  ["≥ 0.85", "every field, or a person"],
   ["Refused", "no buyer contact"],
-  ["Labels", "suggested, approved by a person"],
+  ["Labels", "a person approves"],
+];
+
+/* ---------- OpenAI core (production) ------------------------------------ */
+
+const OPENAI = [
+  { name: "gpt-oss-20b", role: "Agent decisions and extraction", where: "Area server, vLLM · open weights", stage: "Production" },
+  { name: "Agents SDK", role: "Per-order agent, tools, guardrails, CS handoff, tracing", where: "Alodi backend", stage: "Production" },
+  { name: "Responses API", role: "Tool calling and Structured Outputs; masked fallback for the hardest ~10%", where: "OpenAI cloud · gpt-5-mini", stage: "Demo + production" },
+  { name: "gpt-4o-mini-tts", role: "Dynamic voice lines inside the AI call", where: "OpenAI cloud", stage: "Demo + production" },
+  { name: "gpt-4o-transcribe", role: "Second opinion when local ASR is unsure", where: "OpenAI cloud · masked audio turns", stage: "Production" },
+  { name: "Evals", role: "Graders on the held-out set; gate every prompt or model change", where: "OpenAI platform", stage: "Production" },
+  { name: "Codex", role: "Build, review and run the eval loop", where: "CLI · cloud · GitHub", stage: "Today" },
 ];
 
 /* ---------- deployment -------------------------------------------------- */
@@ -93,30 +106,30 @@ const DEPLOY = [
     k: "Demo · 31 Oct",
     note: "One VM on a 4G hotspot",
     rows: [
-      ["Docker Compose", "caddy · web (Next.js) · api (FastAPI + agent + scheduler)"],
-      ["Data", "SQLite, recordings folder, mock data for one hub"],
+      ["Compose", "caddy · web · api (agent + scheduler)"],
+      ["Data", "SQLite, recordings folder, mock hub"],
       ["Models", "OpenAI API, OpenAI TTS, AssemblyAI"],
-      ["Screens", "Phone /courier · iPad /ops · laptop /buyer · /control"],
+      ["Screens", "Phone · iPad · laptop · control"],
     ],
   },
   {
     k: "Production · per area",
     note: "Local-first, one workstation + UPS",
     rows: [
-      ["GPU 1", "gpt-oss-20b via vLLM / Ollama: decisions and extraction"],
-      ["GPU 2", "PhoWhisper ASR + Piper TTS"],
-      ["Data", "PostgreSQL · Redis · Temporal · MinIO, RAID 1"],
-      ["Out", "Viettel SIP · Zalo ZNS · OpenAI fallback (~10%, masked) · nightly S3 backup"],
+      ["GPU 1", "gpt-oss-20b on vLLM"],
+      ["GPU 2", "PhoWhisper + Piper TTS"],
+      ["Data", "PostgreSQL · Redis · Temporal · MinIO"],
+      ["Out", "SIP · Zalo ZNS · OpenAI fallback · S3 backup"],
     ],
   },
   {
     k: "Many areas",
     note: "When one box is not enough",
     rows: [
-      ["Compute", "Kubernetes per region, shared GPU pool"],
-      ["Data", "PostgreSQL HA, Redis + Temporal, object storage"],
-      ["Edge", "Model gateway in the trusted zone, SIP trunk"],
-      ["Rule", "Same interfaces as the demo; only implementations swap"],
+      ["Compute", "Kubernetes per region, GPU pool"],
+      ["Data", "PostgreSQL HA, Temporal, object storage"],
+      ["Edge", "Model gateway in the trusted zone"],
+      ["Rule", "Same interfaces; implementations swap"],
     ],
   },
 ];
@@ -124,49 +137,57 @@ const DEPLOY = [
 /* ---------- flow · eight steps ----------------------------------------- */
 
 const STEPS = [
-  { n: 1, t: "Load today’s orders + windows", d: "Every morning, per area" },
-  { n: 2, t: "Ask the buyer for a window", d: "≥ 2 options, or “can’t today” + reason" },
-  { n: 3, t: "Window note to the courier", d: "No reply: deliver as planned" },
-  { n: 4, t: "Deliver, tap the outcome", d: "A / B / Refused, 2-minute undo" },
-  { n: 5, t: "Flow A · no answer", d: "Chat → 60′ call 1 → +2 h call 2 → CS" },
-  { n: 6, t: "Flow B · rescheduled", d: "10 s memo → ASR → mask → JSON" },
-  { n: 7, t: "Save the new appointment", d: "Context card for the next attempt" },
-  { n: 8, t: "CS decides", d: "Refused, unreachable, low confidence; a person labels" },
+  { n: 1, t: "Load orders + windows", d: "Every morning, per area" },
+  { n: 2, t: "Ask for a window", d: "≥ 2 options, or “can’t today”" },
+  { n: 3, t: "Note to the courier", d: "No reply: deliver as planned" },
+  { n: 4, t: "Deliver, tap the outcome", d: "A / B / Refused, 2′ undo" },
+  { n: 5, t: "Flow A · no answer", d: "Chat → 60′ call → +2 h call → CS" },
+  { n: 6, t: "Flow B · rescheduled", d: "Memo → ASR → mask → JSON" },
+  { n: 7, t: "Save the appointment", d: "Context card for next attempt" },
+  { n: 8, t: "CS decides", d: "A person labels and returns" },
 ];
 
 /* ---------- pieces ------------------------------------------------------- */
 
 function Box({ n, dense = false }: { n: Node; dense?: boolean }) {
-  const core = n.kind === "system";
+  const core = n.kind === "core";
+  const oa = n.kind === "openai";
   const ext = n.kind === "external";
   return (
     <div
-      className={`relative h-full rounded-[12px] px-4 py-3.5 ${
-        core ? "bg-navy text-parchment" : ext ? "border border-dashed border-ash bg-transparent" : "border border-ash bg-paper"
+      className={`relative h-full rounded-[12px] px-3.5 py-3 ${
+        core ? "bg-[var(--oa-ink)] text-white" : oa ? "border border-[var(--oa-green-line)] bg-[var(--oa-green-soft)]" : ext ? "border border-dashed border-[var(--oa-line-strong)]" : "border border-[var(--oa-line)] bg-white"
       }`}
     >
       <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
-        <div className={`t-body-sans text-[15px] font-medium ${core ? "text-parchment" : "text-navy"}`}>
-          {n.kind === "store" && <span className="mr-1.5 text-smoke">▤</span>}
+        <div className={`flex items-center gap-1.5 text-[14px] font-medium tracking-[-0.01em] ${core ? "text-white" : "text-[var(--oa-ink)]"}`}>
+          {oa && <TechIcon icon="siOpenai" size={13} mono className="text-[var(--oa-green)]" />}
+          {n.kind === "store" && <span className="text-[var(--oa-muted)]">▤</span>}
           {n.name}
         </div>
-        {n.steps && <span className={`shrink-0 whitespace-nowrap text-[10px] uppercase ${core ? "text-peach" : "text-orange-deep"}`}>step {n.steps}</span>}
+        {n.steps && <span className={`shrink-0 whitespace-nowrap font-[family-name:var(--font-mono)] text-[10px] ${core ? "text-white/55" : "text-[var(--oa-muted)]"}`}>step {n.steps}</span>}
       </div>
       {n.tech && (
-        <div className={`mt-1 text-[11px] ${core ? "text-parchment/70" : "text-smoke"}`}>
-          {n.prod ? "Demo " : ""}[{n.tech}]
+        <div className={`mt-1.5 font-[family-name:var(--font-mono)] text-[11px] leading-[1.45] ${core ? "text-white/60" : "text-[var(--oa-muted)]"}`}>
+          {n.prod ? "demo  " : ""}
+          {n.tech}
+          {n.prod && (
+            <>
+              <br />
+              <span className={core ? "text-white" : oa ? "text-[var(--oa-green)]" : "text-[var(--oa-ink)]"}>prod  {n.prod}</span>
+            </>
+          )}
         </div>
       )}
-      {n.prod && <div className={`text-[11px] ${core ? "text-parchment/70" : "text-smoke"}`}>Prod [{n.prod}]</div>}
-      {!dense && <div className={`t-body-sans mt-1.5 text-[13px] leading-[1.4] ${core ? "text-parchment/85" : "text-graphite"}`}>{n.d}</div>}
+      {!dense && n.d && <div className={`mt-1.5 text-[13px] leading-[1.4] ${core ? "text-white/80" : "text-[var(--oa-text-2)]"}`}>{n.d}</div>}
     </div>
   );
 }
 
 function Boundary({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-[16px] border border-dashed border-navy/30 p-3 pt-2 ${className}`}>
-      <div className="mb-2 px-1 text-[11px] uppercase tracking-[0.04em] text-smoke">{label}</div>
+    <div className={`rounded-[16px] border border-[var(--oa-line)] bg-[var(--oa-subtle)] p-2.5 ${className}`}>
+      <div className="px-1.5 pb-2 pt-1 font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.06em] text-[var(--oa-muted)]">{label}</div>
       {children}
     </div>
   );
@@ -174,10 +195,10 @@ function Boundary({ label, children, className = "" }: { label: string; children
 
 function Rels({ rels }: { rels: Rel[] }) {
   return (
-    <ul className="mt-5 grid gap-x-8 gap-y-2 border-t border-ash pt-4 md:grid-cols-2">
+    <ul className="mt-4 grid gap-x-8 gap-y-2 border-t border-[var(--oa-line)] pt-4 md:grid-cols-2">
       {rels.map((r) => (
-        <li key={r.from + r.to + r.label} className="t-body-sans flex gap-2 text-[13px] leading-[1.4] text-graphite">
-          <span className="shrink-0 font-[family-name:var(--font-mono)] text-[12px] text-navy">
+        <li key={r.from + r.to} className="flex gap-2 text-[13px] leading-[1.4] text-[var(--oa-text-2)]">
+          <span className="shrink-0 font-[family-name:var(--font-mono)] text-[12px] text-[var(--oa-ink)]">
             {r.from} → {r.to}
           </span>
           <span>{r.label}</span>
@@ -187,12 +208,12 @@ function Rels({ rels }: { rels: Rel[] }) {
   );
 }
 
-/* ---------- levels ------------------------------------------------------- */
+/* ---------- views -------------------------------------------------------- */
 
 function Context() {
   return (
     <div>
-      <div className="grid gap-3 lg:grid-cols-[1fr_1.1fr_1fr]">
+      <div className="grid gap-3 lg:grid-cols-[1fr_1.15fr_1fr]">
         <Boundary label="People">
           <div className="grid gap-2">
             {PEOPLE.map((p) => (
@@ -200,16 +221,15 @@ function Context() {
             ))}
           </div>
         </Boundary>
-        <div className="flex flex-col justify-center gap-3">
-          <div className="rounded-[16px] bg-navy p-6 text-parchment">
-            <div className="text-[11px] uppercase text-peach">Software system</div>
-            <div className="t-h3 mt-2 !text-parchment">Alodi</div>
-            <p className="t-body-sans mt-3 text-[14px] leading-[1.45] text-parchment/85">
-              Rescues failed deliveries: talks to the buyer at the right time and writes structured context back to the
-              carrier. Replaces nothing; fails open.
+        <div className="flex flex-col gap-3">
+          <div className="rounded-[16px] bg-[var(--oa-ink)] p-6 text-white">
+            <div className="font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.06em] text-white/50">Software system</div>
+            <div className="mt-3 font-[family-name:var(--font-logo)] text-[34px] font-extrabold leading-none tracking-[-0.03em]">alodi</div>
+            <p className="mt-4 text-[14px] leading-[1.45] text-white/75">
+              Talks to the buyer at the right time and writes structured context back to the carrier. Replaces nothing; fails open.
             </p>
           </div>
-          <Boundary label="Carrier systems · SPX">
+          <Boundary label="Carrier systems · SPX" className="flex-1">
             <div className="grid gap-2 sm:grid-cols-2">
               {CARRIER.map((c) => (
                 <Box key={c.name} n={c} dense />
@@ -240,15 +260,15 @@ function Containers() {
           ))}
         </div>
       </Boundary>
-      <div className="text-center text-[11px] uppercase text-smoke">↓ HTTPS / WSS · REST + WebSocket ↓</div>
-      <Boundary label="Alodi backend · one API, one agent">
+      <div className="text-center font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.06em] text-[var(--oa-muted)]">↓ https / wss · rest + websocket</div>
+      <Boundary label="Alodi backend">
         <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
           {BACKEND.map((c) => (
             <Box key={c.name} n={c} />
           ))}
         </div>
       </Boundary>
-      <div className="grid gap-3 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid gap-3 lg:grid-cols-[1.5fr_1fr]">
         <Boundary label="Alodi data · PII stays in">
           <div className="grid gap-2 md:grid-cols-3">
             {STORES.map((c) => (
@@ -256,7 +276,7 @@ function Containers() {
             ))}
           </div>
         </Boundary>
-        <Boundary label="External services · masked text only">
+        <Boundary label="External · masked text only">
           <div className="grid grid-cols-2 gap-2">
             {SERVICES.map((s) => (
               <Box key={s.name} n={s} dense />
@@ -270,14 +290,13 @@ function Containers() {
 
 function Components() {
   return (
-    <div className="grid gap-3 lg:grid-cols-[1.7fr_1fr]">
-      <Boundary label="Container · Alodi Agent">
-        <div className="rounded-[12px] bg-navy px-4 py-3.5 text-parchment">
-          <div className="t-body-sans text-[15px] font-medium">Agent loop</div>
-          <div className="mt-1 text-[11px] text-parchment/70">[one state machine per order + LLM tool calling]</div>
-          <div className="t-body-sans mt-1.5 text-[13px] text-parchment/85">
-            pre → delivering → chat → call 1 → call 2 → extract → ready · review · cs → closed
+    <div className="grid gap-3 lg:grid-cols-[1.75fr_1fr]">
+      <Boundary label="Container · Alodi Agent (OpenAI Agents SDK)">
+        <div className="rounded-[12px] bg-[var(--oa-ink)] px-4 py-3.5 text-white">
+          <div className="flex items-center gap-2 text-[14px] font-medium">
+            <TechIcon icon="siOpenai" size={14} mono className="text-white" /> Agent run, one per order
           </div>
+          <div className="mt-1.5 font-[family-name:var(--font-mono)] text-[11px] text-white/65">pre → delivering → chat → call 1 → call 2 → extract → ready · review · cs → closed</div>
         </div>
         <div className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
           {TOOLS.map((t) => (
@@ -285,16 +304,16 @@ function Components() {
           ))}
         </div>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
-          <Box n={{ name: "Order Context Object", kind: "store", tech: "versioned JSON", d: "Who changed what and when: agent, buyer, courier, CS" }} />
-          <Box n={{ name: "Decision", kind: "container", tech: "auto_applied · needs_review · escalated_cs", d: "Every field ≥ 0.85 applies; anything lower is confirmed in chat or goes to CS" }} />
+          <Box n={{ name: "Order Context Object", kind: "store", tech: "versioned JSON", d: "Who changed what and when" }} />
+          <Box n={{ name: "Decision", kind: "container", tech: "auto_applied · needs_review · escalated_cs", d: "Every field ≥ 0.85 applies; lower goes to chat or CS" }} />
         </div>
       </Boundary>
-      <Boundary label="Component · Policy guard (runs before every action)">
+      <Boundary label="Policy guard · before every action">
         <ul className="grid gap-2">
           {GUARD.map(([k, v]) => (
-            <li key={k + v} className="flex items-baseline justify-between gap-3 rounded-[10px] border border-ash bg-paper px-4 py-2.5">
-              <span className="text-[13px] text-navy">{k}</span>
-              <span className="t-body-sans text-right text-[13px] text-graphite">{v}</span>
+            <li key={k + v} className="flex items-baseline justify-between gap-3 rounded-[10px] border border-[var(--oa-line)] bg-white px-3.5 py-2.5">
+              <span className="font-[family-name:var(--font-mono)] text-[12px] text-[var(--oa-ink)]">{k}</span>
+              <span className="text-right text-[13px] text-[var(--oa-text-2)]">{v}</span>
             </li>
           ))}
         </ul>
@@ -303,18 +322,50 @@ function Components() {
   );
 }
 
+function OpenAICore() {
+  return (
+    <div className="overflow-hidden rounded-[16px] border border-[var(--oa-line)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-[var(--oa-ink)] px-5 py-4 text-white">
+        <span className="flex items-center gap-2.5 text-[15px] font-medium">
+          <TechIcon icon="siOpenai" size={18} mono className="text-white" /> OpenAI at the core
+        </span>
+        <span className="font-[family-name:var(--font-mono)] text-[11px] text-white/60">production design · demo runs a subset</span>
+      </div>
+      <ul className="divide-y divide-[var(--oa-line)] bg-white">
+        {OPENAI.map((o, i) => (
+          <motion.li
+            key={o.name}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05, duration: 0.4, ease: EASE }}
+            className="grid gap-1 px-5 py-3.5 md:grid-cols-[200px_1fr_220px_130px] md:items-center md:gap-6"
+          >
+            <span className="flex items-center gap-2 text-[14px] font-medium text-[var(--oa-ink)]">
+              <span className="size-1.5 rounded-full bg-[var(--oa-green)]" />
+              {o.name}
+            </span>
+            <span className="text-[13px] leading-[1.4] text-[var(--oa-text-2)]">{o.role}</span>
+            <span className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--oa-muted)]">{o.where}</span>
+            <span className="font-[family-name:var(--font-mono)] text-[11px] text-[var(--oa-green)] md:text-right">{o.stage}</span>
+          </motion.li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function Deployment() {
   return (
     <div className="grid gap-3 lg:grid-cols-3">
       {DEPLOY.map((d, i) => (
-        <div key={d.k} className={`rounded-[16px] p-5 ${i === 1 ? "bg-navy text-parchment" : "border border-ash bg-paper"}`}>
-          <div className={`text-[11px] uppercase ${i === 1 ? "text-peach" : "text-orange-deep"}`}>{d.note}</div>
-          <div className={`t-h4 mt-2 ${i === 1 ? "!text-parchment" : ""}`}>{d.k}</div>
-          <dl className="mt-5 grid gap-3">
+        <div key={d.k} className={`rounded-[16px] p-5 ${i === 1 ? "bg-[var(--oa-ink)] text-white" : "border border-[var(--oa-line)] bg-white"}`}>
+          <div className={`font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.06em] ${i === 1 ? "text-white/50" : "text-[var(--oa-muted)]"}`}>{d.note}</div>
+          <div className={`mt-2 text-[18px] font-medium tracking-[-0.01em] ${i === 1 ? "text-white" : "text-[var(--oa-ink)]"}`}>{d.k}</div>
+          <dl className="mt-4 grid gap-2.5">
             {d.rows.map(([k, v]) => (
-              <div key={k} className={`grid grid-cols-[86px_1fr] gap-3 border-t pt-3 ${i === 1 ? "border-white/15" : "border-ash"}`}>
-                <dt className={`text-[12px] uppercase ${i === 1 ? "text-parchment/60" : "text-smoke"}`}>{k}</dt>
-                <dd className={`t-body-sans text-[13px] leading-[1.4] ${i === 1 ? "text-parchment/90" : "text-graphite"}`}>{v}</dd>
+              <div key={k} className={`grid grid-cols-[74px_1fr] gap-3 border-t pt-2.5 ${i === 1 ? "border-white/12" : "border-[var(--oa-line)]"}`}>
+                <dt className={`font-[family-name:var(--font-mono)] text-[11px] uppercase ${i === 1 ? "text-white/50" : "text-[var(--oa-muted)]"}`}>{k}</dt>
+                <dd className={`text-[13px] leading-[1.4] ${i === 1 ? "text-white/85" : "text-[var(--oa-text-2)]"}`}>{v}</dd>
               </div>
             ))}
           </dl>
@@ -326,12 +377,12 @@ function Deployment() {
 
 function Flow() {
   return (
-    <ol className="grid gap-px overflow-hidden rounded-[16px] border border-ash bg-ash sm:grid-cols-2 xl:grid-cols-4">
+    <ol className="grid gap-px overflow-hidden rounded-[16px] border border-[var(--oa-line)] bg-[var(--oa-line)] sm:grid-cols-2 xl:grid-cols-4">
       {STEPS.map((s) => (
-        <li key={s.n} className={`p-5 ${s.n === 8 ? "bg-[#fdeee4]" : "bg-paper"}`}>
-          <span className={`grid size-7 place-items-center rounded-full text-[12px] text-paper ${s.n === 8 ? "bg-bad" : "bg-orange"}`}>{s.n}</span>
-          <div className="t-body-sans mt-4 text-[15px] font-medium text-navy">{s.t}</div>
-          <div className="t-body-sans mt-1 text-[13px] leading-[1.4] text-graphite">{s.d}</div>
+        <li key={s.n} className="bg-white p-5">
+          <span className={`font-[family-name:var(--font-mono)] text-[12px] ${s.n === 8 ? "text-[var(--oa-ink)]" : "text-[var(--oa-muted)]"}`}>0{s.n}</span>
+          <div className="mt-3 text-[14px] font-medium text-[var(--oa-ink)]">{s.t}</div>
+          <div className="mt-1 text-[13px] leading-[1.4] text-[var(--oa-text-2)]">{s.d}</div>
         </li>
       ))}
     </ol>
@@ -339,62 +390,63 @@ function Flow() {
 }
 
 const LEVELS = [
-  { k: "L1", label: "System context", hint: "Who uses Alodi and what it talks to", View: Context },
-  { k: "L2", label: "Containers", hint: "What runs, and on what, demo → production", View: Containers },
-  { k: "L3", label: "Agent components", hint: "Inside the agent: tools and the guard", View: Components },
+  { k: "L1", label: "Context", hint: "Who uses Alodi and what it talks to", View: Context },
+  { k: "L2", label: "Containers", hint: "What runs where, demo → production", View: Containers },
+  { k: "L3", label: "Agent", hint: "Inside the agent: tools, handoff, guard", View: Components },
+  { k: "AI", label: "OpenAI core", hint: "The OpenAI parts of the production design", View: OpenAICore },
   { k: "D", label: "Deployment", hint: "Demo VM, one server per area, then regions", View: Deployment },
-  { k: "→", label: "Flow · 8 steps", hint: "The business flow the agent runs", View: Flow },
+  { k: "→", label: "Flow", hint: "The eight business steps the agent runs", View: Flow },
 ];
 
 export function C4Architecture() {
   const [i, setI] = useState(0);
   const L = LEVELS[i];
   return (
-    <div className="rounded-[16px] border border-ash bg-paper/70 p-4 md:p-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div className="t-eyebrow text-smoke">C4 model · current architecture</div>
-          <div className="t-body-sans mt-1 text-[13px] text-graphite">{L.hint}</div>
+    <div className="oa-panel rounded-[24px] border border-[var(--oa-line)] bg-white p-3 md:p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-2 pt-1">
+        <div role="tablist" aria-label="C4 level" className="flex gap-0.5 overflow-x-auto rounded-full bg-[var(--oa-subtle)] p-1">
+          {LEVELS.map((l, j) => (
+            <button
+              key={l.k}
+              role="tab"
+              aria-selected={i === j}
+              onClick={() => setI(j)}
+              className={`relative shrink-0 rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${i === j ? "text-[var(--oa-ink)]" : "text-[var(--oa-muted)] hover:text-[var(--oa-ink)]"}`}
+            >
+              {i === j && <motion.span layoutId="c4-tab" className="absolute inset-0 rounded-full bg-white shadow-[0_0_0_1px_var(--oa-line),0_1px_2px_rgba(0,0,0,0.06)]" transition={{ type: "spring", stiffness: 420, damping: 36 }} />}
+              <span className="relative">
+                <span className="mr-1.5 font-[family-name:var(--font-mono)] text-[11px] text-[var(--oa-muted)]">{l.k}</span>
+                {l.label}
+              </span>
+            </button>
+          ))}
         </div>
-        <div className="flex flex-wrap gap-4 text-[11px] uppercase text-smoke">
-          <span className="flex items-center gap-2">
-            <span className="size-3 rounded-[3px] bg-navy" /> Alodi core
+        <div className="flex flex-wrap gap-4 font-[family-name:var(--font-mono)] text-[10px] uppercase tracking-[0.04em] text-[var(--oa-muted)]">
+          <span className="flex items-center gap-1.5">
+            <span className="size-2.5 rounded-[3px] bg-[var(--oa-ink)]" /> core
           </span>
-          <span className="flex items-center gap-2">
-            <span className="size-3 rounded-[3px] border border-ash bg-paper" /> Alodi container
+          <span className="flex items-center gap-1.5">
+            <span className="size-2.5 rounded-[3px] border border-[var(--oa-green-line)] bg-[var(--oa-green-soft)]" /> openai
           </span>
-          <span className="flex items-center gap-2">
-            <span className="size-3 rounded-[3px] border border-dashed border-smoke" /> External
+          <span className="flex items-center gap-1.5">
+            <span className="size-2.5 rounded-[3px] border border-[var(--oa-line)] bg-white" /> alodi
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-2.5 rounded-[3px] border border-dashed border-[var(--oa-line-strong)]" /> external
           </span>
         </div>
       </div>
+      <p className="px-2 pt-3 text-[13px] text-[var(--oa-text-2)]">{L.hint}</p>
 
-      <div role="tablist" aria-label="C4 level" className="mt-5 flex gap-1 overflow-x-auto border-b border-ash">
-        {LEVELS.map((l, j) => (
-          <button
-            key={l.k}
-            role="tab"
-            aria-selected={i === j}
-            onClick={() => setI(j)}
-            className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-[13px] uppercase transition ${
-              i === j ? "border-orange text-navy" : "border-transparent text-smoke hover:text-navy"
-            }`}
-          >
-            <span className={i === j ? "text-orange-deep" : ""}>{l.k}</span>
-            {l.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-5">
+      <div className="mt-3">
         <AnimatePresence mode="wait">
-          <motion.div key={L.k} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease: EASE }}>
+          <motion.div key={L.k} initial={{ opacity: 0, y: 10, filter: "blur(4px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, y: -6, filter: "blur(4px)" }} transition={{ duration: 0.35, ease: EASE }}>
             <L.View />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <SourceNote className="mt-5">PRD §16 System architecture and §18.8 local-first deployment; diagram prep/02-technical/diagrams/alodi-architecture.pdf</SourceNote>
+      <p className="px-2 pb-1 pt-4 font-[family-name:var(--font-mono)] text-[11px] text-[var(--oa-muted)]">Source: PRD §16 architecture, §16.7 OpenAI platform, §18.8 local-first deployment</p>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-// Demo script for 31 October. The editable copy for the team lives in docs/DEMO_SCRIPT.md — keep both in sync.
+// Demo script for 31 October, rendered at /script. Keep in sync with prep/01-pitch/1-LIVE-DEMO.md.
 
 export type Shot = { tc: string; screen: string; action: string; vo: string; onScreen?: string };
 

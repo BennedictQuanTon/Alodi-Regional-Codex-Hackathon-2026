@@ -7,7 +7,8 @@
  *   Monad Ink        -> Alodi Deep Navy #121a2c
  *   Monad Lake Blue  -> Alodi Orange    #f05a00 (single primary action per screen)
  *   Monad Periwinkle -> Peach Mist       #fbe3d4
- * Fonts: Source Serif 4 (Untitled Serif), Geist Mono (ABC Diatype Mono), Geist (Untitled Sans).
+ * Fonts: Source Serif 4 (Untitled Serif) for display, Geist for everything else. No monospace face is shown anywhere:
+ * --font-mono is kept as a token name for the UI role but resolves to Geist (see /CLAUDE.md).
  * JetBrains Mono and citation markers are banned — see /CLAUDE.md.
  */
 :root {
@@ -63,7 +64,7 @@
   --color-bad: var(--status-bad);
 
   --font-serif: var(--font-serif-face), "Untitled Serif", Georgia, serif;
-  --font-mono: var(--font-mono-face), "ABC Diatype Mono", ui-monospace, monospace;
+  --font-mono: var(--font-sans-face), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-sans-face), "Untitled Sans", ui-sans-serif, system-ui, sans-serif;
   --font-logo: var(--font-logo-face), ui-sans-serif, system-ui, sans-serif;
 }
@@ -143,9 +144,10 @@ body {
 }
 @utility t-eyebrow {
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.3;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 @utility t-label {
@@ -168,7 +170,7 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Buttons — monad pill language: 48px tall, mono uppercase, trailing chevron */
+/* Buttons — monad pill language: 48px tall, uppercase Geist, trailing chevron */
 @utility btn {
   display: inline-flex;
   align-items: center;
@@ -178,10 +180,10 @@ body {
   padding: 0 32px;
   border-radius: 100px;
   font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
   white-space: nowrap;
   transition:
     background-color 0.2s ease,
@@ -279,7 +281,42 @@ body {
   animation-play-state: paused;
 }
 
-/* Tech-stack chip marquee: monochrome logo + name, note revealed on hover */
+/* Architecture panel: neutral technical palette; OpenAI green only on OpenAI-powered parts */
+.oa-panel {
+  --oa-ink: #0d0d0d;
+  --oa-text-2: #5d5d5d;
+  --oa-muted: #8f8f8f;
+  --oa-line: #e5e5e5;
+  --oa-line-strong: #c9c9c9;
+  --oa-subtle: #f9f9f9;
+  --oa-green: #0e8a6c;
+  --oa-green-soft: #eef8f4;
+  --oa-green-line: #bfe3d6;
+  font-family: var(--font-sans);
+  color: var(--oa-ink);
+}
+
+/* Open-licence photography toned to the parchment palette */
+.photo-tone {
+  filter: grayscale(0.55) sepia(0.12) contrast(1.05) brightness(0.95);
+}
+
+/* Courier logo strip: greyscale at rest, brand colour on hover */
+.courier-logo img {
+  filter: grayscale(1) contrast(1.1);
+  opacity: 0.55;
+  transition:
+    filter 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.courier-logo:hover img {
+  filter: none;
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* Tech-stack chip marquee: monochrome logo + name; never pauses, hover only tints the chip */
 .mq {
   overflow: hidden;
   mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
@@ -288,9 +325,6 @@ body {
   display: flex;
   width: max-content;
   animation: marquee linear infinite;
-}
-.mq:hover .mq-track {
-  animation-play-state: paused;
 }
 .mq-reverse {
   animation-direction: reverse;
@@ -321,21 +355,6 @@ body {
 }
 .mq-chip:hover img {
   filter: none;
-}
-.mq-note {
-  max-width: 0;
-  overflow: hidden;
-  font: 400 12px/1 var(--font-mono);
-  text-transform: uppercase;
-  color: var(--color-orange-deep);
-  opacity: 0;
-  transition:
-    max-width 0.4s ease,
-    opacity 0.3s ease;
-}
-.mq-chip:hover .mq-note {
-  max-width: 320px;
-  opacity: 1;
 }
 .mq-mono {
   display: grid;

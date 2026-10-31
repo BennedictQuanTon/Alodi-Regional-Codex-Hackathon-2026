@@ -55,7 +55,7 @@ export function Nav() {
           <LogoLink size="text-[34px]" />
           <nav className="hidden items-center gap-8 xl:flex">
             {LINKS.map((l) => (
-              <a key={l.href} href={l.href} className="text-[18px] uppercase tracking-[0.01em] hover:text-orange-deep">
+              <a key={l.href} href={l.href} className="text-[14px] font-medium uppercase tracking-[0.06em] hover:text-orange-deep">
                 {l.label}
               </a>
             ))}

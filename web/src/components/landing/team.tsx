@@ -57,7 +57,7 @@ function Member({ m, i }: { m: (typeof TEAM)[number]; i: number }) {
 
 export function Team() {
   return (
-    <section id="team" className="scroll-mt-28 py-24 md:py-32">
+    <section id="team" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
         <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
           <div>

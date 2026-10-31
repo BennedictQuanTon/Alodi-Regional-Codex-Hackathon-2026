@@ -56,7 +56,7 @@ const STAGES = [
 
 export function CodexEcosystem() {
   return (
-    <section id="codex" className="scroll-mt-28 py-24 md:py-32">
+    <section id="codex" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
         <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-end">
           <div>

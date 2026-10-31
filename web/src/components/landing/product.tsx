@@ -1,25 +1,27 @@
-import { FEATURES, OUTPUT_METRICS, SAVINGS } from "@/lib/content";
+"use client";
+
+import { motion } from "motion/react";
+import { FEATURES, MONEY, NUMBERS_PDF, OUTPUT_METRICS } from "@/lib/content";
 import { Mark, SourceNote } from "@/components/site/brand";
 import { C4Architecture } from "./architecture";
 import { Figure, Reveal, RevealText } from "./motion";
 
 export function Product() {
   return (
-    <section id="product" className="scroll-mt-28 py-24 md:py-32">
+    <section id="product" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-end">
           <div>
-            <div className="t-eyebrow">What Alodi is</div>
+            <div className="t-eyebrow">Architecture</div>
             <RevealText text="An agent layer between the buyer and the carrier." className="t-h1 mt-6" />
           </div>
           <Reveal delay={0.1}>
             <p className="text-[20px] leading-[1.35] text-graphite">
-              Alodi reads failed-delivery events, talks to the buyer, and writes structured context back into the carrier’s
-              own systems. It replaces nothing the carrier already runs.
+              Production design in the C4 model. OpenAI runs the agent; the carrier keeps every system it already has.
             </p>
           </Reveal>
         </div>
-        <div className="mt-12">
+        <div className="mt-10">
           <C4Architecture />
         </div>
       </div>
@@ -30,7 +32,7 @@ export function Product() {
 /** Monad "Why Teams Choose" cards: soft colour bloom top-left, serif title, mono body. */
 export function Features() {
   return (
-    <section id="features" className="scroll-mt-28 py-24 md:py-32">
+    <section id="features" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
         <RevealText text="Why Alodi" className="t-h1" />
         <div className="mt-12 grid gap-5 md:grid-cols-2">
@@ -54,61 +56,65 @@ export function Features() {
 
 export function Outcomes() {
   return (
-    <section id="metrics" className="scroll-mt-28 py-24 md:py-32">
+    <section id="metrics" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
-        <Reveal>
-          <div className="t-eyebrow">Expected outcomes</div>
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+          <div>
+            <Reveal>
+              <div className="t-eyebrow">Expected outcomes</div>
+            </Reveal>
+            <RevealText text="Four numbers we will be judged on." className="t-h1 mt-6 max-w-[760px]" stagger={0.035} />
+          </div>
+          <Reveal delay={0.1}>
+            <p className="max-w-[440px] text-[18px] leading-[1.4] text-graphite lg:ml-auto">
+              Three are measured on stage from the event log and the eval set. Money is projected, and every input is in the PDF.
+            </p>
           </Reveal>
-          <RevealText text="Four problem numbers. Four output metrics. The story closes the loop." className="t-h1 mt-6 max-w-[1000px]" stagger={0.035} />
-          <Reveal>
-          <p className="mt-8 max-w-[760px] text-[20px] leading-[1.35] text-graphite">
-            Accuracy and Safe autonomy are measured on stage. Time-to-context is the best moment of the demo. Money always
-            carries the word “projected”.
-          </p>
-        </Reveal>
-        <div className="mt-14 border-t border-ash">
+        </div>
+
+        <div className="mt-10 grid border-y border-ash sm:grid-cols-2 xl:grid-cols-4">
           {OUTPUT_METRICS.map((m, i) => (
-            <Reveal key={m.metric} delay={i * 0.05}>
-              <div className="grid gap-6 border-b border-ash py-10 md:grid-cols-[1fr_1.4fr_auto] md:items-center md:gap-10">
-                <div>
-                  <div className="t-label text-smoke">Problem</div>
-                  <div className="mt-2 text-[16px] text-graphite">{m.problem}</div>
-                </div>
-                <div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h3 className="t-h2">{m.metric}</h3>
-                    <span
-                      className={`rounded-full border px-3 py-1 text-[11px] uppercase ${
-                        m.kind === "Measured" ? "border-good text-good" : "border-warn text-warn"
-                      }`}
-                    >
-                      {m.kind}
-                    </span>
-                  </div>
-                  <p className="t-body-sans mt-3 max-w-[560px] text-[15px] leading-[1.45] text-graphite">{m.how}</p>
-                </div>
-                <div className="md:text-right">
-                  <div className="t-number text-[48px] md:text-[64px]">{m.target}</div>
-                  <div className="mt-2 text-[12px] uppercase text-smoke">{m.targetNote}</div>
-                </div>
+            <Reveal
+              key={m.metric}
+              delay={i * 0.07}
+              className={`flex flex-col py-10 sm:px-8 sm:first:pl-0 ${i > 0 ? "border-t border-ash sm:border-t-0" : ""} ${i % 2 === 1 ? "sm:border-l" : ""} ${i === 2 ? "sm:border-t xl:border-t-0" : ""} ${i === 3 ? "sm:border-t xl:border-t-0" : ""} ${i > 0 ? "xl:border-l" : ""}`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-[12px] font-medium uppercase tracking-[0.06em] text-navy">{m.metric}</span>
+                <span className={`text-[11px] font-medium uppercase tracking-[0.06em] ${m.kind === "Measured" ? "text-good" : "text-warn"}`}>{m.kind}</span>
               </div>
+              <div className={`t-number mt-10 whitespace-nowrap text-[64px] leading-none md:text-[80px] ${i === 3 ? "text-orange-deep" : ""}`}>
+                <Figure value={m.target} />
+              </div>
+              <p className="mt-6 max-w-[260px] text-[14px] leading-[1.45] text-graphite">{m.how}</p>
             </Reveal>
           ))}
         </div>
-        <Reveal className="mt-14">
-          <div className="t-eyebrow text-smoke">One area · 20 couriers · 4,000 orders a day · best-in-class rescue</div>
-          <div className="mt-6 grid border-t border-ash sm:grid-cols-2 xl:grid-cols-4">
-            {SAVINGS.map((s, i) => (
-              <div key={s.value} className={`border-b border-ash py-8 sm:px-8 sm:first:pl-0 xl:border-b-0 ${i > 0 ? "xl:border-l" : ""} ${i % 2 === 1 ? "sm:border-l" : ""}`}>
-                <div className={`t-number text-[56px] md:text-[64px] ${i === 0 ? "text-orange-deep" : ""}`}>
-                  <Figure value={s.value} />
-                </div>
-                <p className="mt-4 max-w-[280px] text-[15px] leading-[1.4] text-graphite">{s.text}</p>
-                <div className="mt-3 text-[11px] uppercase text-smoke">{s.note}</div>
-              </div>
-            ))}
+
+        <Reveal className="mt-4">
+          <div className="grid items-center gap-8 rounded-[24px] bg-ink px-7 py-7 text-parchment md:px-9 xl:grid-cols-[1fr_auto]">
+            <ol className="grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-4">
+              {MONEY.map((m, i) => (
+                <motion.li
+                  key={m.label}
+                  initial={{ opacity: 0, y: 8 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ delay: 0.1 + i * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <div className="flex items-baseline gap-3">
+                    {i > 0 && <span className="text-[20px] text-parchment/30">{i === 2 ? "−" : i === 3 ? "=" : "→"}</span>}
+                    <span className={`t-number text-[40px] leading-none md:text-[44px] ${i === 3 ? "text-orange" : ""}`}>{m.value}</span>
+                  </div>
+                  <div className="mt-2 text-[12px] uppercase tracking-[0.06em] text-parchment/55">{m.label}</div>
+                </motion.li>
+              ))}
+            </ol>
+            <a href={NUMBERS_PDF} target="_blank" rel="noreferrer" className="btn justify-self-start bg-parchment text-ink hover:bg-white">
+              The numbers, proved · PDF
+            </a>
           </div>
-          <SourceNote className="mt-4">Team cost model, PRD §18.8; rescue 25% → 65% uses Shipsy’s best-in-class range (vendor). Base case: ₫99M a month (21%).</SourceNote>
+          <SourceNote className="mt-4">Team cost model, PRD §18.8. One area, best-in-class rescue (25% → 65%, Shipsy vendor range). Base case ₫99M a month. Projected.</SourceNote>
         </Reveal>
       </div>
     </section>

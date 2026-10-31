@@ -1597,6 +1597,22 @@ flowchart TB
 - Opt-out checked before every job.
 - No real number is dialled in the demo; demo phones are `TEST-0001` … `TEST-2000`.
 
+### 16.7 OpenAI platform in production
+
+The production design keeps OpenAI at the core of the agent while staying local-first (§18.8): the open-weight model runs on the area server, and the OpenAI cloud only ever receives masked text for the hardest cases. The demo uses the OpenAI API directly behind the same interfaces.
+
+| Component | Role in Alodi | Runs where | Demo (31 Oct) | Production |
+| --- | --- | --- | --- | --- |
+| **gpt-oss-20b** (open weights) | Agent decisions and JSON extraction | Area server, vLLM or Ollama | — | Primary model |
+| **OpenAI Agents SDK** | One agent run per order: function tools, handoff to CS, guardrails, tracing | Alodi backend | State machine in the API | Orchestration layer |
+| **Responses API** | Tool calling and Structured Outputs (strict schema §12.4) | OpenAI cloud (`gpt-5-mini`) | Primary | Fallback for ~10% of requests, masked text only |
+| **gpt-4o-mini-tts** | Dynamic phrases inside the AI call; fixed phrases stay pre-recorded | OpenAI cloud | Yes | Yes, short lines only |
+| **gpt-4o-transcribe** | Second opinion when PhoWhisper confidence is low | OpenAI cloud, masked audio turns | — | Fallback |
+| **OpenAI Evals** | Graders on the held-out set (§23); gate every prompt, schema or model change | OpenAI platform | Codex-run loop | Release gate |
+| **Codex** | Build, review and the eval loop | CLI, cloud tasks, GitHub | Yes | Yes |
+
+**Distributed agent.** The agent is one orchestrator with specialist workers (window question, rescue chat, voice, extractor, fallback, guardrails). Each worker runs as a task on the Temporal queue (§16.3 scheduler), so a restart never loses a case, and every worker call passes the policy guard first. Agents SDK traces are written to the events log next to the audit trail.
+
 ## 17. Data flow
 
 ### 17.1 Context diagram (DFD level 0)
