@@ -313,6 +313,10 @@ class DemoState(Base):
     clock_start: Mapped[datetime] = mapped_column(UTCDateTime)
     business_time: Mapped[datetime | None] = mapped_column(UTCDateTime)
     clock_speed: Mapped[float] = mapped_column(Float)
+    clock_paused: Mapped[bool] = mapped_column(Boolean, default=False)
+    clock_revision: Mapped[int] = mapped_column(Integer, default=0)
+    auto_buyer: Mapped[bool] = mapped_column(Boolean, default=False)
+    offline_mode: Mapped[bool] = mapped_column(Boolean, default=False)
     seeded_at: Mapped[datetime] = mapped_column(UTCDateTime)
     pack_fingerprint: Mapped[str] = mapped_column(String)
 
@@ -380,3 +384,52 @@ class RescueMessage(Base):
     context_version: Mapped[int] = mapped_column(Integer)
     idempotency_key: Mapped[str] = mapped_column(String)
     data_source: Mapped[str] = mapped_column(String, default="synthetic")
+
+
+class CallAttempt(Base):
+    __tablename__ = "call_attempts"
+    __table_args__ = (
+        UniqueConstraint("rescue_case_id", "number"),
+        CheckConstraint("number BETWEEN 1 AND 2", name="number"),
+        CheckConstraint(
+            "status IN ('requested','connected','missed','declined','ended','cancelled','failed')",
+            name="status",
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    generation_id: Mapped[str] = mapped_column(String)
+    rescue_case_id: Mapped[int] = mapped_column(ForeignKey("rescue_case.id"), index=True)
+    number: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String)
+    dispatched: Mapped[bool] = mapped_column(Boolean, default=False)
+    context_version: Mapped[int] = mapped_column(Integer)
+    active_version: Mapped[int] = mapped_column(Integer)
+    requested_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    requested_real_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    connected_real_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    ended_real_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    duration_s: Mapped[float | None] = mapped_column(Float)
+    recording_consent: Mapped[bool | None] = mapped_column(Boolean)
+    mode: Mapped[str] = mapped_column(String)
+
+
+class ProviderRequest(Base):
+    __tablename__ = "provider_requests"
+    __table_args__ = (UniqueConstraint("generation_id", "correlation_key"),)
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    generation_id: Mapped[str] = mapped_column(String)
+    rescue_case_id: Mapped[int] = mapped_column(ForeignKey("rescue_case.id"), index=True)
+    tracking_id: Mapped[str] = mapped_column(ForeignKey("orders.tracking_id"))
+    context_version: Mapped[int] = mapped_column(Integer)
+    kind: Mapped[str] = mapped_column(String)
+    source: Mapped[str] = mapped_column(String)
+    mode: Mapped[str] = mapped_column(String)
+    status: Mapped[str] = mapped_column(String, index=True)
+    correlation_key: Mapped[str] = mapped_column(String)
+    input: Mapped[dict[str, Any]] = mapped_column(JSON)
+    result: Mapped[dict[str, Any] | None] = mapped_column(JSON(none_as_null=True))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    lease_until: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    call_id: Mapped[str | None] = mapped_column(ForeignKey("call_attempts.id"))

@@ -1,9 +1,11 @@
 """Strict application contracts. Provider implementations belong to Part 2."""
 
-from datetime import date, time
+from datetime import date, datetime, time
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from app.settings import ScenarioName
 
 Confidence = Annotated[float, Field(ge=0, le=1, allow_inf_nan=False)]
 
@@ -92,3 +94,86 @@ class CSDecision(Command):
         if (self.action in {"approve_label", "reject_label"}) != (self.label is not None):
             raise ValueError("A label is required only for a label decision")
         return self
+
+
+class RescueReply(Command):
+    rescue_case_id: int = Field(gt=0)
+    text: str = Field(default="", max_length=4000)
+    opt_out: bool = False
+
+
+class Proposal(StrictModel):
+    request_id: str
+    tracking_id: str
+    rescue_case_id: int
+    generation_id: str
+    context_version: int
+    source: Literal["chat", "ai_call", "shipper_memo"]
+    mode: Literal["stub", "replay", "live"]
+    fields: Extraction
+    conflicts: list[str] = Field(default_factory=list, max_length=10)
+
+
+class CallReport(StrictModel):
+    generation_id: str
+    call_id: str
+    context_version: int = Field(ge=0)
+    idempotency_key: str = Field(min_length=1, max_length=128)
+    status: Literal["requested", "connected", "consent", "missed", "declined", "ended"]
+    recording_consent: bool | None = None
+    masked_text: str | None = Field(default=None, max_length=4000)
+
+
+class FixtureMemo(Command):
+    shipper_event_id: int = Field(gt=0)
+    memo_ref: Literal["fixture:B_memo"]
+
+
+class ClockChange(StrictModel):
+    generation_id: str
+    speed: float | None = Field(default=None, gt=0, le=3600, allow_inf_nan=False)
+    paused: bool | None = None
+    jump: str | None = None
+
+    @model_validator(mode="after")
+    def valid_jump(self):
+        if self.jump and self.jump != "next_timer":
+            value = datetime.fromisoformat(self.jump)
+            if value.tzinfo is None or value.utcoffset() is None:
+                raise ValueError("Jump must include a timezone")
+        return self
+
+
+class ModeChange(StrictModel):
+    generation_id: str
+    auto_buyer: bool | None = None
+    offline: bool | None = None
+
+
+class GenerationRequest(StrictModel):
+    generation_id: str
+
+
+class ScenarioReset(GenerationRequest):
+    scenario: ScenarioName
+
+
+class Part2Input(StrictModel):
+    """Local handoff. Part 2 must mask text/audio before sending to cloud providers."""
+
+    request_id: str
+    correlation_id: str
+    generation_id: str
+    tracking_id: str
+    rescue_case_id: int
+    context_version: int
+    source: Literal["chat", "ai_call", "shipper_memo"]
+    mode: Literal["stub", "replay", "live"]
+    trigger: str
+    business_time: datetime
+    masked_order_context: dict
+    offered_windows: list[dict[str, str]]
+    text: str | None = None
+    memo_ref: str | None = None
+    call_id: str | None = None
+    auto_buyer: bool = False

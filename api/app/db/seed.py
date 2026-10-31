@@ -319,6 +319,10 @@ async def seed_database(
                 clock_start=at,
                 business_time=at,
                 clock_speed=settings.demo_clock_speed,
+                clock_paused=False,
+                clock_revision=0,
+                auto_buyer=settings.auto_buyer,
+                offline_mode=settings.offline_mode,
                 seeded_at=at,
                 pack_fingerprint=pack.fingerprint,
             )

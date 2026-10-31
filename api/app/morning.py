@@ -57,6 +57,7 @@ class MutationLog:
         self.generation, self.at = generation, at
         self.revisions: list[dict] = []
         self.events: list[dict] = []
+        self.data_source = "synthetic"
 
     def audit(self, order: Order | None, kind: str, payload: dict, actor: str = "system"):
         self.events.append(
@@ -68,7 +69,7 @@ class MutationLog:
                 "payload": deepcopy(payload),
                 "version": order.context_version if order else 0,
                 "generation_id": self.generation,
-                "data_source": "synthetic",
+                "data_source": self.data_source,
             }
         )
 
@@ -645,13 +646,17 @@ class MorningService:
             "message_id": message_id,
         }
 
-    async def opt_out(self, session, order, now, log):
+    async def opt_out(self, session, order, now, log, source="morning_chat"):
+        if getattr(self, "cancel_hook", None):
+            await self.cancel_hook(session, order, now, "opt_out")
         order.opt_out = True
         context = deepcopy(order.context)
         context.setdefault("consent", {})["opt_out"] = True
         if "availability" in context:
             context["availability"].update(status="opted_out", note=None)
-        log.change(order, context, "opt_out", {"source": "morning_chat"}, "buyer")
+        if order.status not in {"delivered", "labelled", "with_cs", "moved"}:
+            context["workflow_state"] = "planned"
+        log.change(order, context, "opt_out", {"source": source}, "buyer")
         await session.execute(
             update(AvailabilityReply)
             .where(
@@ -672,6 +677,8 @@ class MorningService:
             if case.next_action_at:
                 log.audit(order, "call_cancelled", {"rescue_case_id": case.id, "reason": "opt_out"})
             case.opt_out, case.next_action_at = True, None
+            if case.state not in {"rescheduled", "with_cs"}:
+                case.state, case.closed_at = "planned", now
         return {"status": "applied", "context_version": order.context_version, "opt_out": True}
 
     @staticmethod

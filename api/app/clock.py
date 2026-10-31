@@ -17,13 +17,18 @@ class BusinessClock:
         self._generation: str | None = None
         self._start: datetime | None = None
         self._elapsed_start = 0.0
+        self._revision = None
 
     def now(self, state: DemoState) -> datetime:
         checkpoint = state.business_time or state.clock_start
-        if self._generation != state.generation_id:
+        revision = (state.clock_revision or 0, state.clock_speed, bool(state.clock_paused))
+        if self._generation != state.generation_id or self._revision != revision:
             self._generation = state.generation_id
+            self._revision = revision
             self._start = max(checkpoint, state.clock_start)
             self._elapsed_start = monotonic()
+        if state.clock_paused:
+            return checkpoint
         elapsed = (monotonic() - self._elapsed_start) * state.clock_speed
         assert self._start is not None
         candidate = self._start + timedelta(seconds=elapsed)

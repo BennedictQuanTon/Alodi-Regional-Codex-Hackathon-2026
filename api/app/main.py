@@ -4,22 +4,25 @@ from contextlib import asynccontextmanager
 from datetime import date as Date
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import APIRouter, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, select, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.clock import BusinessClock
+from app.contracts import RescueReply
 from app.db.migrate import upgrade_database
 from app.db.models import (
     AvailabilityReply,
+    CallAttempt,
     Courier,
     DemoState,
     Event,
     Hub,
     Message,
     Order,
+    ProviderRequest,
     RescueCase,
     RescueMessage,
     RouteWindow,
@@ -27,7 +30,11 @@ from app.db.models import (
 )
 from app.db.seed import load_seed_pack, seed_database
 from app.db.session import Database
+from app.demo import DemoService
 from app.morning import MorningService, WorkflowError, window_note
+from app.part2 import Part2Adapter
+from app.rescue_routes import rescue_router
+from app.scheduler import Scheduler
 from app.schemas import (
     AuditView,
     DispatchRequest,
@@ -70,9 +77,20 @@ def order_view(order: Order) -> OrderView:
     )
 
 
-def create_app(settings: Settings | None = None, *, clock: BusinessClock | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    *,
+    clock: BusinessClock | None = None,
+    part2_adapter: Part2Adapter | None = None,
+    part2_router: APIRouter | None = None,
+    start_scheduler: bool | None = None,
+) -> FastAPI:
     settings = settings or load_settings()
-    if settings.effective_ai_mode == "live":
+    if part2_adapter is not None and part2_adapter.mode != "live":
+        raise ConfigurationError("Part 2 provider adapter must declare live mode")
+    if settings.effective_ai_mode == "live" and (
+        part2_adapter is None or part2_adapter.mode != "live"
+    ):
         raise ConfigurationError(
             "AI_MODE requires Part 2 live adapters, which are not registered yet"
         )
@@ -89,17 +107,33 @@ def create_app(settings: Settings | None = None, *, clock: BusinessClock | None 
                 await seed_database(database, settings, pack)
             app.state.morning = MorningService(database, settings, clock=clock)
             app.state.workflow = WorkflowService(app.state.morning)
-            async with database.sessions() as session:
+            app.state.scheduler = Scheduler(app.state.workflow, part2_adapter)
+            app.state.demo = DemoService(app.state.scheduler)
+            async with database.sessions.begin() as session:
                 state = await session.get(DemoState, 1)
                 if state:
+                    # Environment switches initialize each process; controls may change
+                    # them during the demo. Existing business time and speed are retained.
+                    state.auto_buyer = settings.auto_buyer
+                    state.offline_mode = settings.offline_mode
                     app.state.morning.clock.now(state)
-            yield
+            if settings.app_env == "demo" and (
+                start_scheduler is True or (start_scheduler is None and clock is None)
+            ):
+                app.state.scheduler.start()
+            try:
+                yield
+            finally:
+                await app.state.scheduler.stop()
         finally:
             await database.close()
 
     app = FastAPI(title="Alodi local API", version="0.1.0", lifespan=lifespan)
     app.state.settings = settings
     app.include_router(workflow_router())
+    app.include_router(rescue_router(fixture_memo=part2_router is None))
+    if part2_router is not None:
+        app.include_router(part2_router)
 
     @app.exception_handler(WorkflowError)
     async def workflow_error(request: Request, error: WorkflowError):
@@ -136,11 +170,19 @@ def create_app(settings: Settings | None = None, *, clock: BusinessClock | None 
         return {
             "status": "ok",
             "database": "ok",
-            "implementation_stage": "courier_workflow",
+            "implementation_stage": "scheduled_rescue",
             "app_env": settings.app_env,
-            "ai_mode": settings.effective_ai_mode,
-            "ai_adapters_ready": False,
-            "provider_calls_enabled": False,
+            "ai_mode": ("replay" if demo.offline_mode else settings.ai_mode)
+            if demo
+            else settings.effective_ai_mode,
+            "ai_adapters_ready": part2_adapter is not None,
+            "provider_calls_enabled": settings.ai_mode == "live"
+            and part2_adapter is not None
+            and not (demo.offline_mode if demo else settings.offline_mode),
+            "stub_adapter_ready": True,
+            "replay_adapter_ready": True,
+            "scheduler_running": request.app.state.scheduler.task is not None,
+            "scheduler_error": request.app.state.scheduler.last_error,
             "data_source": "synthetic" if demo else "unseeded",
             "counts": counts,
             "generation_id": demo.generation_id if demo else None,
@@ -248,11 +290,51 @@ def create_app(settings: Settings | None = None, *, clock: BusinessClock | None 
                     .order_by(RescueMessage.created_at, RescueMessage.id)
                 )
             ).all()
+            calls = (
+                await session.scalars(
+                    select(CallAttempt)
+                    .join(RescueCase)
+                    .where(RescueCase.tracking_id == tracking_id)
+                    .order_by(CallAttempt.requested_at)
+                )
+            ).all()
+            provider_requests = (
+                await session.scalars(
+                    select(ProviderRequest)
+                    .where(ProviderRequest.tracking_id == tracking_id)
+                    .order_by(ProviderRequest.created_at)
+                )
+            ).all()
             return OrderDetail(
                 order=order_view(order),
                 context=order.context,
                 pending_event=order.context.get("pending_event"),
                 context_card=order.context.get("card"),
+                calls=[
+                    {
+                        "id": call.id,
+                        "case_id": call.rescue_case_id,
+                        "number": call.number,
+                        "status": call.status,
+                        "context_version": call.context_version,
+                        "mode": call.mode,
+                        "recording_consent": call.recording_consent,
+                        "duration_s": call.duration_s,
+                        "requested_at": call.requested_at.astimezone(settings.timezone).isoformat(),
+                    }
+                    for call in calls
+                ],
+                provider_requests=[
+                    {
+                        "id": task.id,
+                        "kind": task.kind,
+                        "mode": task.mode,
+                        "status": task.status,
+                        "context_version": task.context_version,
+                        "result": task.result,
+                    }
+                    for task in provider_requests
+                ],
                 rescue_cases=[case_view(case, settings) for case in rescue_cases],
                 rescue_messages=[
                     {
@@ -341,10 +423,24 @@ def create_app(settings: Settings | None = None, *, clock: BusinessClock | None 
         return await request.app.state.morning.cutoff(body)
 
     @app.post("/webhooks/chat")
-    async def morning_reply(body: MorningReplyRequest, request: Request):
+    async def morning_reply(body: MorningReplyRequest | RescueReply, request: Request):
+        if isinstance(body, RescueReply):
+            return await request.app.state.workflow.receive_reply(
+                # Resolve the target from the authoritative case.
+                await rescue_tracking_id(request, body.rescue_case_id),
+                body,
+            )
         service: MorningService = request.app.state.morning
         result = await service.reply(body)
         await service.dispatch(body.generation_id, tracking_id=body.tracking_id)
         return result
 
     return app
+
+
+async def rescue_tracking_id(request, case_id):
+    async with request.app.state.database.sessions() as session:
+        case = await session.get(RescueCase, case_id)
+        if case is None:
+            raise WorkflowError("not_found", "Case not found", 404)
+        return case.tracking_id

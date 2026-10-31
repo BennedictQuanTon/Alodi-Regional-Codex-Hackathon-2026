@@ -3,7 +3,7 @@
 import hashlib
 import json
 from copy import deepcopy
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from sqlalchemy import select, update
@@ -11,11 +11,14 @@ from sqlalchemy import select, update
 from app.contracts import CourierAction, CSDecision, UndoAction
 from app.db.models import (
     AvailabilityReply,
+    CallAttempt,
     Courier,
+    Event,
     Hub,
     IngressReceipt,
     Message,
     Order,
+    ProviderRequest,
     RescueCase,
     RescueMessage,
     RescueResult,
@@ -24,12 +27,15 @@ from app.db.models import (
 )
 from app.morning import MorningService, WorkflowError
 from app.policy import appointment_policy, deadline
+from app.rescue import ACTIVE_CALLS, RescueBoundary
 
 
-class WorkflowService:
+class WorkflowService(RescueBoundary):
     def __init__(self, morning: MorningService):
         self.morning = morning
         self.database, self.settings, self.clock = morning.database, morning.settings, morning.clock
+        self.real_now = lambda: datetime.now(UTC)
+        morning.cancel_hook = self.cancel_work
 
     @staticmethod
     async def replay(session, source, target, request):
@@ -91,8 +97,83 @@ class WorkflowService:
             )
         ).all()
 
-    @staticmethod
-    async def cancel_work(session, order, now, reason):
+    async def cancel_work(self, session, order, now, reason):
+        scheduled = (
+            await session.scalars(
+                select(RescueCase).where(
+                    RescueCase.tracking_id == order.tracking_id,
+                    RescueCase.next_action_at.is_not(None),
+                )
+            )
+        ).all()
+        for case in scheduled:
+            session.add(
+                Event(
+                    tracking_id=order.tracking_id,
+                    at=now,
+                    actor="system",
+                    type="call_cancelled"
+                    if case.state in {"call_1_due", "call_2_due"}
+                    else "timer_cancelled",
+                    payload={"rescue_case_id": case.id, "reason": reason},
+                    version=order.context_version,
+                    generation_id=order.generation_id,
+                    data_source="synthetic",
+                )
+            )
+        calls = (
+            await session.scalars(
+                select(CallAttempt)
+                .join(RescueCase)
+                .where(
+                    RescueCase.tracking_id == order.tracking_id,
+                    CallAttempt.status.in_(ACTIVE_CALLS),
+                )
+            )
+        ).all()
+        for call in calls:
+            case = await session.get(RescueCase, call.rescue_case_id)
+            if not call.dispatched:
+                case.calls_reserved -= 1
+            call.status, call.ended_real_at = "cancelled", self.real_now()
+            session.add(
+                Event(
+                    tracking_id=order.tracking_id,
+                    at=now,
+                    actor="system",
+                    type="call_cancelled",
+                    payload={"call_id": call.id, "reason": reason},
+                    version=order.context_version,
+                    generation_id=order.generation_id,
+                    data_source="synthetic",
+                )
+            )
+            session.add(
+                ProviderRequest(
+                    id=str(uuid4()),
+                    generation_id=order.generation_id,
+                    tracking_id=order.tracking_id,
+                    rescue_case_id=case.id,
+                    context_version=order.context_version,
+                    kind="cancel_call",
+                    source="ai_call",
+                    mode=call.mode,
+                    status="requested",
+                    created_at=now,
+                    correlation_key=f"cancel:{call.id}",
+                    input={},
+                    call_id=call.id,
+                )
+            )
+        await session.execute(
+            update(ProviderRequest)
+            .where(
+                ProviderRequest.tracking_id == order.tracking_id,
+                ProviderRequest.kind != "cancel_call",
+                ProviderRequest.status.in_(["requested", "processing"]),
+            )
+            .values(status="cancelled")
+        )
         await session.execute(
             update(Message)
             .where(
@@ -332,6 +413,7 @@ class WorkflowService:
                     order,
                     "with_cs" if reason else case.state,
                     pending_event=None,
+                    card=None,
                     trigger={"A": "NO_ANSWER", "B": "RESCHEDULE", "C": "REFUSED"}[event.button],
                 )
                 if case:
@@ -384,6 +466,8 @@ class WorkflowService:
         context = self.context(order, "with_cs", escalation_reason=reason)
         if reason == "refused":
             context["suggested_label"] = "suspected bomb"
+        if reason == "two_calls_unanswered":
+            context["hotline_routing"] = True
         log.change(
             order, context, "escalated", {"reason": reason, "case_id": case.id if case else None}
         )

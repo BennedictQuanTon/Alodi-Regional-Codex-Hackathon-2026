@@ -54,6 +54,8 @@ class OrderDetail(BaseModel):
     context_card: dict[str, Any] | None = None
     rescue_cases: list[dict[str, Any]] = Field(default_factory=list)
     rescue_messages: list[dict[str, Any]] = Field(default_factory=list)
+    calls: list[dict[str, Any]] = Field(default_factory=list)
+    provider_requests: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class MessageView(BaseModel):
