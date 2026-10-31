@@ -57,7 +57,7 @@ function VideoFrame() {
   );
 }
 
-/** TL;DR: what Alodi is, then the demo video. Sits right above "How Alodi works". */
+/** Introducing Alodi: what it is, then the demo video. Sits right above "How Alodi works". */
 export function Tldr() {
   return (
     <section id="tldr" className="scroll-mt-28 py-20 md:py-24">
@@ -65,10 +65,7 @@ export function Tldr() {
         <div className="grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
           <div>
             <Reveal>
-              <div className="t-eyebrow flex items-center gap-3">
-                <span className="rounded-full bg-orange px-2.5 py-1 text-[11px] text-white">TL;DR</span>
-                Introducing Alodi
-              </div>
+              <div className="t-eyebrow">Introducing Alodi</div>
             </Reveal>
             <RevealText text={TLDR.headline} className="t-h1 mt-6" stagger={0.03} />
             <Reveal delay={0.1}>

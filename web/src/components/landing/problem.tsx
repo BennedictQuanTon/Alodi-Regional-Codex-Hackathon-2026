@@ -1,41 +1,85 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
-import { AREA_DAY, HERO_STATS, PHOTOS } from "@/lib/content";
+import { motion } from "motion/react";
+import { HERO_STATS, SURVEY, SURVEY_PHOTOS } from "@/lib/content";
 import { SourceNote } from "@/components/site/brand";
 import { Figure, Reveal, RevealText } from "./motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** Portrait photo with a slow parallax drift and a clip reveal; toned to the parchment palette. */
-function Photo() {
-  const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+/** Reserved for the team’s field-survey photos (SURVEY_PHOTOS). Empty → a quiet placeholder frame. */
+function SurveyPhotos() {
+  const has = SURVEY_PHOTOS.length > 0;
   return (
     <motion.figure
-      ref={ref}
-      initial={{ clipPath: "inset(10% 10% 10% 10% round 24px)" }}
-      whileInView={{ clipPath: "inset(0% 0% 0% 0% round 24px)" }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 1.1, ease: EASE }}
-      className="relative h-[420px] overflow-hidden rounded-[24px] lg:h-full lg:min-h-[560px]"
+      transition={{ duration: 0.9, ease: EASE }}
+      className={`relative min-h-[420px] overflow-hidden rounded-[24px] lg:h-full ${has ? "" : "border border-dashed border-ash bg-paper/60"}`}
     >
-      <motion.div className="absolute inset-[-8%]" style={reduce ? undefined : { y }}>
-        <Image src={PHOTOS.street.src} alt={PHOTOS.street.alt} fill sizes="(min-width: 1024px) 40vw, 100vw" className="photo-tone object-cover object-[50%_92%]" />
-      </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/15 to-transparent" />
-      <figcaption className="absolute inset-0 flex flex-col p-7">
-        <div className="t-number text-[88px] leading-none text-parchment md:text-[112px]">
-          <Figure value="320" />
+      {has ? (
+        <div className={`grid h-full gap-1 ${SURVEY_PHOTOS.length > 1 ? "grid-rows-2" : ""}`}>
+          {SURVEY_PHOTOS.slice(0, 2).map((p) => (
+            <div key={p.src} className="relative">
+              <Image src={p.src} alt={p.alt} fill sizes="(min-width: 1024px) 40vw, 100vw" className="photo-tone object-cover" />
+            </div>
+          ))}
         </div>
-        <p className="mt-3 max-w-[300px] text-[15px] leading-[1.4] text-parchment/85">failed deliveries a day in one area, mostly because nobody picked up.</p>
-        <p className="mt-auto text-[11px] text-parchment/70 [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]">{PHOTOS.street.credit}</p>
-      </figcaption>
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-8 text-center">
+          <span className="grid size-14 place-items-center rounded-full border border-dashed border-smoke text-[22px] text-smoke">+</span>
+          <span className="text-[13px] font-medium uppercase tracking-[0.08em] text-smoke">Field survey photos</span>
+          <span className="max-w-[260px] text-[13px] leading-[1.45] text-smoke">Photos from our interviews with couriers and buyers go here.</span>
+        </div>
+      )}
     </motion.figure>
+  );
+}
+
+function SurveyBand() {
+  const groups = [
+    { who: "Buyers", n: SURVEY.buyers.n, sub: "online shoppers", stats: SURVEY.buyers.stats },
+    { who: "Couriers", n: SURVEY.couriers.n, sub: SURVEY.couriers.from, stats: SURVEY.couriers.stats },
+  ];
+  return (
+    <div className="rounded-[24px] bg-ink px-7 py-6 text-parchment">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <span className="t-eyebrow text-parchment/50">We asked both sides</span>
+        <span className="text-[11px] text-parchment/40">
+          {SURVEY.status === "MOCK" ? "Placeholder values until the interview export replaces them" : "Source: team survey, Oct 2026"}
+        </span>
+      </div>
+      <div className="mt-5 grid gap-6 md:grid-cols-2 md:gap-0">
+        {groups.map((g, gi) => (
+          <div key={g.who} className={gi === 1 ? "md:border-l md:border-white/10 md:pl-7" : "md:pr-7"}>
+            <div className="flex items-baseline gap-2 text-[12px]">
+              <span className="font-medium uppercase tracking-[0.08em] text-orange">{g.who}</span>
+              <span className="text-parchment/45">
+                n = {g.n} · {g.sub}
+              </span>
+            </div>
+            <ul className="mt-4 grid grid-cols-2 gap-5">
+              {g.stats.map((s, i) => (
+                <motion.li
+                  key={s.text}
+                  initial={{ opacity: 0, y: 8 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ delay: 0.1 + (gi * 2 + i) * 0.1, duration: 0.55, ease: EASE }}
+                >
+                  <div className="t-number text-[40px] leading-none">
+                    <Figure value={s.value} />
+                  </div>
+                  <div className="mt-2 text-[12px] leading-[1.4] text-parchment/65">{s.text}</div>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -49,7 +93,7 @@ export function Problem() {
         <RevealText text="A failed delivery is a time negotiation that happens off the system." className="t-h1 mt-5 max-w-[920px]" stagger={0.03} />
 
         <div className="mt-10 grid gap-3 lg:grid-cols-[0.9fr_1.1fr]">
-          <Photo />
+          <SurveyPhotos />
 
           <div className="flex flex-col gap-3">
             <div className="grid flex-1 overflow-hidden rounded-[24px] border border-ash sm:grid-cols-2">
@@ -71,26 +115,7 @@ export function Problem() {
             </div>
 
             <Reveal>
-              <div className="rounded-[24px] bg-ink px-7 py-6 text-parchment">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <span className="t-eyebrow text-parchment/50">One area · one day</span>
-                  <span className="text-[11px] text-parchment/40">Source: VECOM 8%; Shipsy 25% rescue (vendor); Shopee §7.1; PRD §18.8</span>
-                </div>
-                <ol className="mt-5 grid grid-cols-2 gap-x-6 gap-y-5 md:grid-cols-4">
-                  {AREA_DAY.map((d, i) => (
-                    <motion.li
-                      key={d.label}
-                      initial={{ opacity: 0, y: 8 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-40px" }}
-                      transition={{ delay: 0.1 + i * 0.12, duration: 0.55, ease: EASE }}
-                    >
-                      <div className={`t-number text-[36px] leading-none ${i === AREA_DAY.length - 1 ? "text-orange" : ""}`}>{d.value}</div>
-                      <div className="mt-2 text-[12px] leading-[1.35] text-parchment/60">{d.label}</div>
-                    </motion.li>
-                  ))}
-                </ol>
-              </div>
+              <SurveyBand />
             </Reveal>
           </div>
         </div>

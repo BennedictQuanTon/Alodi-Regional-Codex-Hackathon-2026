@@ -122,20 +122,52 @@ export const HERO_STATS = [
   { value: "₫473M", text: "lost a month in one area of 4,000 orders a day", source: "Team cost model, PRD §18.8 (modelled)" },
 ];
 
-/** One area, one day: 20 couriers, 4,000 orders, 8% fail first time, 25% rescued today (Shipsy, vendor). */
-export const AREA_DAY = [
-  { value: "4,000", label: "orders out for delivery" },
-  { value: "320", label: "fail the first attempt" },
-  { value: "240", label: "go back to the seller" },
-  { value: "₫473M", label: "lost every month" },
-];
-
 /** Open-licence photography (CC0, Wikimedia Commons). Shown with a plain credit line. */
 export const PHOTOS = {
   street: {
     src: "/photos/hcmc-street.webp",
     alt: "A rider carrying goods on a motorbike down a tree-lined street in Ho Chi Minh City",
-    credit: "Photo: Lemic302, CC0, via Wikimedia Commons",
+    credit: "Lemic302, CC0",
+  },
+  phone: {
+    src: "/photos/approach-phone.webp",
+    alt: "A hand holding a smartphone",
+    credit: "Samson Vowles, CC0",
+  },
+  laptop: {
+    src: "/photos/approach-laptop.webp",
+    alt: "A developer working on code on a laptop",
+    credit: "Tirza van Dijk, CC0",
+  },
+};
+
+/**
+ * Photo slot in the problem section, reserved for the team’s own field-survey photos.
+ * Drop files in web/public/photos/survey/ and list them here; empty shows a placeholder frame.
+ */
+export const SURVEY_PHOTOS: { src: string; alt: string }[] = [];
+
+/**
+ * Survey headline numbers (prep/06-survey/summary_MOCK.csv). `status` mirrors the files’ data_status:
+ * while it is "MOCK" the section labels the numbers as placeholders; switch to "REAL" once the
+ * interview export replaces the CSVs and these values.
+ */
+export const SURVEY = {
+  status: "MOCK" as "MOCK" | "REAL",
+  buyers: {
+    n: 100,
+    stats: [
+      { value: "86%", text: "want to choose a delivery window" },
+      { value: "66%", text: "called the courier back and couldn’t reach them" },
+    ],
+  },
+  couriers: {
+    n: 12,
+    from: "SPX, GHN, J&T, BEST, GHTK, Viettel Post",
+    stats: [
+      { value: "27%", text: "of their calls to buyers go unanswered" },
+      { value: "83%", text: "would use an Alodi-like system" },
+    ],
   },
 };
 
