@@ -313,7 +313,6 @@ body {
 .shipper-logo:hover img {
   filter: none;
   opacity: 1;
-  transform: translateY(-2px);
 }
 
 /* Tech-stack chip marquee: monochrome logo + name; never pauses, hover only tints the chip */
@@ -639,8 +638,8 @@ body {
   --d-text: #1f2a44;
   --d-text-2: #4a5268;
   --d-muted: #737373;
-  --d-primary: #d14e00;
-  --d-primary-hover: #b34300;
+  --d-primary: #f05a00;
+  --d-primary-hover: #d94f00;
   --d-primary-soft: #fff1e8;
   --d-accent: #f59e0b;
   --d-good: #15803d;
@@ -690,7 +689,7 @@ body {
 .d-card {
   background: var(--d-surface);
   border: 1px solid var(--d-border);
-  border-radius: 16px;
+  border-radius: 24px;
   transition:
     box-shadow 0.15s ease,
     transform 0.15s ease;
@@ -737,7 +736,7 @@ body {
   gap: 8px;
   height: 40px;
   padding: 0 16px;
-  border-radius: 8px;
+  border-radius: 18px;
   font-weight: 600;
   font-size: 14px;
   transition: all 0.15s ease;

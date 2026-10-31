@@ -4,6 +4,7 @@ import { ViewTransition, useEffect, useRef, useState } from "react";
 import { BrandWipe } from "@/components/site/brand-wipe";
 import { useDemo } from "@/lib/demo/engine";
 import { BuyerPhone } from "./buyer-phone";
+import { Person } from "./cast";
 import { ConsolePanel } from "./console-parts";
 import { DemoNav, Director, useLocalFlag } from "./director";
 import { PhoneFrame } from "./phone";
@@ -30,15 +31,11 @@ export function Enter({ children, className = "" }: { i?: number; children: Reac
   return <div className={className}>{children}</div>;
 }
 
-function Label({ children }: { children: React.ReactNode }) {
-  return <div className="mb-4 text-center text-[13px] font-medium text-[var(--ui-muted)]">{children}</div>;
-}
-
 export function DemoStage() {
   const { state, engine } = useDemo();
   const [captions, setCaptions] = useLocalFlag("alodi-captions", true);
   const BASE_W = 1720;
-  const BASE_H = 880;
+  const BASE_H = 900;
   const { ref, scale } = useFit(BASE_W, BASE_H);
   const callOn = state.call.status === "ringing" || state.call.status === "connected";
 
@@ -51,7 +48,7 @@ export function DemoStage() {
           style={{ width: BASE_W, height: BASE_H - 120, transform: `translate(-50%, -50%) scale(${scale})`, transformOrigin: "center" }}
         >
           <Enter i={0}>
-            <Label>Shipper</Label>
+            <Person who="shipper" state={state} />
             <ViewTransition name="phone-shipper" share="morph" default="none">
               <PhoneFrame clock={state.clock}>
                 <ShipperApp state={state} engine={engine} />
@@ -59,7 +56,7 @@ export function DemoStage() {
             </ViewTransition>
           </Enter>
           <Enter i={1}>
-            <Label>Buyer</Label>
+            <Person who="buyer" state={state} />
             <ViewTransition name="phone-buyer" share="morph" default="none">
               <PhoneFrame clock={state.clock} dark={callOn}>
                 <BuyerPhone state={state} engine={engine} />
@@ -67,7 +64,7 @@ export function DemoStage() {
             </ViewTransition>
           </Enter>
           <Enter i={2} className="flex h-full flex-1 flex-col">
-            <Label>Operations</Label>
+            <Person who="ops" state={state} />
             <ViewTransition name="panel-console" share="morph" default="none">
               <div className="h-[704px]">
                 <ConsolePanel state={state} engine={engine} />
