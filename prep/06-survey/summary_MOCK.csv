@@ -1,0 +1,22 @@
+﻿data_status,audience,metric,value,n
+MOCK,customer,"Courier called while busy, often or very often",56.0%,100
+MOCK,customer,"Missed the courier's call, often or very often",39.0%,100
+MOCK,customer,"Called back and could not reach the courier, sometimes or more",66.0%,100
+MOCK,customer,"Had to remind the courier, sometimes or more",81.0%,100
+MOCK,customer,"Instruction not followed, sometimes or more",59.0%,100
+MOCK,customer,Had an order returned or cancelled in the last 3 months,31.0%,100
+MOCK,customer,Want to choose a delivery window (agree or strongly agree),86.0%,100
+MOCK,customer,Comfortable with an automated call (agree or strongly agree),58.0%,100
+MOCK,customer,Would use an Alodi-like service: Yes,65.0%,100
+MOCK,customer,Would use an Alodi-like service: Maybe,34.0%,100
+MOCK,customer,Would use an Alodi-like service: No,1.0%,100
+MOCK,courier,Would like an Alodi-like system: Yes,83.3%,12
+MOCK,courier,Would like an Alodi-like system: Not sure,16.7%,12
+MOCK,courier,Would like an Alodi-like system: No,0.0%,12
+MOCK,courier,"Buyers call while riding, often or very often",83.3%,12
+MOCK,courier,Keep buyers' instructions only in memory,25.0%,12
+MOCK,courier,Mean calls to buyers per day,107.8,12
+MOCK,courier,Mean unanswered call share (%),26.6,12
+MOCK,courier,Mean minutes per day on calls,78.9,12
+MOCK,courier,Mean expected minutes saved per day (Yes answers),46.0,12
+MOCK,customer,Mean pain index (1–5),3.2,100

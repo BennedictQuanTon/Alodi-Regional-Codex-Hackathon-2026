@@ -1,0 +1,49 @@
+{
+  "orders": 3993,
+  "window_questions_sent": 3993,
+  "morning": {
+    "windows": 1437,
+    "cannot_today": 196,
+    "no_reply": 2360
+  },
+  "attempted_today": 3797,
+  "delivered_first_attempt": 3447,
+  "failed_first_attempt": {
+    "A": 209,
+    "B": 91,
+    "C": 50,
+    "total": 350
+  },
+  "flow_a": {
+    "chat_sent": 209,
+    "replied_in_chat": 89,
+    "call_1": 117,
+    "call_1_answered": 47,
+    "call_2": 70,
+    "call_2_answered": 20,
+    "unreachable_to_cs": 50,
+    "calls_moved_to_next_morning": 0
+  },
+  "flow_b": {
+    "memos": 91
+  },
+  "extraction": {
+    "auto_applied": 209,
+    "confirmed_in_chat": 22,
+    "cs_review": 16
+  },
+  "opt_out": 3,
+  "cs_queue": {
+    "refused": 50,
+    "unreachable": 50,
+    "low_confidence": 16,
+    "total": 116
+  },
+  "rescheduled_with_card": 231,
+  "messages_sent": 6110,
+  "call_minutes_answered": 89.1,
+  "memo_seconds": 678,
+  "calls_placed": 187,
+  "scripted_demo_orders": 7,
+  "note": "Simulated with fixed seed 31102026. Rates are team assumptions for testing, not measurements."
+}

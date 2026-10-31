@@ -1,0 +1,2359 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1152pt" height="648pt" viewBox="0 0 1152 648" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-30T22:45:16.388523</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 648 
+L 1152 648 
+L 1152 0 
+L 0 0 
+z
+" style="fill: #f6f3f1"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 69.12 388.8 
+L 1082.88 388.8 
+L 1082.88 285.12 
+L 69.12 285.12 
+z
+" style="fill: #f6f3f1"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 69.12 368.064 
+L 1082.88 368.064 
+L 1082.88 305.856 
+L 69.12 305.856 
+z
+" clip-path="url(#p2679861c9f)" style="fill: #e9e3de"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 69.12 368.064 
+L 113.925839 368.064 
+L 113.925839 305.856 
+L 69.12 305.856 
+z
+" clip-path="url(#p2679861c9f)" style="fill: #f05a00"/>
+   </g>
+   <g id="matplotlib.axis_1"/>
+   <g id="matplotlib.axis_2"/>
+  </g>
+  <g id="text_1">
+   <!-- Running Alodi costs 4.4% of what is lost -->
+   <g style="fill: #1f2a44" transform="translate(69.12 54.77) scale(0.34 -0.34)">
+    <defs>
+     <path id="Geist-Regular-7a" d="M 589 0 
+L 589 4544 
+L 2310 4544 
+Q 2790 4544 3136 4377 
+Q 3482 4211 3670 3900 
+Q 3859 3590 3859 3168 
+Q 3859 2861 3715 2621 
+Q 3571 2381 3347 2240 
+Q 3123 2099 2880 2086 
+L 2842 2144 
+Q 3258 2144 3498 1952 
+Q 3738 1760 3776 1338 
+L 3904 0 
+L 3347 0 
+L 3232 1280 
+Q 3206 1562 3030 1696 
+Q 2854 1830 2458 1830 
+L 1139 1830 
+L 1139 0 
+L 589 0 
+z
+M 1139 2368 
+L 2381 2368 
+Q 2797 2368 3040 2579 
+Q 3283 2790 3283 3181 
+Q 3283 3578 3033 3792 
+Q 2784 4006 2310 4006 
+L 1139 4006 
+L 1139 2368 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-16e" d="M 1626 -77 
+Q 1120 -77 816 265 
+Q 512 608 512 1210 
+L 512 3392 
+L 1050 3392 
+L 1050 1357 
+Q 1050 864 1226 630 
+Q 1402 397 1766 397 
+Q 2170 397 2400 656 
+Q 2630 915 2630 1370 
+L 2630 3392 
+L 3168 3392 
+L 3168 0 
+L 2656 0 
+L 2656 838 
+L 2739 794 
+Q 2637 378 2349 150 
+Q 2061 -77 1626 -77 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-13e" d="M 512 0 
+L 512 3392 
+L 1005 3392 
+L 1024 2528 
+L 960 2586 
+Q 1024 2886 1184 3081 
+Q 1344 3277 1571 3373 
+Q 1798 3469 2061 3469 
+Q 2451 3469 2704 3296 
+Q 2957 3123 3081 2832 
+Q 3206 2541 3206 2182 
+L 3206 0 
+L 2669 0 
+L 2669 2029 
+Q 2669 2342 2595 2556 
+Q 2522 2771 2362 2883 
+Q 2202 2995 1946 2995 
+Q 1555 2995 1302 2748 
+Q 1050 2502 1050 2029 
+L 1050 0 
+L 512 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-124" d="M 512 0 
+L 512 3392 
+L 1050 3392 
+L 1050 0 
+L 512 0 
+z
+M 500 3923 
+L 500 4550 
+L 1063 4550 
+L 1063 3923 
+L 500 3923 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-119" d="M 1798 -1037 
+Q 1434 -1037 1139 -915 
+Q 845 -794 646 -570 
+Q 448 -346 378 -51 
+L 941 -13 
+Q 1018 -250 1213 -387 
+Q 1408 -525 1798 -525 
+Q 2259 -525 2505 -339 
+Q 2752 -154 2752 218 
+L 2752 768 
+Q 2630 499 2361 339 
+Q 2093 179 1760 179 
+Q 1331 179 995 390 
+Q 659 602 470 973 
+Q 282 1344 282 1824 
+Q 282 2310 467 2678 
+Q 653 3046 982 3257 
+Q 1312 3469 1734 3469 
+Q 2093 3469 2377 3302 
+Q 2662 3136 2778 2854 
+L 2778 3392 
+L 3290 3392 
+L 3290 230 
+Q 3290 -166 3110 -451 
+Q 2931 -736 2598 -886 
+Q 2266 -1037 1798 -1037 
+z
+M 1786 691 
+Q 2221 691 2483 995 
+Q 2746 1299 2752 1824 
+Q 2758 2176 2640 2429 
+Q 2522 2682 2301 2819 
+Q 2080 2957 1786 2957 
+Q 1338 2957 1091 2653 
+Q 845 2349 845 1824 
+Q 845 1299 1097 995 
+Q 1350 691 1786 691 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-2e1" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-1" d="M 128 0 
+L 1766 4544 
+L 2509 4544 
+L 4147 0 
+L 3546 0 
+L 3091 1293 
+L 1184 1293 
+L 730 0 
+L 128 0 
+z
+M 1370 1830 
+L 2906 1830 
+L 2138 4064 
+L 1370 1830 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-138" d="M 1178 0 
+Q 883 0 697 153 
+Q 512 307 512 640 
+L 512 4544 
+L 1050 4544 
+L 1050 685 
+Q 1050 582 1104 528 
+Q 1158 474 1261 474 
+L 1555 474 
+L 1555 0 
+L 1178 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-144" d="M 1837 -77 
+Q 1370 -77 1018 140 
+Q 666 358 474 758 
+Q 282 1158 282 1696 
+Q 282 2240 474 2637 
+Q 666 3034 1018 3251 
+Q 1370 3469 1837 3469 
+Q 2304 3469 2653 3251 
+Q 3002 3034 3194 2637 
+Q 3386 2240 3386 1696 
+Q 3386 1158 3194 758 
+Q 3002 358 2653 140 
+Q 2304 -77 1837 -77 
+z
+M 1837 435 
+Q 2304 435 2563 771 
+Q 2822 1107 2822 1696 
+Q 2822 2285 2563 2621 
+Q 2304 2957 1837 2957 
+Q 1370 2957 1107 2621 
+Q 845 2285 845 1696 
+Q 845 1107 1107 771 
+Q 1370 435 1837 435 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-102" d="M 1715 -77 
+Q 1274 -77 950 140 
+Q 627 358 454 755 
+Q 282 1152 282 1696 
+Q 282 2240 454 2637 
+Q 627 3034 950 3251 
+Q 1274 3469 1715 3469 
+Q 2054 3469 2336 3325 
+Q 2618 3181 2758 2918 
+L 2758 4544 
+L 3296 4544 
+L 3296 0 
+L 2810 0 
+L 2790 512 
+Q 2650 237 2362 80 
+Q 2074 -77 1715 -77 
+z
+M 1824 435 
+Q 2125 435 2333 588 
+Q 2541 742 2649 1027 
+Q 2758 1312 2758 1696 
+Q 2758 2093 2649 2374 
+Q 2541 2656 2333 2806 
+Q 2125 2957 1824 2957 
+Q 1376 2957 1110 2621 
+Q 845 2285 845 1696 
+Q 845 1114 1110 774 
+Q 1376 435 1824 435 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-fc" d="M 1837 -77 
+Q 1363 -77 1014 140 
+Q 666 358 474 758 
+Q 282 1158 282 1696 
+Q 282 2234 474 2630 
+Q 666 3027 1014 3248 
+Q 1363 3469 1837 3469 
+Q 2227 3469 2531 3331 
+Q 2835 3194 3027 2931 
+Q 3219 2669 3277 2291 
+L 2714 2253 
+Q 2656 2592 2419 2774 
+Q 2182 2957 1837 2957 
+Q 1370 2957 1107 2621 
+Q 845 2285 845 1696 
+Q 845 1107 1107 771 
+Q 1370 435 1837 435 
+Q 2182 435 2419 627 
+Q 2656 819 2714 1203 
+L 3277 1165 
+Q 3219 787 3027 508 
+Q 2835 230 2531 76 
+Q 2227 -77 1837 -77 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-162" d="M 1747 -77 
+Q 1280 -77 963 70 
+Q 646 218 476 477 
+Q 307 736 282 1069 
+L 845 1107 
+Q 896 800 1097 617 
+Q 1299 435 1747 435 
+Q 2093 435 2281 547 
+Q 2470 659 2470 909 
+Q 2470 1043 2409 1132 
+Q 2349 1222 2169 1289 
+Q 1990 1357 1645 1421 
+Q 1171 1510 902 1644 
+Q 634 1779 525 1971 
+Q 416 2163 416 2432 
+Q 416 2886 752 3177 
+Q 1088 3469 1702 3469 
+Q 2150 3469 2435 3312 
+Q 2720 3155 2867 2905 
+Q 3014 2656 3046 2381 
+L 2483 2342 
+Q 2470 2502 2387 2643 
+Q 2304 2784 2137 2870 
+Q 1971 2957 1690 2957 
+Q 1325 2957 1152 2816 
+Q 979 2675 979 2458 
+Q 979 2291 1046 2185 
+Q 1114 2080 1283 2013 
+Q 1453 1946 1747 1894 
+Q 2246 1811 2528 1683 
+Q 2810 1555 2922 1366 
+Q 3034 1178 3034 909 
+Q 3034 442 2672 182 
+Q 2310 -77 1747 -77 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-169" d="M 1754 0 
+Q 1293 0 1072 211 
+Q 851 422 851 870 
+L 851 4186 
+L 1389 4186 
+L 1389 883 
+Q 1389 653 1491 563 
+Q 1594 474 1805 474 
+L 2291 474 
+L 2291 0 
+L 1754 0 
+z
+M 352 2918 
+L 352 3392 
+L 2291 3392 
+L 2291 2918 
+L 352 2918 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-288" d="M 2502 0 
+L 2502 986 
+L 192 986 
+L 192 1485 
+L 2464 4544 
+L 3053 4544 
+L 3053 1523 
+L 3616 1523 
+L 3616 986 
+L 3053 986 
+L 3053 0 
+L 2502 0 
+z
+M 858 1523 
+L 2502 1523 
+L 2502 3699 
+L 858 1523 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-2e8" d="M 282 0 
+L 282 723 
+L 1005 723 
+L 1005 0 
+L 282 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-362" d="M 1267 2342 
+Q 838 2342 560 2633 
+Q 282 2925 282 3469 
+Q 282 4019 560 4307 
+Q 838 4595 1267 4595 
+Q 1702 4595 1977 4307 
+Q 2253 4019 2253 3469 
+Q 2253 2925 1977 2633 
+Q 1702 2342 1267 2342 
+z
+M 1267 2739 
+Q 1530 2739 1661 2931 
+Q 1792 3123 1792 3469 
+Q 1792 3814 1661 4006 
+Q 1530 4198 1267 4198 
+Q 1011 4198 876 4006 
+Q 742 3814 742 3469 
+Q 742 3123 876 2931 
+Q 1011 2739 1267 2739 
+z
+M 3866 -51 
+Q 3437 -51 3158 240 
+Q 2880 531 2880 1075 
+Q 2880 1626 3158 1914 
+Q 3437 2202 3866 2202 
+Q 4301 2202 4576 1914 
+Q 4851 1626 4851 1075 
+Q 4851 531 4576 240 
+Q 4301 -51 3866 -51 
+z
+M 3866 346 
+Q 4128 346 4259 538 
+Q 4390 730 4390 1075 
+Q 4390 1421 4259 1613 
+Q 4128 1805 3866 1805 
+Q 3610 1805 3475 1613 
+Q 3341 1421 3341 1075 
+Q 3341 730 3475 538 
+Q 3610 346 3866 346 
+z
+M 742 0 
+L 3878 4544 
+L 4390 4544 
+L 1254 0 
+L 742 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-118" d="M 845 0 
+L 845 3699 
+Q 845 4077 1062 4310 
+Q 1280 4544 1741 4544 
+L 2278 4544 
+L 2278 4070 
+L 1779 4070 
+Q 1581 4070 1481 3961 
+Q 1382 3853 1382 3661 
+L 1382 0 
+L 845 0 
+z
+M 384 2918 
+L 384 3392 
+L 2234 3392 
+L 2234 2918 
+L 384 2918 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-182" d="M 1190 0 
+L 141 3392 
+L 730 3392 
+L 1523 563 
+L 2330 3392 
+L 2906 3392 
+L 3712 563 
+L 4512 3392 
+L 5101 3392 
+L 4051 0 
+L 3373 0 
+L 2618 2579 
+L 1862 0 
+L 1190 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-121" d="M 512 0 
+L 512 4544 
+L 1050 4544 
+L 1050 2643 
+L 986 2656 
+Q 1050 2938 1203 3117 
+Q 1357 3296 1581 3382 
+Q 1805 3469 2074 3469 
+Q 2438 3469 2691 3305 
+Q 2944 3142 3075 2851 
+Q 3206 2560 3206 2182 
+L 3206 0 
+L 2669 0 
+L 2669 2029 
+Q 2669 2522 2493 2758 
+Q 2317 2995 1958 2995 
+Q 1549 2995 1299 2745 
+Q 1050 2496 1050 2022 
+L 1050 0 
+L 512 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-e3" d="M 1427 -77 
+Q 902 -77 592 166 
+Q 282 410 282 845 
+Q 282 1280 538 1529 
+Q 794 1779 1350 1882 
+L 2554 2106 
+Q 2554 2534 2352 2745 
+Q 2150 2957 1747 2957 
+Q 1395 2957 1190 2800 
+Q 986 2643 909 2349 
+L 339 2394 
+Q 435 2874 803 3171 
+Q 1171 3469 1747 3469 
+Q 2400 3469 2745 3101 
+Q 3091 2733 3091 2086 
+L 3091 685 
+Q 3091 570 3132 522 
+Q 3174 474 3270 474 
+L 3405 474 
+L 3405 0 
+Q 3379 -6 3321 -9 
+Q 3264 -13 3200 -13 
+Q 2970 -13 2826 60 
+Q 2682 134 2618 291 
+Q 2554 448 2554 704 
+L 2618 691 
+Q 2573 474 2400 298 
+Q 2227 122 1971 22 
+Q 1715 -77 1427 -77 
+z
+M 1478 397 
+Q 1818 397 2058 528 
+Q 2298 659 2426 886 
+Q 2554 1114 2554 1395 
+L 2554 1638 
+L 1453 1434 
+Q 1107 1370 976 1238 
+Q 845 1107 845 896 
+Q 845 659 1014 528 
+Q 1184 397 1478 397 
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#Geist-Regular-7a"/>
+    <use xlink:href="#Geist-Regular-16e" transform="translate(66.203125 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(123.703125 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(179.796875 0)"/>
+    <use xlink:href="#Geist-Regular-124" transform="translate(237.296875 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(262.296875 0)"/>
+    <use xlink:href="#Geist-Regular-119" transform="translate(319.1875 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(378.59375 0)"/>
+    <use xlink:href="#Geist-Regular-1" transform="translate(403.59375 0)"/>
+    <use xlink:href="#Geist-Regular-138" transform="translate(468.390625 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(494.5 0)"/>
+    <use xlink:href="#Geist-Regular-102" transform="translate(550.796875 0)"/>
+    <use xlink:href="#Geist-Regular-124" transform="translate(608.296875 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(632.703125 0)"/>
+    <use xlink:href="#Geist-Regular-fc" transform="translate(657.703125 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(711.296875 0)"/>
+    <use xlink:href="#Geist-Regular-162" transform="translate(767.59375 0)"/>
+    <use xlink:href="#Geist-Regular-169" transform="translate(816.59375 0)"/>
+    <use xlink:href="#Geist-Regular-162" transform="translate(854.203125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(906.203125 0)"/>
+    <use xlink:href="#Geist-Regular-288" transform="translate(931.203125 0)"/>
+    <use xlink:href="#Geist-Regular-2e8" transform="translate(992.703125 0)"/>
+    <use xlink:href="#Geist-Regular-288" transform="translate(1012.796875 0)"/>
+    <use xlink:href="#Geist-Regular-362" transform="translate(1072.296875 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(1152.5 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(1177.5 0)"/>
+    <use xlink:href="#Geist-Regular-118" transform="translate(1231.796875 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(1271.296875 0)"/>
+    <use xlink:href="#Geist-Regular-182" transform="translate(1296.296875 0)"/>
+    <use xlink:href="#Geist-Regular-121" transform="translate(1377.203125 0)"/>
+    <use xlink:href="#Geist-Regular-e3" transform="translate(1434.296875 0)"/>
+    <use xlink:href="#Geist-Regular-169" transform="translate(1484.390625 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(1523.59375 0)"/>
+    <use xlink:href="#Geist-Regular-124" transform="translate(1548.59375 0)"/>
+    <use xlink:href="#Geist-Regular-162" transform="translate(1572 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(1624 0)"/>
+    <use xlink:href="#Geist-Regular-138" transform="translate(1649 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(1675.109375 0)"/>
+    <use xlink:href="#Geist-Regular-162" transform="translate(1731.40625 0)"/>
+    <use xlink:href="#Geist-Regular-169" transform="translate(1780.40625 0)"/>
+   </g>
+  </g>
+  <g id="text_2">
+   <!-- 21M VND a month against 473M VND a month · one-time server 75–98M VND -->
+   <g style="fill: #5a6173" transform="translate(69.12 88.65) scale(0.18 -0.18)">
+    <defs>
+     <path id="Geist-Regular-286" d="M 384 0 
+Q 384 480 534 867 
+Q 685 1254 1065 1606 
+Q 1446 1958 2125 2317 
+Q 2438 2483 2630 2624 
+Q 2822 2765 2912 2925 
+Q 3002 3085 3002 3315 
+Q 3002 3552 2899 3728 
+Q 2797 3904 2595 4006 
+Q 2394 4109 2093 4109 
+Q 1613 4109 1334 3859 
+Q 1056 3610 986 3149 
+L 410 3187 
+Q 486 3853 921 4249 
+Q 1357 4646 2093 4646 
+Q 2560 4646 2893 4480 
+Q 3226 4314 3402 4016 
+Q 3578 3718 3578 3328 
+Q 3578 2982 3462 2729 
+Q 3347 2477 3075 2259 
+Q 2803 2042 2330 1792 
+Q 1715 1466 1398 1133 
+Q 1082 800 1062 538 
+L 3578 538 
+L 3578 0 
+L 384 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-285" d="M 1203 0 
+L 1203 3366 
+L 256 3366 
+L 256 3840 
+L 640 3840 
+Q 890 3840 1040 3904 
+Q 1190 3968 1254 4121 
+Q 1318 4275 1318 4544 
+L 1754 4544 
+L 1754 0 
+L 1203 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-59" d="M 589 0 
+L 589 4544 
+L 1357 4544 
+L 2810 602 
+L 4256 4544 
+L 5024 4544 
+L 5024 0 
+L 4474 0 
+L 4474 3520 
+L 3174 0 
+L 2438 0 
+L 1139 3520 
+L 1139 0 
+L 589 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-9d" d="M 1773 0 
+L 128 4544 
+L 730 4544 
+L 2138 602 
+L 3539 4544 
+L 4141 4544 
+L 2496 0 
+L 1773 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-5a" d="M 589 0 
+L 589 4544 
+L 1370 4544 
+L 3616 550 
+L 3616 4544 
+L 4166 4544 
+L 4166 0 
+L 3347 0 
+L 1139 3917 
+L 1139 0 
+L 589 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-20" d="M 589 0 
+L 589 4544 
+L 1997 4544 
+Q 3046 4544 3612 3952 
+Q 4179 3360 4179 2266 
+Q 4179 1178 3622 589 
+Q 3066 0 2035 0 
+L 589 0 
+z
+M 1139 538 
+L 1997 538 
+Q 2797 538 3200 970 
+Q 3603 1402 3603 2266 
+Q 3603 3142 3200 3574 
+Q 2797 4006 1997 4006 
+L 1139 4006 
+L 1139 538 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-13d" d="M 512 0 
+L 512 3392 
+L 1005 3392 
+L 1024 2534 
+L 947 2560 
+Q 1005 2842 1149 3043 
+Q 1293 3245 1504 3357 
+Q 1715 3469 1971 3469 
+Q 2413 3469 2691 3225 
+Q 2970 2982 3040 2547 
+L 2938 2554 
+Q 2989 2848 3126 3049 
+Q 3264 3251 3481 3360 
+Q 3699 3469 3981 3469 
+Q 4346 3469 4595 3318 
+Q 4845 3168 4973 2880 
+Q 5101 2592 5101 2182 
+L 5101 0 
+L 4563 0 
+L 4563 2067 
+Q 4563 2528 4384 2761 
+Q 4205 2995 3853 2995 
+Q 3616 2995 3440 2880 
+Q 3264 2765 3168 2550 
+Q 3072 2336 3072 2029 
+L 3072 0 
+L 2534 0 
+L 2534 2029 
+Q 2534 2483 2374 2739 
+Q 2214 2995 1837 2995 
+Q 1600 2995 1424 2880 
+Q 1248 2765 1149 2547 
+Q 1050 2330 1050 2029 
+L 1050 0 
+L 512 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-28b" d="M 1139 0 
+Q 1139 704 1331 1405 
+Q 1523 2106 1884 2765 
+Q 2246 3424 2752 4006 
+L 128 4006 
+L 128 4544 
+L 3354 4544 
+L 3354 4045 
+Q 2784 3392 2416 2755 
+Q 2048 2118 1875 1443 
+Q 1702 768 1702 0 
+L 1139 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-287" d="M 1926 -102 
+Q 1171 -102 761 253 
+Q 352 608 320 1171 
+L 890 1210 
+Q 928 794 1213 614 
+Q 1498 435 1926 435 
+Q 2221 435 2470 515 
+Q 2720 595 2873 777 
+Q 3027 960 3027 1267 
+Q 3027 1722 2726 1933 
+Q 2426 2144 1933 2144 
+L 1574 2144 
+L 1574 2682 
+L 1933 2682 
+Q 2336 2682 2601 2842 
+Q 2867 3002 2867 3392 
+Q 2867 3744 2640 3926 
+Q 2413 4109 1958 4109 
+Q 1510 4109 1283 3936 
+Q 1056 3763 1011 3462 
+L 435 3501 
+Q 499 4013 889 4329 
+Q 1280 4646 1958 4646 
+Q 2419 4646 2752 4496 
+Q 3085 4346 3264 4070 
+Q 3443 3795 3443 3418 
+Q 3443 2995 3177 2736 
+Q 2912 2477 2394 2381 
+L 2394 2496 
+Q 2950 2432 3276 2099 
+Q 3603 1766 3603 1267 
+Q 3603 832 3388 525 
+Q 3174 218 2796 58 
+Q 2419 -102 1926 -102 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-2f1" d="M 282 1587 
+L 282 2310 
+L 1005 2310 
+L 1005 1587 
+L 282 1587 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-106" d="M 1837 -77 
+Q 1357 -77 1008 140 
+Q 659 358 470 758 
+Q 282 1158 282 1696 
+Q 282 2234 470 2630 
+Q 659 3027 1001 3248 
+Q 1344 3469 1811 3469 
+Q 2253 3469 2592 3261 
+Q 2931 3053 3120 2656 
+Q 3309 2259 3309 1690 
+L 3309 1530 
+L 845 1530 
+Q 877 986 1136 710 
+Q 1395 435 1837 435 
+Q 2170 435 2384 592 
+Q 2598 749 2682 1005 
+L 3258 960 
+Q 3123 506 2748 214 
+Q 2374 -77 1837 -77 
+z
+M 845 2003 
+L 2720 2003 
+Q 2682 2496 2435 2726 
+Q 2189 2957 1811 2957 
+Q 1421 2957 1168 2717 
+Q 915 2477 845 2003 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-305" d="M 282 1613 
+L 282 2118 
+L 2400 2118 
+L 2400 1613 
+L 282 1613 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-15e" d="M 512 0 
+L 512 3392 
+L 986 3392 
+L 1011 2534 
+L 960 2554 
+Q 1024 2989 1238 3190 
+Q 1453 3392 1811 3392 
+L 2144 3392 
+L 2144 2880 
+L 1818 2880 
+Q 1562 2880 1392 2787 
+Q 1222 2694 1136 2512 
+Q 1050 2330 1050 2048 
+L 1050 0 
+L 512 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-181" d="M 1376 0 
+L 141 3392 
+L 730 3392 
+L 1715 550 
+L 2701 3392 
+L 3290 3392 
+L 2054 0 
+L 1376 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-289" d="M 1997 -102 
+Q 1517 -102 1168 58 
+Q 819 218 617 506 
+Q 416 794 384 1171 
+L 960 1210 
+Q 1011 826 1289 630 
+Q 1568 435 1997 435 
+Q 2477 435 2758 707 
+Q 3040 979 3040 1459 
+Q 3040 1779 2915 2012 
+Q 2790 2246 2553 2374 
+Q 2317 2502 1984 2502 
+Q 1670 2502 1414 2368 
+Q 1158 2234 1050 1990 
+L 461 1990 
+L 762 4544 
+L 3309 4544 
+L 3309 4006 
+L 1267 4006 
+L 1062 2330 
+L 960 2432 
+Q 1062 2630 1232 2761 
+Q 1402 2893 1622 2960 
+Q 1843 3027 2086 3027 
+Q 2541 3027 2886 2825 
+Q 3232 2624 3424 2269 
+Q 3616 1914 3616 1459 
+Q 3616 1005 3411 649 
+Q 3206 294 2841 96 
+Q 2477 -102 1997 -102 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-306" d="M 282 1619 
+L 282 2118 
+L 3501 2118 
+L 3501 1619 
+L 282 1619 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-28d" d="M 1715 -102 
+Q 1152 -102 797 176 
+Q 442 454 314 877 
+L 896 922 
+Q 973 691 1177 563 
+Q 1382 435 1715 435 
+Q 2285 435 2589 892 
+Q 2893 1350 2899 2368 
+L 3034 2342 
+Q 2874 1914 2541 1680 
+Q 2208 1446 1766 1446 
+Q 1325 1446 985 1644 
+Q 646 1843 451 2201 
+Q 256 2560 256 3034 
+Q 256 3533 461 3894 
+Q 666 4256 1024 4451 
+Q 1382 4646 1837 4646 
+Q 2406 4646 2768 4384 
+Q 3130 4122 3302 3651 
+Q 3475 3181 3475 2541 
+Q 3475 1971 3385 1488 
+Q 3296 1005 3091 649 
+Q 2886 294 2550 96 
+Q 2214 -102 1715 -102 
+z
+M 1805 1990 
+Q 2118 1990 2355 2112 
+Q 2592 2234 2729 2464 
+Q 2867 2694 2867 3021 
+Q 2867 3334 2742 3580 
+Q 2618 3827 2387 3968 
+Q 2157 4109 1837 4109 
+Q 1523 4109 1299 3971 
+Q 1075 3834 953 3590 
+Q 832 3347 832 3034 
+Q 832 2714 957 2480 
+Q 1082 2246 1299 2118 
+Q 1517 1990 1805 1990 
+z
+" transform="scale(0.015625)"/>
+     <path id="Geist-Regular-28c" d="M 1933 -102 
+Q 1446 -102 1065 51 
+Q 685 205 470 505 
+Q 256 806 256 1248 
+Q 256 1741 550 2064 
+Q 845 2387 1331 2502 
+L 1344 2374 
+Q 954 2483 714 2729 
+Q 474 2976 474 3398 
+Q 474 3757 656 4038 
+Q 838 4320 1164 4483 
+Q 1491 4646 1933 4646 
+Q 2374 4646 2704 4483 
+Q 3034 4320 3213 4038 
+Q 3392 3757 3392 3398 
+Q 3392 2976 3155 2729 
+Q 2918 2483 2522 2374 
+L 2534 2502 
+Q 3027 2387 3318 2064 
+Q 3610 1741 3610 1248 
+Q 3610 806 3395 505 
+Q 3181 205 2803 51 
+Q 2426 -102 1933 -102 
+z
+M 1933 435 
+Q 2438 435 2736 643 
+Q 3034 851 3034 1280 
+Q 3034 1677 2768 1917 
+Q 2502 2157 1933 2157 
+Q 1370 2157 1101 1917 
+Q 832 1677 832 1280 
+Q 832 851 1129 643 
+Q 1427 435 1933 435 
+z
+M 1933 2669 
+Q 2355 2669 2585 2851 
+Q 2816 3034 2816 3398 
+Q 2816 3725 2592 3917 
+Q 2368 4109 1933 4109 
+Q 1504 4109 1277 3917 
+Q 1050 3725 1050 3398 
+Q 1050 3034 1280 2851 
+Q 1510 2669 1933 2669 
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#Geist-Regular-286"/>
+    <use xlink:href="#Geist-Regular-285" transform="translate(60.90625 0)"/>
+    <use xlink:href="#Geist-Regular-59" transform="translate(99.3125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(187.015625 0)"/>
+    <use xlink:href="#Geist-Regular-9d" transform="translate(212.015625 0)"/>
+    <use xlink:href="#Geist-Regular-5a" transform="translate(276.515625 0)"/>
+    <use xlink:href="#Geist-Regular-20" transform="translate(348.8125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(418.21875 0)"/>
+    <use xlink:href="#Geist-Regular-e3" transform="translate(443.21875 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(498.3125 0)"/>
+    <use xlink:href="#Geist-Regular-13d" transform="translate(523.3125 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(609.8125 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(666.109375 0)"/>
+    <use xlink:href="#Geist-Regular-169" transform="translate(720.203125 0)"/>
+    <use xlink:href="#Geist-Regular-121" transform="translate(757.8125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(815.90625 0)"/>
+    <use xlink:href="#Geist-Regular-e3" transform="translate(840.90625 0)"/>
+    <use xlink:href="#Geist-Regular-119" transform="translate(895.40625 0)"/>
+    <use xlink:href="#Geist-Regular-e3" transform="translate(954.8125 0)"/>
+    <use xlink:href="#Geist-Regular-124" transform="translate(1009.109375 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(1034.109375 0)"/>
+    <use xlink:href="#Geist-Regular-162" transform="translate(1091 0)"/>
+    <use xlink:href="#Geist-Regular-169" transform="translate(1140 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(1179.203125 0)"/>
+    <use xlink:href="#Geist-Regular-288" transform="translate(1204.203125 0)"/>
+    <use xlink:href="#Geist-Regular-28b" transform="translate(1262.703125 0)"/>
+    <use xlink:href="#Geist-Regular-287" transform="translate(1315.109375 0)"/>
+    <use xlink:href="#Geist-Regular-59" transform="translate(1376.40625 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(1464.109375 0)"/>
+    <use xlink:href="#Geist-Regular-9d" transform="translate(1489.109375 0)"/>
+    <use xlink:href="#Geist-Regular-5a" transform="translate(1553.609375 0)"/>
+    <use xlink:href="#Geist-Regular-20" transform="translate(1625.90625 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(1695.3125 0)"/>
+    <use xlink:href="#Geist-Regular-e3" transform="translate(1720.3125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(1775.40625 0)"/>
+    <use xlink:href="#Geist-Regular-13d" transform="translate(1800.40625 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(1886.90625 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(1943.203125 0)"/>
+    <use xlink:href="#Geist-Regular-169" transform="translate(1997.296875 0)"/>
+    <use xlink:href="#Geist-Regular-121" transform="translate(2034.90625 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(2093 0)"/>
+    <use xlink:href="#Geist-Regular-2f1" transform="translate(2118 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(2138.09375 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(2163.09375 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(2219.390625 0)"/>
+    <use xlink:href="#Geist-Regular-106" transform="translate(2276.28125 0)"/>
+    <use xlink:href="#Geist-Regular-305" transform="translate(2332.375 0)"/>
+    <use xlink:href="#Geist-Regular-169" transform="translate(2374.28125 0)"/>
+    <use xlink:href="#Geist-Regular-124" transform="translate(2411.890625 0)"/>
+    <use xlink:href="#Geist-Regular-13d" transform="translate(2436.890625 0)"/>
+    <use xlink:href="#Geist-Regular-106" transform="translate(2523.390625 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(2579.484375 0)"/>
+    <use xlink:href="#Geist-Regular-162" transform="translate(2604.484375 0)"/>
+    <use xlink:href="#Geist-Regular-106" transform="translate(2655.484375 0)"/>
+    <use xlink:href="#Geist-Regular-15e" transform="translate(2710.578125 0)"/>
+    <use xlink:href="#Geist-Regular-181" transform="translate(2745.984375 0)"/>
+    <use xlink:href="#Geist-Regular-106" transform="translate(2796.984375 0)"/>
+    <use xlink:href="#Geist-Regular-15e" transform="translate(2852.078125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(2889.984375 0)"/>
+    <use xlink:href="#Geist-Regular-28b" transform="translate(2914.984375 0)"/>
+    <use xlink:href="#Geist-Regular-289" transform="translate(2967.390625 0)"/>
+    <use xlink:href="#Geist-Regular-306" transform="translate(3029.984375 0)"/>
+    <use xlink:href="#Geist-Regular-28d" transform="translate(3089.078125 0)"/>
+    <use xlink:href="#Geist-Regular-28c" transform="translate(3148.375 0)"/>
+    <use xlink:href="#Geist-Regular-59" transform="translate(3208.78125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(3296.484375 0)"/>
+    <use xlink:href="#Geist-Regular-9d" transform="translate(3321.484375 0)"/>
+    <use xlink:href="#Geist-Regular-5a" transform="translate(3385.984375 0)"/>
+    <use xlink:href="#Geist-Regular-20" transform="translate(3458.28125 0)"/>
+   </g>
+  </g>
+  <g id="text_3">
+   <!-- 21M VND  Alodi running cost -->
+   <g style="fill: #1f2a44" transform="translate(69.12 453.6) scale(0.18 -0.18)">
+    <use xlink:href="#Geist-Regular-286"/>
+    <use xlink:href="#Geist-Regular-285" transform="translate(60.90625 0)"/>
+    <use xlink:href="#Geist-Regular-59" transform="translate(99.3125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(187.015625 0)"/>
+    <use xlink:href="#Geist-Regular-9d" transform="translate(212.015625 0)"/>
+    <use xlink:href="#Geist-Regular-5a" transform="translate(276.515625 0)"/>
+    <use xlink:href="#Geist-Regular-20" transform="translate(348.8125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(418.21875 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(443.21875 0)"/>
+    <use xlink:href="#Geist-Regular-1" transform="translate(468.21875 0)"/>
+    <use xlink:href="#Geist-Regular-138" transform="translate(533.015625 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(559.125 0)"/>
+    <use xlink:href="#Geist-Regular-102" transform="translate(615.421875 0)"/>
+    <use xlink:href="#Geist-Regular-124" transform="translate(672.921875 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(697.328125 0)"/>
+    <use xlink:href="#Geist-Regular-15e" transform="translate(722.328125 0)"/>
+    <use xlink:href="#Geist-Regular-16e" transform="translate(758.234375 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(815.734375 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(871.828125 0)"/>
+    <use xlink:href="#Geist-Regular-124" transform="translate(929.328125 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(954.328125 0)"/>
+    <use xlink:href="#Geist-Regular-119" transform="translate(1011.21875 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(1070.625 0)"/>
+    <use xlink:href="#Geist-Regular-fc" transform="translate(1095.625 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(1149.21875 0)"/>
+    <use xlink:href="#Geist-Regular-162" transform="translate(1205.515625 0)"/>
+    <use xlink:href="#Geist-Regular-169" transform="translate(1254.515625 0)"/>
+   </g>
+  </g>
+  <g id="text_4">
+   <!-- 473M VND  monthly delivery-failure loss -->
+   <g style="fill: #5a6173" transform="translate(753.204375 453.6) scale(0.18 -0.18)">
+    <defs>
+     <path id="Geist-Regular-188" d="M 659 -960 
+L 659 -486 
+L 1050 -486 
+Q 1229 -486 1315 -432 
+Q 1402 -378 1446 -256 
+L 1568 64 
+L 1382 64 
+L 141 3392 
+L 730 3392 
+L 1741 563 
+L 2707 3392 
+L 3296 3392 
+L 1920 -429 
+Q 1824 -704 1632 -832 
+Q 1440 -960 1101 -960 
+L 659 -960 
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#Geist-Regular-288"/>
+    <use xlink:href="#Geist-Regular-28b" transform="translate(58.5 0)"/>
+    <use xlink:href="#Geist-Regular-287" transform="translate(110.90625 0)"/>
+    <use xlink:href="#Geist-Regular-59" transform="translate(172.203125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(259.90625 0)"/>
+    <use xlink:href="#Geist-Regular-9d" transform="translate(284.90625 0)"/>
+    <use xlink:href="#Geist-Regular-5a" transform="translate(349.40625 0)"/>
+    <use xlink:href="#Geist-Regular-20" transform="translate(421.703125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(491.109375 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(516.109375 0)"/>
+    <use xlink:href="#Geist-Regular-13d" transform="translate(541.109375 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(627.609375 0)"/>
+    <use xlink:href="#Geist-Regular-13e" transform="translate(683.90625 0)"/>
+    <use xlink:href="#Geist-Regular-169" transform="translate(738 0)"/>
+    <use xlink:href="#Geist-Regular-121" transform="translate(775.609375 0)"/>
+    <use xlink:href="#Geist-Regular-138" transform="translate(832.203125 0)"/>
+    <use xlink:href="#Geist-Regular-188" transform="translate(856.5 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(910.203125 0)"/>
+    <use xlink:href="#Geist-Regular-102" transform="translate(935.203125 0)"/>
+    <use xlink:href="#Geist-Regular-106" transform="translate(993.703125 0)"/>
+    <use xlink:href="#Geist-Regular-138" transform="translate(1049.296875 0)"/>
+    <use xlink:href="#Geist-Regular-124" transform="translate(1075.203125 0)"/>
+    <use xlink:href="#Geist-Regular-181" transform="translate(1098.609375 0)"/>
+    <use xlink:href="#Geist-Regular-106" transform="translate(1149.609375 0)"/>
+    <use xlink:href="#Geist-Regular-15e" transform="translate(1204.703125 0)"/>
+    <use xlink:href="#Geist-Regular-188" transform="translate(1240.109375 0)"/>
+    <use xlink:href="#Geist-Regular-305" transform="translate(1292.8125 0)"/>
+    <use xlink:href="#Geist-Regular-118" transform="translate(1333.71875 0)"/>
+    <use xlink:href="#Geist-Regular-e3" transform="translate(1370.21875 0)"/>
+    <use xlink:href="#Geist-Regular-124" transform="translate(1424.515625 0)"/>
+    <use xlink:href="#Geist-Regular-138" transform="translate(1447.921875 0)"/>
+    <use xlink:href="#Geist-Regular-16e" transform="translate(1473.625 0)"/>
+    <use xlink:href="#Geist-Regular-15e" transform="translate(1531.125 0)"/>
+    <use xlink:href="#Geist-Regular-106" transform="translate(1565.03125 0)"/>
+    <use xlink:href="#Geist-Regular-2e1" transform="translate(1621.125 0)"/>
+    <use xlink:href="#Geist-Regular-138" transform="translate(1646.125 0)"/>
+    <use xlink:href="#Geist-Regular-144" transform="translate(1672.234375 0)"/>
+    <use xlink:href="#Geist-Regular-162" transform="translate(1728.53125 0)"/>
+    <use xlink:href="#Geist-Regular-162" transform="translate(1779.53125 0)"/>
+   </g>
+  </g>
+  <g id="text_5">
+   <!-- Source: Phong Vu RTX 5060 Ti listing · Viettel Mobile SIP price list · Zalo ZNS price tables · EVN business tariff · -->
+   <g style="fill: #8a8f9c" transform="translate(69.12 595.521914) scale(0.125 -0.125)">
+    <defs>
+     <path id="GeistMono-Regular-7d" d="M 1990 -102 
+Q 1510 -102 1139 96 
+Q 768 294 544 643 
+Q 320 992 282 1453 
+L 858 1491 
+Q 902 1152 1052 915 
+Q 1203 678 1443 556 
+Q 1683 435 2003 435 
+Q 2323 435 2540 515 
+Q 2758 595 2870 752 
+Q 2982 909 2982 1133 
+Q 2982 1350 2883 1507 
+Q 2784 1664 2512 1801 
+Q 2240 1939 1709 2086 
+Q 1235 2221 944 2384 
+Q 653 2547 521 2780 
+Q 390 3014 390 3354 
+Q 390 3738 572 4029 
+Q 755 4320 1094 4483 
+Q 1434 4646 1901 4646 
+Q 2368 4646 2701 4457 
+Q 3034 4269 3229 3942 
+Q 3424 3616 3475 3200 
+L 2899 3162 
+Q 2861 3437 2739 3651 
+Q 2618 3866 2406 3987 
+Q 2195 4109 1888 4109 
+Q 1466 4109 1216 3907 
+Q 966 3706 966 3379 
+Q 966 3168 1059 3030 
+Q 1152 2893 1389 2787 
+Q 1626 2682 2054 2560 
+Q 2611 2406 2940 2214 
+Q 3270 2022 3414 1760 
+Q 3558 1498 3558 1120 
+Q 3558 762 3360 483 
+Q 3162 205 2810 51 
+Q 2458 -102 1990 -102 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-133" d="M 1920 -77 
+Q 1453 -77 1104 140 
+Q 755 358 563 758 
+Q 371 1158 371 1696 
+Q 371 2240 563 2637 
+Q 755 3034 1104 3251 
+Q 1453 3469 1920 3469 
+Q 2387 3469 2736 3251 
+Q 3085 3034 3277 2637 
+Q 3469 2240 3469 1696 
+Q 3469 1158 3277 758 
+Q 3085 358 2736 140 
+Q 2387 -77 1920 -77 
+z
+M 1920 435 
+Q 2387 435 2646 771 
+Q 2906 1107 2906 1696 
+Q 2906 2285 2646 2621 
+Q 2387 2957 1920 2957 
+Q 1453 2957 1193 2621 
+Q 934 2285 934 1696 
+Q 934 1107 1193 771 
+Q 1453 435 1920 435 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-15d" d="M 1683 -77 
+Q 1178 -77 877 265 
+Q 576 608 576 1210 
+L 576 3392 
+L 1114 3392 
+L 1114 1357 
+Q 1114 864 1290 630 
+Q 1466 397 1830 397 
+Q 2227 397 2457 656 
+Q 2688 915 2688 1370 
+L 2688 3392 
+L 3226 3392 
+L 3226 0 
+L 2714 0 
+L 2714 838 
+L 2797 794 
+Q 2694 378 2406 150 
+Q 2118 -77 1683 -77 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-14d" d="M 576 0 
+L 576 474 
+L 1722 474 
+L 1459 218 
+L 1459 3181 
+L 1722 2918 
+L 576 2918 
+L 576 3392 
+L 1907 3392 
+L 1958 2483 
+L 1907 2522 
+Q 1958 2963 2176 3177 
+Q 2394 3392 2758 3392 
+L 3456 3392 
+L 3456 2906 
+L 2765 2906 
+Q 2515 2906 2345 2806 
+Q 2176 2707 2086 2518 
+Q 1997 2330 1997 2048 
+L 1997 218 
+L 1741 474 
+L 3072 474 
+L 3072 0 
+L 576 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-ec" d="M 2010 -77 
+Q 1536 -77 1184 140 
+Q 832 358 640 758 
+Q 448 1158 448 1696 
+Q 448 2234 640 2630 
+Q 832 3027 1184 3248 
+Q 1536 3469 2010 3469 
+Q 2387 3469 2681 3331 
+Q 2976 3194 3168 2931 
+Q 3360 2669 3430 2291 
+L 2867 2253 
+Q 2790 2592 2563 2774 
+Q 2336 2957 2010 2957 
+Q 1542 2957 1276 2621 
+Q 1011 2285 1011 1696 
+Q 1011 1107 1276 771 
+Q 1542 435 2010 435 
+Q 2336 435 2576 627 
+Q 2816 819 2893 1203 
+L 3456 1165 
+Q 3386 787 3187 508 
+Q 2989 230 2688 76 
+Q 2387 -77 2010 -77 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-f6" d="M 1958 -77 
+Q 1478 -77 1129 140 
+Q 781 358 592 758 
+Q 403 1158 403 1696 
+Q 403 2234 592 2630 
+Q 781 3027 1123 3248 
+Q 1466 3469 1933 3469 
+Q 2374 3469 2713 3261 
+Q 3053 3053 3245 2656 
+Q 3437 2259 3437 1690 
+L 3437 1530 
+L 966 1530 
+Q 998 986 1257 710 
+Q 1517 435 1958 435 
+Q 2291 435 2505 592 
+Q 2720 749 2803 1005 
+L 3379 960 
+Q 3245 506 2870 214 
+Q 2496 -77 1958 -77 
+z
+M 966 2003 
+L 2848 2003 
+Q 2810 2496 2560 2726 
+Q 2310 2957 1933 2957 
+Q 1542 2957 1289 2717 
+Q 1037 2477 966 2003 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-2d5" d="M 1523 0 
+L 1523 781 
+L 2317 781 
+L 2317 0 
+L 1523 0 
+z
+M 1523 2470 
+L 1523 3251 
+L 2317 3251 
+L 2317 2470 
+L 1523 2470 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-2ba" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-76" d="M 576 0 
+L 576 4544 
+L 1958 4544 
+Q 2432 4544 2784 4377 
+Q 3136 4211 3328 3900 
+Q 3520 3590 3520 3155 
+Q 3520 2720 3328 2409 
+Q 3136 2099 2784 1932 
+Q 2432 1766 1958 1766 
+L 1126 1766 
+L 1126 0 
+L 576 0 
+z
+M 1126 2304 
+L 1894 2304 
+Q 2432 2304 2688 2525 
+Q 2944 2746 2944 3155 
+Q 2944 3571 2688 3788 
+Q 2432 4006 1894 4006 
+L 1126 4006 
+L 1126 2304 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-111" d="M 640 0 
+L 640 4544 
+L 1178 4544 
+L 1178 2643 
+L 1114 2656 
+Q 1178 2938 1331 3117 
+Q 1485 3296 1709 3382 
+Q 1933 3469 2195 3469 
+Q 2560 3469 2813 3305 
+Q 3066 3142 3197 2851 
+Q 3328 2560 3328 2182 
+L 3328 0 
+L 2790 0 
+L 2790 2029 
+Q 2790 2522 2614 2758 
+Q 2438 2995 2080 2995 
+Q 1670 2995 1424 2745 
+Q 1178 2496 1178 2022 
+L 1178 0 
+L 640 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-12d" d="M 538 0 
+L 538 3392 
+L 1030 3392 
+L 1050 2528 
+L 986 2586 
+Q 1050 2886 1219 3081 
+Q 1389 3277 1625 3373 
+Q 1862 3469 2125 3469 
+Q 2515 3469 2774 3296 
+Q 3034 3123 3168 2832 
+Q 3302 2541 3302 2182 
+L 3302 0 
+L 2765 0 
+L 2765 2029 
+Q 2765 2502 2579 2748 
+Q 2394 2995 2010 2995 
+Q 1747 2995 1536 2883 
+Q 1325 2771 1200 2556 
+Q 1075 2342 1075 2029 
+L 1075 0 
+L 538 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-109" d="M 1901 -1037 
+Q 1536 -1037 1241 -915 
+Q 947 -794 748 -570 
+Q 550 -346 480 -51 
+L 1043 -13 
+Q 1120 -250 1315 -387 
+Q 1510 -525 1901 -525 
+Q 2362 -525 2608 -339 
+Q 2854 -154 2854 218 
+L 2854 768 
+Q 2733 499 2464 339 
+Q 2195 179 1862 179 
+Q 1434 179 1098 390 
+Q 762 602 573 973 
+Q 384 1344 384 1824 
+Q 384 2310 569 2678 
+Q 755 3046 1084 3257 
+Q 1414 3469 1837 3469 
+Q 2195 3469 2480 3302 
+Q 2765 3136 2880 2854 
+L 2880 3392 
+L 3392 3392 
+L 3392 230 
+Q 3392 -166 3213 -451 
+Q 3034 -736 2701 -886 
+Q 2368 -1037 1901 -1037 
+z
+M 1888 691 
+Q 2323 691 2585 995 
+Q 2848 1299 2854 1824 
+Q 2861 2176 2742 2429 
+Q 2624 2682 2403 2819 
+Q 2182 2957 1888 2957 
+Q 1440 2957 1193 2653 
+Q 947 2349 947 1824 
+Q 947 1299 1200 995 
+Q 1453 691 1888 691 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-9c" d="M 1562 0 
+L 192 4544 
+L 781 4544 
+L 1997 358 
+L 1843 358 
+L 3059 4544 
+L 3648 4544 
+L 2278 0 
+L 1562 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-79" d="M 448 0 
+L 448 4544 
+L 1830 4544 
+Q 2547 4544 2963 4182 
+Q 3379 3821 3379 3187 
+Q 3379 2867 3232 2620 
+Q 3085 2374 2854 2233 
+Q 2624 2093 2381 2074 
+L 2355 2150 
+Q 2810 2125 3037 1933 
+Q 3264 1741 3302 1306 
+L 3418 0 
+L 2867 0 
+L 2758 1235 
+Q 2739 1446 2659 1577 
+Q 2579 1709 2409 1769 
+Q 2240 1830 1946 1830 
+L 998 1830 
+L 998 0 
+L 448 0 
+z
+M 998 2368 
+L 1830 2368 
+Q 2304 2368 2553 2582 
+Q 2803 2797 2803 3187 
+Q 2803 3584 2553 3795 
+Q 2304 4006 1830 4006 
+L 998 4006 
+L 998 2368 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-84" d="M 1645 0 
+L 1645 4006 
+L 256 4006 
+L 256 4544 
+L 3584 4544 
+L 3584 4006 
+L 2195 4006 
+L 2195 0 
+L 1645 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-a2" d="M 320 0 
+L 1574 2285 
+L 346 4544 
+L 986 4544 
+L 1926 2720 
+L 2867 4544 
+L 3494 4544 
+L 2266 2278 
+L 3520 0 
+L 2880 0 
+L 1914 1850 
+L 947 0 
+L 320 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-26d" d="M 1907 -102 
+Q 1466 -102 1136 58 
+Q 806 218 611 506 
+Q 416 794 384 1171 
+L 960 1210 
+Q 1011 826 1264 630 
+Q 1517 435 1907 435 
+Q 2349 435 2614 707 
+Q 2880 979 2880 1459 
+Q 2880 1779 2765 2012 
+Q 2650 2246 2435 2371 
+Q 2221 2496 1920 2496 
+Q 1651 2496 1404 2365 
+Q 1158 2234 1050 1990 
+L 461 1990 
+L 762 4544 
+L 3181 4544 
+L 3181 4006 
+L 1267 4006 
+L 1062 2330 
+L 960 2432 
+Q 1062 2630 1228 2758 
+Q 1395 2886 1596 2953 
+Q 1798 3021 1997 3021 
+Q 2432 3021 2761 2819 
+Q 3091 2618 3273 2266 
+Q 3456 1914 3456 1459 
+Q 3456 1005 3257 649 
+Q 3059 294 2710 96 
+Q 2362 -102 1907 -102 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-268" d="M 768 653 
+L 2560 3917 
+L 3072 3891 
+L 1280 627 
+L 768 653 
+z
+M 1920 -102 
+Q 1427 -102 1065 186 
+Q 704 474 512 1005 
+Q 320 1536 320 2266 
+Q 320 3002 512 3533 
+Q 704 4064 1065 4355 
+Q 1427 4646 1920 4646 
+Q 2419 4646 2777 4355 
+Q 3136 4064 3328 3533 
+Q 3520 3002 3520 2266 
+Q 3520 1536 3328 1005 
+Q 3136 474 2777 186 
+Q 2419 -102 1920 -102 
+z
+M 1920 435 
+Q 2240 435 2467 659 
+Q 2694 883 2819 1296 
+Q 2944 1709 2944 2266 
+Q 2944 2835 2819 3248 
+Q 2694 3661 2467 3885 
+Q 2240 4109 1920 4109 
+Q 1606 4109 1376 3885 
+Q 1146 3661 1021 3248 
+Q 896 2835 896 2266 
+Q 896 1709 1021 1296 
+Q 1146 883 1376 659 
+Q 1606 435 1920 435 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-26e" d="M 1933 -102 
+Q 1421 -102 1059 131 
+Q 698 365 509 819 
+Q 320 1274 320 1920 
+Q 320 2483 413 2976 
+Q 506 3469 714 3843 
+Q 922 4218 1264 4432 
+Q 1606 4646 2112 4646 
+Q 2515 4646 2796 4512 
+Q 3078 4378 3254 4134 
+Q 3430 3891 3520 3571 
+L 2944 3520 
+Q 2867 3789 2678 3949 
+Q 2490 4109 2112 4109 
+Q 1734 4109 1465 3894 
+Q 1197 3680 1046 3251 
+Q 896 2822 883 2176 
+L 768 2202 
+Q 838 2432 1014 2627 
+Q 1190 2822 1449 2940 
+Q 1709 3059 2035 3059 
+Q 2483 3059 2816 2867 
+Q 3149 2675 3334 2326 
+Q 3520 1978 3520 1510 
+Q 3520 1011 3318 649 
+Q 3117 288 2761 93 
+Q 2406 -102 1933 -102 
+z
+M 1946 435 
+Q 2394 435 2669 720 
+Q 2944 1005 2944 1510 
+Q 2944 1984 2685 2259 
+Q 2426 2534 1997 2534 
+Q 1690 2534 1446 2409 
+Q 1203 2285 1062 2054 
+Q 922 1824 922 1510 
+Q 922 1197 1046 953 
+Q 1171 710 1401 572 
+Q 1632 435 1946 435 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-114" d="M 512 0 
+L 512 474 
+L 1875 474 
+L 1875 3181 
+L 2138 2918 
+L 576 2918 
+L 576 3392 
+L 2413 3392 
+L 2413 474 
+L 3584 474 
+L 3584 0 
+L 2413 0 
+L 1875 0 
+L 512 0 
+z
+M 1824 3923 
+L 1824 4550 
+L 2388 4550 
+L 2388 3923 
+L 1824 3923 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-127" d="M 1747 192 
+L 1747 3635 
+Q 1747 3840 1632 3955 
+Q 1517 4070 1312 4070 
+L 512 4070 
+L 512 4544 
+L 1338 4544 
+Q 1805 4544 2045 4304 
+Q 2285 4064 2285 3597 
+L 2285 192 
+L 1747 192 
+z
+M 384 0 
+L 384 474 
+L 3456 474 
+L 3456 0 
+L 384 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-151" d="M 1984 -77 
+Q 1542 -77 1222 76 
+Q 902 230 720 489 
+Q 538 749 512 1069 
+L 1075 1107 
+Q 1126 794 1353 614 
+Q 1581 435 1984 435 
+Q 2362 435 2570 544 
+Q 2778 653 2778 883 
+Q 2778 1030 2707 1126 
+Q 2637 1222 2445 1289 
+Q 2253 1357 1882 1421 
+Q 1389 1510 1110 1641 
+Q 832 1773 717 1971 
+Q 602 2170 602 2445 
+Q 602 2739 749 2969 
+Q 896 3200 1184 3334 
+Q 1472 3469 1888 3469 
+Q 2310 3469 2595 3318 
+Q 2880 3168 3046 2921 
+Q 3213 2675 3264 2381 
+L 2701 2342 
+Q 2662 2522 2556 2659 
+Q 2451 2797 2281 2877 
+Q 2112 2957 1882 2957 
+Q 1510 2957 1331 2809 
+Q 1152 2662 1152 2445 
+Q 1152 2272 1235 2169 
+Q 1318 2067 1504 2006 
+Q 1690 1946 1997 1894 
+Q 2522 1811 2810 1680 
+Q 3098 1549 3213 1357 
+Q 3328 1165 3328 883 
+Q 3328 582 3152 368 
+Q 2976 154 2672 38 
+Q 2368 -77 1984 -77 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-158" d="M 2419 0 
+Q 1926 0 1683 230 
+Q 1440 461 1440 934 
+L 1440 4186 
+L 1978 4186 
+L 1978 934 
+Q 1978 698 2086 586 
+Q 2195 474 2419 474 
+L 3328 474 
+L 3328 0 
+L 2419 0 
+z
+M 320 2918 
+L 320 3392 
+L 3328 3392 
+L 3328 2918 
+L 320 2918 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-2dc" d="M 1523 1555 
+L 1523 2336 
+L 2317 2336 
+L 2317 1555 
+L 1523 1555 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-58" d="M 1677 512 
+L 819 4032 
+L 870 4032 
+L 870 0 
+L 320 0 
+L 320 4544 
+L 1152 4544 
+L 2048 806 
+L 1792 806 
+L 2688 4544 
+L 3520 4544 
+L 3520 0 
+L 2970 0 
+L 2970 4032 
+L 3021 4032 
+L 2163 512 
+L 1677 512 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-eb" d="M 2131 -77 
+Q 1862 -77 1638 12 
+Q 1414 102 1254 272 
+Q 1094 442 1011 672 
+L 1094 768 
+L 1062 0 
+L 576 0 
+L 576 4544 
+L 1114 4544 
+L 1114 2662 
+L 1056 2797 
+Q 1114 2957 1264 3110 
+Q 1414 3264 1638 3366 
+Q 1862 3469 2131 3469 
+Q 2579 3469 2905 3251 
+Q 3232 3034 3408 2637 
+Q 3584 2240 3584 1696 
+Q 3584 1152 3408 755 
+Q 3232 358 2905 140 
+Q 2579 -77 2131 -77 
+z
+M 2099 435 
+Q 2528 435 2774 774 
+Q 3021 1114 3021 1696 
+Q 3021 2285 2774 2621 
+Q 2528 2957 2112 2957 
+Q 1798 2957 1574 2806 
+Q 1350 2656 1232 2374 
+Q 1114 2093 1114 1696 
+Q 1114 1312 1232 1027 
+Q 1350 742 1571 588 
+Q 1792 435 2099 435 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-42" d="M 512 0 
+L 512 538 
+L 1645 538 
+L 1645 4006 
+L 512 4006 
+L 512 4544 
+L 3328 4544 
+L 3328 4006 
+L 2195 4006 
+L 2195 538 
+L 3328 538 
+L 3328 0 
+L 512 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-14a" d="M 512 -960 
+L 512 3392 
+L 1011 3392 
+L 1024 2624 
+L 947 2662 
+Q 1075 3059 1372 3264 
+Q 1670 3469 2061 3469 
+Q 2566 3469 2889 3219 
+Q 3213 2970 3366 2566 
+Q 3520 2163 3520 1696 
+Q 3520 1229 3366 825 
+Q 3213 422 2889 172 
+Q 2566 -77 2061 -77 
+Q 1798 -77 1571 12 
+Q 1344 102 1187 262 
+Q 1030 422 973 640 
+L 1050 730 
+L 1050 -960 
+L 512 -960 
+z
+M 2010 435 
+Q 2451 435 2704 768 
+Q 2957 1101 2957 1696 
+Q 2957 2291 2704 2624 
+Q 2451 2957 2010 2957 
+Q 1715 2957 1500 2816 
+Q 1286 2675 1168 2393 
+Q 1050 2112 1050 1696 
+Q 1050 1280 1165 998 
+Q 1280 717 1497 576 
+Q 1715 435 2010 435 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-ab" d="M 320 0 
+L 320 550 
+L 2854 4006 
+L 435 4006 
+L 435 4544 
+L 3469 4544 
+L 3469 3994 
+L 934 538 
+L 3520 538 
+L 3520 0 
+L 320 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-d3" d="M 1472 -77 
+Q 1152 -77 896 38 
+Q 640 154 493 362 
+Q 346 570 346 845 
+Q 346 1280 605 1520 
+Q 864 1760 1421 1869 
+L 2560 2099 
+Q 2560 2534 2365 2745 
+Q 2170 2957 1805 2957 
+Q 1453 2957 1254 2800 
+Q 1056 2643 979 2349 
+L 410 2394 
+Q 506 2874 867 3171 
+Q 1229 3469 1805 3469 
+Q 2419 3469 2758 3101 
+Q 3098 2733 3098 2086 
+L 3098 678 
+Q 3098 563 3149 518 
+Q 3200 474 3302 474 
+L 3520 474 
+L 3520 0 
+Q 3482 -6 3398 -9 
+Q 3315 -13 3238 -13 
+Q 3021 -13 2870 57 
+Q 2720 128 2643 285 
+Q 2566 442 2560 691 
+L 2662 691 
+Q 2618 474 2448 298 
+Q 2278 122 2022 22 
+Q 1766 -77 1472 -77 
+z
+M 1523 397 
+Q 1869 397 2099 515 
+Q 2330 634 2445 848 
+Q 2560 1062 2560 1344 
+L 2560 1638 
+L 1523 1434 
+Q 1178 1370 1043 1238 
+Q 909 1107 909 896 
+Q 909 659 1072 528 
+Q 1235 397 1523 397 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-59" d="M 448 0 
+L 448 4544 
+L 1229 4544 
+L 2938 390 
+L 2842 371 
+L 2842 4544 
+L 3392 4544 
+L 3392 0 
+L 2611 0 
+L 902 4154 
+L 998 4179 
+L 998 0 
+L 448 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-24" d="M 576 0 
+L 576 4544 
+L 3341 4544 
+L 3341 4006 
+L 1126 4006 
+L 1126 2541 
+L 3264 2541 
+L 3264 2016 
+L 1126 2016 
+L 1126 538 
+L 3392 538 
+L 3392 0 
+L 576 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-108" d="M 1357 0 
+L 1357 3610 
+Q 1357 4064 1590 4304 
+Q 1824 4544 2304 4544 
+L 3392 4544 
+L 3392 4070 
+L 2304 4070 
+Q 2106 4070 2000 3945 
+Q 1894 3821 1894 3610 
+L 1894 0 
+L 1357 0 
+z
+M 448 2918 
+L 448 3392 
+L 3328 3392 
+L 3328 2918 
+L 448 2918 
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#GeistMono-Regular-7d"/>
+    <use xlink:href="#GeistMono-Regular-133" transform="translate(60 0)"/>
+    <use xlink:href="#GeistMono-Regular-15d" transform="translate(120 0)"/>
+    <use xlink:href="#GeistMono-Regular-14d" transform="translate(180 0)"/>
+    <use xlink:href="#GeistMono-Regular-ec" transform="translate(240 0)"/>
+    <use xlink:href="#GeistMono-Regular-f6" transform="translate(300 0)"/>
+    <use xlink:href="#GeistMono-Regular-2d5" transform="translate(360 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(420 0)"/>
+    <use xlink:href="#GeistMono-Regular-76" transform="translate(480 0)"/>
+    <use xlink:href="#GeistMono-Regular-111" transform="translate(540 0)"/>
+    <use xlink:href="#GeistMono-Regular-133" transform="translate(600 0)"/>
+    <use xlink:href="#GeistMono-Regular-12d" transform="translate(660 0)"/>
+    <use xlink:href="#GeistMono-Regular-109" transform="translate(720 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(780 0)"/>
+    <use xlink:href="#GeistMono-Regular-9c" transform="translate(840 0)"/>
+    <use xlink:href="#GeistMono-Regular-15d" transform="translate(900 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(960 0)"/>
+    <use xlink:href="#GeistMono-Regular-79" transform="translate(1020 0)"/>
+    <use xlink:href="#GeistMono-Regular-84" transform="translate(1080 0)"/>
+    <use xlink:href="#GeistMono-Regular-a2" transform="translate(1140 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(1200 0)"/>
+    <use xlink:href="#GeistMono-Regular-26d" transform="translate(1260 0)"/>
+    <use xlink:href="#GeistMono-Regular-268" transform="translate(1320 0)"/>
+    <use xlink:href="#GeistMono-Regular-26e" transform="translate(1380 0)"/>
+    <use xlink:href="#GeistMono-Regular-268" transform="translate(1440 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(1500 0)"/>
+    <use xlink:href="#GeistMono-Regular-84" transform="translate(1560 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(1620 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(1680 0)"/>
+    <use xlink:href="#GeistMono-Regular-127" transform="translate(1740 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(1800 0)"/>
+    <use xlink:href="#GeistMono-Regular-151" transform="translate(1860 0)"/>
+    <use xlink:href="#GeistMono-Regular-158" transform="translate(1920 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(1980 0)"/>
+    <use xlink:href="#GeistMono-Regular-12d" transform="translate(2040 0)"/>
+    <use xlink:href="#GeistMono-Regular-109" transform="translate(2100 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(2160 0)"/>
+    <use xlink:href="#GeistMono-Regular-2dc" transform="translate(2220 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(2280 0)"/>
+    <use xlink:href="#GeistMono-Regular-9c" transform="translate(2340 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(2400 0)"/>
+    <use xlink:href="#GeistMono-Regular-f6" transform="translate(2460 0)"/>
+    <use xlink:href="#GeistMono-Regular-158" transform="translate(2520 0)"/>
+    <use xlink:href="#GeistMono-Regular-158" transform="translate(2580 0)"/>
+    <use xlink:href="#GeistMono-Regular-f6" transform="translate(2640 0)"/>
+    <use xlink:href="#GeistMono-Regular-127" transform="translate(2700 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(2760 0)"/>
+    <use xlink:href="#GeistMono-Regular-58" transform="translate(2820 0)"/>
+    <use xlink:href="#GeistMono-Regular-133" transform="translate(2880 0)"/>
+    <use xlink:href="#GeistMono-Regular-eb" transform="translate(2940 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(3000 0)"/>
+    <use xlink:href="#GeistMono-Regular-127" transform="translate(3060 0)"/>
+    <use xlink:href="#GeistMono-Regular-f6" transform="translate(3120 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(3180 0)"/>
+    <use xlink:href="#GeistMono-Regular-7d" transform="translate(3240 0)"/>
+    <use xlink:href="#GeistMono-Regular-42" transform="translate(3300 0)"/>
+    <use xlink:href="#GeistMono-Regular-76" transform="translate(3360 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(3420 0)"/>
+    <use xlink:href="#GeistMono-Regular-14a" transform="translate(3480 0)"/>
+    <use xlink:href="#GeistMono-Regular-14d" transform="translate(3540 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(3600 0)"/>
+    <use xlink:href="#GeistMono-Regular-ec" transform="translate(3660 0)"/>
+    <use xlink:href="#GeistMono-Regular-f6" transform="translate(3720 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(3780 0)"/>
+    <use xlink:href="#GeistMono-Regular-127" transform="translate(3840 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(3900 0)"/>
+    <use xlink:href="#GeistMono-Regular-151" transform="translate(3960 0)"/>
+    <use xlink:href="#GeistMono-Regular-158" transform="translate(4020 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(4080 0)"/>
+    <use xlink:href="#GeistMono-Regular-2dc" transform="translate(4140 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(4200 0)"/>
+    <use xlink:href="#GeistMono-Regular-ab" transform="translate(4260 0)"/>
+    <use xlink:href="#GeistMono-Regular-d3" transform="translate(4320 0)"/>
+    <use xlink:href="#GeistMono-Regular-127" transform="translate(4380 0)"/>
+    <use xlink:href="#GeistMono-Regular-133" transform="translate(4440 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(4500 0)"/>
+    <use xlink:href="#GeistMono-Regular-ab" transform="translate(4560 0)"/>
+    <use xlink:href="#GeistMono-Regular-59" transform="translate(4620 0)"/>
+    <use xlink:href="#GeistMono-Regular-7d" transform="translate(4680 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(4740 0)"/>
+    <use xlink:href="#GeistMono-Regular-14a" transform="translate(4800 0)"/>
+    <use xlink:href="#GeistMono-Regular-14d" transform="translate(4860 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(4920 0)"/>
+    <use xlink:href="#GeistMono-Regular-ec" transform="translate(4980 0)"/>
+    <use xlink:href="#GeistMono-Regular-f6" transform="translate(5040 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(5100 0)"/>
+    <use xlink:href="#GeistMono-Regular-158" transform="translate(5160 0)"/>
+    <use xlink:href="#GeistMono-Regular-d3" transform="translate(5220 0)"/>
+    <use xlink:href="#GeistMono-Regular-eb" transform="translate(5280 0)"/>
+    <use xlink:href="#GeistMono-Regular-127" transform="translate(5340 0)"/>
+    <use xlink:href="#GeistMono-Regular-f6" transform="translate(5400 0)"/>
+    <use xlink:href="#GeistMono-Regular-151" transform="translate(5460 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(5520 0)"/>
+    <use xlink:href="#GeistMono-Regular-2dc" transform="translate(5580 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(5640 0)"/>
+    <use xlink:href="#GeistMono-Regular-24" transform="translate(5700 0)"/>
+    <use xlink:href="#GeistMono-Regular-9c" transform="translate(5760 0)"/>
+    <use xlink:href="#GeistMono-Regular-59" transform="translate(5820 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(5880 0)"/>
+    <use xlink:href="#GeistMono-Regular-eb" transform="translate(5940 0)"/>
+    <use xlink:href="#GeistMono-Regular-15d" transform="translate(6000 0)"/>
+    <use xlink:href="#GeistMono-Regular-151" transform="translate(6060 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(6120 0)"/>
+    <use xlink:href="#GeistMono-Regular-12d" transform="translate(6180 0)"/>
+    <use xlink:href="#GeistMono-Regular-f6" transform="translate(6240 0)"/>
+    <use xlink:href="#GeistMono-Regular-151" transform="translate(6300 0)"/>
+    <use xlink:href="#GeistMono-Regular-151" transform="translate(6360 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(6420 0)"/>
+    <use xlink:href="#GeistMono-Regular-158" transform="translate(6480 0)"/>
+    <use xlink:href="#GeistMono-Regular-d3" transform="translate(6540 0)"/>
+    <use xlink:href="#GeistMono-Regular-14d" transform="translate(6600 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(6660 0)"/>
+    <use xlink:href="#GeistMono-Regular-108" transform="translate(6720 0)"/>
+    <use xlink:href="#GeistMono-Regular-108" transform="translate(6780 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(6840 0)"/>
+    <use xlink:href="#GeistMono-Regular-2dc" transform="translate(6900 0)"/>
+   </g>
+   <!-- OpenAI pricing (third-party lists). PRD §18.8 -->
+   <g style="fill: #8a8f9c" transform="translate(69.12 620.047305) scale(0.125 -0.125)">
+    <defs>
+     <path id="GeistMono-Regular-5f" d="M 1920 -102 
+Q 1382 -102 1008 173 
+Q 634 448 438 979 
+Q 243 1510 243 2266 
+Q 243 3034 438 3565 
+Q 634 4096 1008 4371 
+Q 1382 4646 1920 4646 
+Q 2458 4646 2832 4371 
+Q 3206 4096 3401 3565 
+Q 3597 3034 3597 2266 
+Q 3597 1510 3401 979 
+Q 3206 448 2832 173 
+Q 2458 -102 1920 -102 
+z
+M 1920 435 
+Q 2272 435 2518 643 
+Q 2765 851 2893 1260 
+Q 3021 1670 3021 2266 
+Q 3021 2861 2893 3273 
+Q 2765 3686 2518 3897 
+Q 2272 4109 1920 4109 
+Q 1568 4109 1321 3897 
+Q 1075 3686 947 3273 
+Q 819 2861 819 2266 
+Q 819 1670 947 1260 
+Q 1075 851 1321 643 
+Q 1568 435 1920 435 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-1" d="M 166 0 
+L 1549 4544 
+L 2291 4544 
+L 3674 0 
+L 3085 0 
+L 1920 4045 
+L 755 0 
+L 166 0 
+z
+M 864 1293 
+L 1056 1830 
+L 2784 1830 
+L 2976 1293 
+L 864 1293 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-2f1" d="M 2278 -704 
+Q 1779 -262 1507 195 
+Q 1235 653 1129 1117 
+Q 1024 1581 1024 2048 
+Q 1024 2515 1129 2979 
+Q 1235 3443 1507 3900 
+Q 1779 4358 2278 4800 
+L 2816 4800 
+Q 2336 4346 2067 3885 
+Q 1798 3424 1689 2966 
+Q 1581 2509 1581 2048 
+Q 1581 1587 1689 1129 
+Q 1798 672 2067 214 
+Q 2336 -243 2816 -704 
+L 2278 -704 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-f2" d="M 1709 -77 
+Q 1261 -77 934 140 
+Q 608 358 432 755 
+Q 256 1152 256 1696 
+Q 256 2240 432 2637 
+Q 608 3034 934 3251 
+Q 1261 3469 1709 3469 
+Q 1984 3469 2205 3366 
+Q 2426 3264 2576 3110 
+Q 2726 2957 2784 2797 
+L 2726 2662 
+L 2726 4544 
+L 3264 4544 
+L 3264 0 
+L 2778 0 
+L 2746 768 
+L 2829 672 
+Q 2752 442 2589 272 
+Q 2426 102 2202 12 
+Q 1978 -77 1709 -77 
+z
+M 1741 435 
+Q 2048 435 2269 588 
+Q 2490 742 2608 1027 
+Q 2726 1312 2726 1696 
+Q 2726 2093 2608 2374 
+Q 2490 2656 2266 2806 
+Q 2042 2957 1728 2957 
+Q 1312 2957 1065 2621 
+Q 819 2285 819 1696 
+Q 819 1114 1065 774 
+Q 1312 435 1741 435 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-2ec" d="M 768 1613 
+L 768 2118 
+L 3072 2118 
+L 3072 1613 
+L 768 1613 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-177" d="M 870 -960 
+L 870 -486 
+L 1261 -486 
+Q 1440 -486 1526 -432 
+Q 1613 -378 1658 -256 
+L 1779 64 
+L 1594 64 
+L 333 3392 
+L 922 3392 
+L 1952 563 
+L 2918 3392 
+L 3507 3392 
+L 2131 -429 
+Q 2035 -704 1843 -832 
+Q 1651 -960 1312 -960 
+L 870 -960 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-2f2" d="M 1562 -704 
+L 1024 -704 
+Q 1504 -243 1773 214 
+Q 2042 672 2150 1129 
+Q 2259 1587 2259 2048 
+Q 2259 2509 2150 2966 
+Q 2042 3424 1773 3885 
+Q 1504 4346 1024 4800 
+L 1562 4800 
+Q 2061 4358 2333 3900 
+Q 2605 3443 2710 2979 
+Q 2816 2515 2816 2048 
+Q 2816 1581 2710 1117 
+Q 2605 653 2333 195 
+Q 2061 -262 1562 -704 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-2d3" d="M 1523 0 
+L 1523 781 
+L 2317 781 
+L 2317 0 
+L 1523 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-20" d="M 576 0 
+L 576 4544 
+L 1651 4544 
+Q 2240 4544 2678 4278 
+Q 3117 4013 3357 3504 
+Q 3597 2995 3597 2266 
+Q 3597 1536 3357 1030 
+Q 3117 525 2678 262 
+Q 2240 0 1651 0 
+L 576 0 
+z
+M 1126 538 
+L 1619 538 
+Q 2285 538 2653 970 
+Q 3021 1402 3021 2266 
+Q 3021 3130 2653 3568 
+Q 2285 4006 1619 4006 
+L 1126 4006 
+L 1126 538 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-345" d="M 1984 -410 
+Q 1549 -410 1232 -259 
+Q 915 -109 729 150 
+Q 544 410 512 736 
+L 1069 774 
+Q 1120 467 1344 284 
+Q 1568 102 1984 102 
+Q 2278 102 2444 160 
+Q 2611 218 2684 326 
+Q 2758 435 2758 576 
+Q 2758 774 2550 921 
+Q 2342 1069 1837 1171 
+Q 1402 1267 1133 1395 
+Q 864 1523 742 1702 
+Q 621 1882 621 2125 
+Q 621 2406 774 2611 
+Q 928 2816 1222 2944 
+Q 928 3072 781 3254 
+Q 634 3437 634 3661 
+Q 634 3962 800 4182 
+Q 966 4403 1264 4524 
+Q 1562 4646 1952 4646 
+Q 2336 4646 2627 4518 
+Q 2918 4390 3097 4147 
+Q 3277 3904 3322 3558 
+L 2771 3520 
+Q 2720 3814 2489 3974 
+Q 2259 4134 1894 4134 
+Q 1696 4134 1539 4076 
+Q 1382 4019 1292 3916 
+Q 1203 3814 1203 3686 
+Q 1203 3488 1372 3376 
+Q 1542 3264 2016 3136 
+Q 2515 3008 2800 2867 
+Q 3085 2726 3206 2537 
+Q 3328 2349 3328 2061 
+Q 3328 1805 3193 1629 
+Q 3059 1453 2790 1344 
+Q 3059 1216 3187 1024 
+Q 3315 832 3315 538 
+Q 3315 262 3142 48 
+Q 2970 -166 2672 -288 
+Q 2374 -410 1984 -410 
+z
+M 2170 1587 
+Q 2470 1587 2646 1724 
+Q 2822 1862 2822 2086 
+Q 2822 2298 2662 2429 
+Q 2502 2560 2262 2621 
+Q 2022 2682 1779 2682 
+Q 1606 2682 1459 2614 
+Q 1312 2547 1222 2435 
+Q 1133 2323 1133 2182 
+Q 1133 2042 1225 1904 
+Q 1318 1766 1545 1676 
+Q 1773 1587 2170 1587 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-269" d="M 1818 0 
+L 1818 3366 
+L 627 3366 
+L 627 3840 
+L 1242 3840 
+Q 1485 3840 1635 3910 
+Q 1786 3981 1853 4134 
+Q 1920 4288 1920 4544 
+L 2368 4544 
+L 2368 0 
+L 1818 0 
+z
+M 384 0 
+L 384 538 
+L 3456 538 
+L 3456 0 
+L 384 0 
+z
+" transform="scale(0.015625)"/>
+     <path id="GeistMono-Regular-270" d="M 1920 -102 
+Q 1472 -102 1107 51 
+Q 742 205 531 505 
+Q 320 806 320 1248 
+Q 320 1741 614 2064 
+Q 909 2387 1395 2502 
+L 1408 2374 
+Q 1018 2483 778 2729 
+Q 538 2976 538 3398 
+Q 538 3757 717 4038 
+Q 896 4320 1206 4483 
+Q 1517 4646 1920 4646 
+Q 2323 4646 2636 4483 
+Q 2950 4320 3126 4038 
+Q 3302 3757 3302 3398 
+Q 3302 2976 3065 2729 
+Q 2829 2483 2432 2374 
+L 2445 2502 
+Q 2938 2387 3229 2064 
+Q 3520 1741 3520 1248 
+Q 3520 806 3309 505 
+Q 3098 205 2736 51 
+Q 2374 -102 1920 -102 
+z
+M 1920 435 
+Q 2368 435 2656 643 
+Q 2944 851 2944 1280 
+Q 2944 1677 2688 1917 
+Q 2432 2157 1920 2157 
+Q 1414 2157 1155 1917 
+Q 896 1677 896 1280 
+Q 896 851 1184 643 
+Q 1472 435 1920 435 
+z
+M 1920 2669 
+Q 2285 2669 2505 2851 
+Q 2726 3034 2726 3398 
+Q 2726 3725 2512 3917 
+Q 2298 4109 1920 4109 
+Q 1549 4109 1331 3917 
+Q 1114 3725 1114 3398 
+Q 1114 3034 1334 2851 
+Q 1555 2669 1920 2669 
+z
+" transform="scale(0.015625)"/>
+    </defs>
+    <use xlink:href="#GeistMono-Regular-5f"/>
+    <use xlink:href="#GeistMono-Regular-14a" transform="translate(60 0)"/>
+    <use xlink:href="#GeistMono-Regular-f6" transform="translate(120 0)"/>
+    <use xlink:href="#GeistMono-Regular-12d" transform="translate(180 0)"/>
+    <use xlink:href="#GeistMono-Regular-1" transform="translate(240 0)"/>
+    <use xlink:href="#GeistMono-Regular-42" transform="translate(300 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(360 0)"/>
+    <use xlink:href="#GeistMono-Regular-14a" transform="translate(420 0)"/>
+    <use xlink:href="#GeistMono-Regular-14d" transform="translate(480 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(540 0)"/>
+    <use xlink:href="#GeistMono-Regular-ec" transform="translate(600 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(660 0)"/>
+    <use xlink:href="#GeistMono-Regular-12d" transform="translate(720 0)"/>
+    <use xlink:href="#GeistMono-Regular-109" transform="translate(780 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(840 0)"/>
+    <use xlink:href="#GeistMono-Regular-2f1" transform="translate(900 0)"/>
+    <use xlink:href="#GeistMono-Regular-158" transform="translate(960 0)"/>
+    <use xlink:href="#GeistMono-Regular-111" transform="translate(1020 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(1080 0)"/>
+    <use xlink:href="#GeistMono-Regular-14d" transform="translate(1140 0)"/>
+    <use xlink:href="#GeistMono-Regular-f2" transform="translate(1200 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ec" transform="translate(1260 0)"/>
+    <use xlink:href="#GeistMono-Regular-14a" transform="translate(1320 0)"/>
+    <use xlink:href="#GeistMono-Regular-d3" transform="translate(1380 0)"/>
+    <use xlink:href="#GeistMono-Regular-14d" transform="translate(1440 0)"/>
+    <use xlink:href="#GeistMono-Regular-158" transform="translate(1500 0)"/>
+    <use xlink:href="#GeistMono-Regular-177" transform="translate(1560 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(1620 0)"/>
+    <use xlink:href="#GeistMono-Regular-127" transform="translate(1680 0)"/>
+    <use xlink:href="#GeistMono-Regular-114" transform="translate(1740 0)"/>
+    <use xlink:href="#GeistMono-Regular-151" transform="translate(1800 0)"/>
+    <use xlink:href="#GeistMono-Regular-158" transform="translate(1860 0)"/>
+    <use xlink:href="#GeistMono-Regular-151" transform="translate(1920 0)"/>
+    <use xlink:href="#GeistMono-Regular-2f2" transform="translate(1980 0)"/>
+    <use xlink:href="#GeistMono-Regular-2d3" transform="translate(2040 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(2100 0)"/>
+    <use xlink:href="#GeistMono-Regular-76" transform="translate(2160 0)"/>
+    <use xlink:href="#GeistMono-Regular-79" transform="translate(2220 0)"/>
+    <use xlink:href="#GeistMono-Regular-20" transform="translate(2280 0)"/>
+    <use xlink:href="#GeistMono-Regular-2ba" transform="translate(2340 0)"/>
+    <use xlink:href="#GeistMono-Regular-345" transform="translate(2400 0)"/>
+    <use xlink:href="#GeistMono-Regular-269" transform="translate(2460 0)"/>
+    <use xlink:href="#GeistMono-Regular-270" transform="translate(2520 0)"/>
+    <use xlink:href="#GeistMono-Regular-2d3" transform="translate(2580 0)"/>
+    <use xlink:href="#GeistMono-Regular-270" transform="translate(2640 0)"/>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p2679861c9f">
+   <rect x="69.12" y="285.12" width="1013.76" height="103.68"/>
+  </clipPath>
+ </defs>
+</svg>

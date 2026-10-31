@@ -1,0 +1,104 @@
+{
+  "A_main": {
+    "call": {
+      "en": "Tomorrow after five, please. I'm out until late, so leave it with security in Tower B. Or call my wife.",
+      "vi": "Mai sau năm giờ chiều nha em. Chị đi làm về trễ, em gửi bảo vệ tòa B giùm chị, không thì gọi vợ anh."
+    },
+    "gold": {
+      "time_window": {
+        "date": "2026-11-01",
+        "from": "17:00",
+        "to": "20:00"
+      },
+      "drop_location": {
+        "type": "security_desk",
+        "note": "Tower B security"
+      },
+      "alt_receiver": {
+        "relation": "wife"
+      },
+      "address_correction": null,
+      "cannot_receive": null,
+      "opt_out": false
+    }
+  },
+  "B_memo": {
+    "memo": {
+      "en": "She wants tomorrow before ten, leave it at Tower A reception.",
+      "vi": "Khách hẹn sáng mai trước mười giờ, gửi lễ tân tòa A."
+    },
+    "gold": {
+      "time_window": {
+        "date": "2026-11-01",
+        "from": "08:00",
+        "to": "10:00"
+      },
+      "drop_location": {
+        "type": "reception",
+        "note": "Tower A reception"
+      },
+      "alt_receiver": null,
+      "address_correction": null,
+      "cannot_receive": null,
+      "opt_out": false
+    }
+  },
+  "A_lowconf": {
+    "call": {
+      "en": "Maybe in the afternoon… or tonight, anywhere is fine I guess.",
+      "vi": "Chắc buổi chiều… hoặc tối, để đâu cũng được em."
+    },
+    "gold": {
+      "time_window": null,
+      "drop_location": null,
+      "alt_receiver": null,
+      "address_correction": null,
+      "cannot_receive": null,
+      "opt_out": false
+    }
+  },
+  "A_midway": {
+    "chat": {
+      "en": "after 5 tomorrow",
+      "vi": "mai sau 5h nha"
+    },
+    "gold": {
+      "time_window": {
+        "date": "2026-11-01",
+        "from": "17:00",
+        "to": "20:00"
+      },
+      "drop_location": null,
+      "alt_receiver": null,
+      "address_correction": null,
+      "cannot_receive": null,
+      "opt_out": false
+    }
+  },
+  "CANT_TODAY": {
+    "chat": {
+      "en": "Out of town until Monday",
+      "vi": "Em đi công tác tới thứ hai mới về"
+    },
+    "gold": {
+      "time_window": null,
+      "drop_location": null,
+      "alt_receiver": null,
+      "address_correction": null,
+      "cannot_receive": {
+        "reason": "Out of town until Monday"
+      },
+      "opt_out": false
+    }
+  },
+  "agent_lines": {
+    "window_question": "Hi {first_name}, your {item} arrives today. Pick at least two windows that work, or tell us you can't receive today.",
+    "rescue_chat": "We just missed you. When and where should we come back?",
+    "call_greeting": "Hello, this is the automated delivery assistant calling about your {item}. This call is recorded so we get the delivery right — is that okay?",
+    "call_ask": "Our courier missed you this morning. Tomorrow we have 8 to 10, 10 to 12, 2 to 5, or 5 to 8 in the evening. Which works for you?",
+    "call_confirm": "Confirming: {window}, {drop}{alt}. Is that right?",
+    "confirm_in_chat": "Just to be sure — which works better: {w1} or {w2}?",
+    "confirmation": "Got it: {window}, {drop}. Reply “change” anytime.",
+    "opt_out_ack": "Understood. We won't contact you again about this order."
+  }
+}
