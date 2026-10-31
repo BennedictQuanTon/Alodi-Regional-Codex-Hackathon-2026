@@ -89,7 +89,7 @@ Labels:
 
 | Figure | Meaning | Type | Source |
 | --- | --- | --- | --- |
-| **40,000 VND** | Maximum return-shipping fee the seller pays per failed Shopee delivery (20,000 VND for express) | Sourced | Shopee Return & Refund Policy §7.1 (11 Mar 2026); VTV, 25 Mar 2025 |
+| **40,000 VND** | Maximum return-shipping fee the seller pays per failed Shopee delivery (20,000 VND for express) | Sourced | Shopee Return & Refund Policy §7.1; GHN (cap since 1 Apr 2025) |
 | **8–12%** | Orders refused nationwide; up to 20% remote; 25–30% in sale season; 10–15% today (expert) | Sourced | VECOM and Tran Anh Tung (UEF), Nguoi Lao Dong, 19 Jul 2025 |
 | **0** | Delivery windows a Shopee buyer can choose | Sourced | Shopee Help Center 79559 |
 | **2–3 contacts, ≤ 5 days** | Shopee’s redelivery frame (Alodi runs inside it) | Sourced | Shopee Help Center 79569 |
@@ -187,8 +187,8 @@ Re-render after the real survey arrives: `python3 charts/make_charts.py` (needs 
 Cite in plain text (“Source: …”), never with numbered markers.
 
 **Problem**
-- Shopee Return & Refund Policy §7.1–7.2 (effective 11 Mar 2026): https://help.shopee.vn/portal/4/article/77251
-- VTV, 25 Mar 2025, Shopee fee packages: https://vtv.vn/kinh-te/shopee-ha-goi-dich-vu-phi-moi-sau-yeu-cau-bao-cao-cua-bo-cong-thuong-20250325160554152.htm
+- Shopee Return & Refund Policy §7.1–7.2 (checked 31 Oct 2026): https://help.shopee.vn/portal/4/article/77251
+- GHN, who pays for Shopee returns (₫40,000 cap since 1 Apr 2025): https://ghn.vn/blogs/tip-ban-hang/tra-hang-shopee-ai-chiu-phi
 - Shopee Help Center 79559 (no delivery-time choice): https://help.shopee.vn/portal/4/article/79559
 - Nguoi Lao Dong, 19 Jul 2025 (VECOM 8–12%; UEF 10–15%, 25–30%): https://tuoitre.vn/nld/nhuc-nhoi-nan-bom-hang-19625071822023801.htm
 - Shopee Help Center 79196 (COD disabled after 3 failures): https://help.shopee.vn/portal/4/article/79196
