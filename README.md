@@ -28,6 +28,19 @@ people.
 
 ## Run
 
+The local backend foundation uses Python 3.12 and runs without AI keys:
+
+```bash
+uv sync --frozen --python 3.12
+uv run --frozen --python 3.12 alodi-api  # http://localhost:8000/health
+```
+
+First demo startup migrates SQLite and seeds 4,000 fictional orders on 20 routes
+with seven scenario fixtures. Existing data is retained on restart. See
+[`api/README.md`](api/README.md) for Windows startup, configuration, database
+commands and checks. Workflow writes, WebSockets and AI adapters are subsequent
+increments; the frontend below still uses its scripted demo engine.
+
 ```bash
 cd web
 npm install
@@ -51,6 +64,8 @@ savings are *projected*.
 ```
 web/                  Next.js app (landing, demo, dashboard)
   src/lib/demo/       scenario engine: state machine, fast-forward clock, scenarios
+api/                  FastAPI backend foundation, migrations and tests
+scripts/              local startup helpers (Windows PowerShell)
 prep/
   01-pitch/           live demo plan, pitch script, slides, charts, demo film
   02-technical/       PRD, architecture and flow diagrams, cost model, mock data pack
