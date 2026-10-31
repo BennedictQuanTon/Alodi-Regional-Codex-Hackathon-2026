@@ -15,11 +15,11 @@ const W = 1100;
 const H = 440;
 const HUB = { x: W / 2, y: H / 2, w: 300, h: 92 };
 const WORKERS: Worker[] = [
-  { x: 170, y: 70, name: "Window", tool: "ask_window", model: "gpt-oss-20b" },
-  { x: 550, y: 52, name: "Rescue chat", tool: "send_chat", model: "gpt-oss-20b" },
-  { x: 930, y: 70, name: "Voice", tool: "ai_call", model: "gpt-4o-mini-tts" },
-  { x: 170, y: 370, name: "Extractor", tool: "extract", model: "Structured Outputs · strict JSON" },
-  { x: 550, y: 388, name: "Fallback", tool: "responses", model: "gpt-5-mini · masked text" },
+  { x: 170, y: 70, name: "Triage", tool: "decide", model: "Decisions API · GPT-6 Luna" },
+  { x: 550, y: 52, name: "Voice", tool: "live call", model: "GPT-Live-1" },
+  { x: 930, y: 70, name: "Rescue chat", tool: "send_chat", model: "GPT-5.6 Terra" },
+  { x: 170, y: 370, name: "Window", tool: "ask_window", model: "Decisions API · choice" },
+  { x: 550, y: 388, name: "Extractor", tool: "extract", model: "Terra · Structured Outputs" },
   { x: 930, y: 370, name: "Guardrails", tool: "guard", model: "code + SDK guardrails" },
 ];
 const NODE = { w: 232, h: 70 };
@@ -94,7 +94,7 @@ function AgentMesh() {
           Alodi Agent
         </text>
         <text x={HUB.x - HUB.w / 2 + 74} y={HUB.y + 18} fontSize="12" fill="rgba(255,255,255,0.6)" fontFamily="var(--font-mono)">
-          Agents SDK · gpt-oss-20b
+          Agents SDK · GPT-5.6 Terra
         </text>
       </motion.g>
     </svg>
@@ -102,8 +102,8 @@ function AgentMesh() {
 }
 
 const MESH_FOOT = [
-  ["Distributed", "each worker is a task on a Temporal queue; a restart never loses a case"],
-  ["Local-first", "gpt-oss-20b on the area server; the cloud sees masked text only"],
+  ["Triage first", "GPT-6 Luna answers routine questions through the Decisions API; only real cases reach Terra"],
+  ["Private by default", "Text to the cloud is masked; calls run on GPT-Live-1 after consent; gpt-oss-20b stays local as fallback"],
   ["Gated", "OpenAI Evals on the held-out set before any prompt or model change"],
 ];
 
@@ -178,7 +178,7 @@ function OpenAICore() {
       </div>
       <ul className="grid gap-2 p-4 md:hidden">
         <li className="flex items-center gap-2 rounded-[14px] bg-[var(--oa-ink)] px-4 py-3 text-white">
-          <TechIcon icon="siOpenai" size={16} mono /> Alodi Agent · Agents SDK · gpt-oss-20b
+          <TechIcon icon="siOpenai" size={16} mono /> Alodi Agent · Agents SDK · GPT-5.6 Terra
         </li>
         {WORKERS.map((w) => (
           <li key={w.name} className="flex items-center justify-between gap-3 rounded-[14px] border border-[var(--oa-line)] px-4 py-3 text-[14px]">
@@ -252,7 +252,7 @@ export function Stack() {
           </div>
           <Reveal delay={0.1}>
             <p className="max-w-[440px] text-[18px] leading-[1.4] text-graphite lg:ml-auto">
-              The agent runs on OpenAI models; the team builds and reviews it with Codex.
+              GPT-Live-1 talks to the buyer, GPT-6 Luna triages through the Decisions API, GPT-5.6 Terra orchestrates. Codex builds it.
             </p>
           </Reveal>
         </div>

@@ -2,7 +2,7 @@
 
 Compares two ways to run Alodi in production:
   * local_first  — one on-prem server per hub (one-time purchase), open-weight models run locally
-                   (OpenAI gpt-oss-20b, VinAI PhoWhisper, Piper TTS); OpenAI API only as a fallback;
+                   (OpenAI gpt-oss-20b as a fallback, VinAI PhoWhisper); OpenAI GPT-Live-1, Decisions API (GPT-6 Luna) and GPT-5.6 Terra in the cloud;
                    AWS only for encrypted off-site backup.
   * aws_managed  — the earlier design: dedicated Multi-AZ stack on AWS + Bedrock/Transcribe/Connect.
 
@@ -39,7 +39,7 @@ SCENARIOS = {   # projected. Shipsy (vendor): industry rescue 20–30%, best-in-
 # ------------------------------------------------------------------ usage per day (mock-data/expected-day-summary.json)
 BILLED_CALL_MIN = 134         # ≤ 134 billed minutes (67 answered calls × 2 min)
 LLM_TOKENS_IN, LLM_TOKENS_OUT = 6.0e6, 0.72e6
-DYNAMIC_TTS_MIN = 52
+TERRA_SHARE = 0.20            # estimate: share of LLM traffic the Decisions API escalates to GPT-5.6 Terra
 ZNS_PER_DAY = {"risky_only": 1_250, "all_orders": 6_110}   # 547 risky orders (high COD / failed before) + replies + 484 rescue messages
 
 # ------------------------------------------------------------------ local-first: one-time hardware per hub (listed-price, VN retail)
@@ -52,16 +52,22 @@ HARDWARE = {
 
 # ------------------------------------------------------------------ local-first: monthly running cost (VND)
 def local_first_month(msg_policy: str) -> dict:
-    llm_fallback_usd = 0.10 * (LLM_TOKENS_IN / 1e6 * 0.25 + LLM_TOKENS_OUT / 1e6 * 2.00) * DAYS  # 10% of requests → gpt-5-mini
-    tts_usd = DYNAMIC_TTS_MIN * 0.015 * DAYS                                                     # gpt-4o-mini-tts for dynamic lines
+    # OpenAI stack (listed prices, developers.openai.com, checked 31 Oct 2026):
+    #   Decisions API on GPT-6 Luna triages every message: $0.10 per 1M input tokens, no output charge.
+    #   GPT-5.6 Terra orchestrates the cases triage escalates (TERRA_SHARE of LLM traffic): $2 / $12 per 1M tokens.
+    #   GPT-Live-1 runs the AI calls: $0.05 per session minute; its backend calls are the Terra share above.
+    luna_usd = LLM_TOKENS_IN / 1e6 * 0.10 * DAYS
+    terra_usd = TERRA_SHARE * (LLM_TOKENS_IN / 1e6 * 2.00 + LLM_TOKENS_OUT / 1e6 * 12.00) * DAYS
+    live_usd = BILLED_CALL_MIN * 0.05 * DAYS
     sip = BILLED_CALL_MIN * DAYS * 780 + 50_000                    # Viettel Mobile SIP: ₫780/min off-net, ₫50k/month per line
     zns = ZNS_PER_DAY[msg_policy] * DAYS * 300                     # ZNS transactional template ≈ ₫300 (oazns.vn, worldfone)
     kwh = 0.35 * 24 * DAYS * 1.08                                  # ~350 W average + UPS loss
     power = kwh * 3_000                                            # EVN business tariff ≈ ₫2,666 normal / ₫5,025 peak → ₫3,000 blended
     return {
-        "OpenAI API fallback (10% of LLM calls, gpt-5-mini)": llm_fallback_usd * FX,
-        "OpenAI TTS for dynamic phrases (gpt-4o-mini-tts)": tts_usd * FX,
-        "Local models: gpt-oss-20b, PhoWhisper, Piper TTS": 0,
+        "Decisions API on GPT-6 Luna (triage of every message)": luna_usd * FX,
+        "GPT-5.6 Terra (orchestration, ~20% of LLM traffic after triage)": terra_usd * FX,
+        "GPT-Live-1 (AI calls, $0.05 a minute)": live_usd * FX,
+        "Local models: gpt-oss-20b fallback, PhoWhisper for memos": 0,
         "Viettel Mobile SIP trunk (calls + line)": sip,
         f"Zalo ZNS ({msg_policy.replace('_', ' ')})": zns,
         "Electricity (≈ 272 kWh)": power,

@@ -66,7 +66,7 @@ INPUTS = [
     ("Orders a day, one area", f"{cm.ORDERS_PER_DAY:,}", "Estimate", "Team sizing: 20 couriers × 200 stops"),
     ("First-attempt failure rate", f"{cm.FAIL_RATE:.0%}", "Sourced", "VECOM 8–12% nationwide, low end (Nguoi Lao Dong, 19 Jul 2025)"),
     ("Rescued today (baseline)", f"{cm.BASELINE_RESCUE:.0%}", "Vendor", "Shipsy: industry rescue rate 20–30%"),
-    ("Return fee per failed order", f"₫{cm.RETURN_FEE:,}", "Sourced", "Shopee Return & Refund Policy §7.1, effective 11 Mar 2026"),
+    ("Return fee per failed order", f"₫{cm.RETURN_FEE:,}", "Sourced", "Shopee Return & Refund Policy §7.1 (seller pays on failed orders); cap ₫40,000 since 1 Apr 2025, GHN"),
     ("Extra attempts per failed order", f"{cm.EXTRA_ATTEMPTS}", "Estimate", "Inside Shopee’s 2–3 contact attempts (Help Center 79569)"),
     ("Courier pay per attempt", "₫6,000–8,000", "Sourced", "GHN blog, courier earnings per order"),
     ("Courier income a month", "₫8–15M", "Sourced", "Glints Vietnam, full-time courier income"),
@@ -218,7 +218,8 @@ sources = page(8, "Simulation and sources", f"""
 <p class="sub">Rates are team assumptions for testing the product, not measurements. The landing page’s problem figures do not use this simulation; they use the cost model above.</p>
 <div class="eyebrow" style="margin-top:9mm">07 · Sources</div>
 <ul class="srcs">
-<li>Shopee Return & Refund Policy §7.1–7.2, effective 11 Mar 2026 — help.shopee.vn/portal/4/article/77251</li>
+<li>Shopee Return & Refund Policy §7.1–7.2 (checked 31 Oct 2026) — help.shopee.vn/portal/4/article/77251</li>
+<li>GHN, who pays for Shopee returns — ₫40,000 cap per order since 1 Apr 2025 (₫20,000 express) — ghn.vn/blogs/tip-ban-hang/tra-hang-shopee-ai-chiu-phi</li>
 <li>VECOM and Tran Anh Tung (UEF), Nguoi Lao Dong, 19 Jul 2025 — refusal rates 8–12%, 25–30% in sale season</li>
 <li>Shopee Help Center, articles 79559 (no delivery time choice), 79569 (2–3 contacts, 5 days), 79196 (COD lock)</li>
 <li>GHN blog — courier earnings ₫6,000–8,000 per order</li>

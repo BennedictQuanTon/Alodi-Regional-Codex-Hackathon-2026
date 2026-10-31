@@ -23,7 +23,7 @@ const INPUTS: Node[] = [
   { title: "Order system", sub: "today’s orders, COD", logo: "/logos/couriers/spx.svg" },
   { title: "Courier tap", sub: "No answer · Rescheduled · Refused", mark: "dot" },
   { title: "Buyer chat", sub: "quick replies, free text", logos: ["siShopee", "siZalo"] },
-  { title: "AI call", sub: "branded SIP line", logo: "siAsterisk" },
+  { title: "AI call", sub: "GPT-Live-1 over a branded SIP line", logo: "siAsterisk" },
 ];
 
 const OUTPUTS: Node[] = [
@@ -33,10 +33,10 @@ const OUTPUTS: Node[] = [
 ];
 
 const CORE = [
-  { icon: "siOpenai", title: "Alodi Agent", sub: "Agents SDK · one run per order" },
-  { mark: "square" as const, title: "Policy guard", sub: "quiet hours · caps · 0.85 · consent" },
+  { icon: "siOpenai", title: "Alodi Agent", sub: "GPT-5.6 Terra · Agents SDK, one run per order" },
+  { icon: "siOpenai", title: "Triage", sub: "Decisions API on GPT-6 Luna" },
+  { mark: "square" as const, title: "Policy guard", sub: "quiet hours · caps · 0.85 · masks PII" },
   { icon: "siTemporal", title: "Scheduler", sub: "60′ and +2 h timers, retries" },
-  { mark: "dot" as const, title: "Model gateway", sub: "masks PII, routes local → cloud" },
 ];
 
 const STORES = [
@@ -46,10 +46,10 @@ const STORES = [
 ];
 
 const MODELS = [
-  { icon: "siOpenai", name: "gpt-oss-20b", sub: "decisions + JSON, on the area server" },
-  { icon: "/logos/vinai-mark.png", name: "PhoWhisper", sub: "Vietnamese speech to text" },
-  { icon: "siOpenai", name: "gpt-4o-mini-tts", sub: "dynamic voice lines" },
-  { icon: "siOpenai", name: "Responses API", sub: "masked fallback, ~10% of requests" },
+  { icon: "siOpenai", name: "GPT-Live-1", sub: "real-time voice calls with the buyer" },
+  { icon: "siOpenai", name: "Decisions API", sub: "GPT-6 Luna triages every message" },
+  { icon: "siOpenai", name: "GPT-5.6 Terra", sub: "orchestrates buyer, courier and policy" },
+  { icon: "siOpenai", name: "gpt-oss-20b", sub: "local fallback · PhoWhisper for memos" },
 ];
 
 function Logo({ n }: { n: Node }) {
@@ -151,7 +151,7 @@ function Core() {
             {s.name}
           </span>
         ))}
-        <span className="ml-auto text-parchment/40">PII stays in</span>
+        <span className="ml-auto text-parchment/40">masked text out</span>
       </div>
     </motion.div>
   );
@@ -192,8 +192,8 @@ export function ArchitectureDiagram() {
       <div className="mx-auto hidden h-8 w-px bg-ash lg:block" />
       <div className="mt-3 overflow-hidden rounded-[20px] border border-ash lg:mt-0">
         <div className="flex items-center justify-between border-b border-ash bg-parchment px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-smoke">
-          <span>Models · local first</span>
-          <span className="normal-case tracking-normal">the cloud only sees masked text</span>
+          <span>Models · OpenAI</span>
+          <span className="normal-case tracking-normal">masked text to the cloud · calls after consent</span>
         </div>
         <ul className="grid bg-paper sm:grid-cols-2 xl:grid-cols-4">
           {MODELS.map((m, i) => (

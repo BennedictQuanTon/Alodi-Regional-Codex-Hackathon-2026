@@ -6,13 +6,13 @@ export type Source = { label: string; detail: string; url: string };
 export const SOURCES: Source[] = [
   {
     label: "Shopee Return & Refund Policy §7.1–7.2",
-    detail: "Effective 11 Mar 2026. Sellers pay up to 40,000 VND return shipping per failed order; exception when the carrier is at fault.",
+    detail: "Sellers pay return shipping on failed-delivery orders; no fee when the carrier is at fault. Checked 31 Oct 2026.",
     url: "https://help.shopee.vn/portal/4/article/77251",
   },
   {
-    label: "VTV, 25 Mar 2025",
-    detail: "Shopee revises its new fee packages after a Ministry of Industry and Trade request (40,000 / 20,000 VND express).",
-    url: "https://vtv.vn/kinh-te/shopee-ha-goi-dich-vu-phi-moi-sau-yeu-cau-bao-cao-cua-bo-cong-thuong-20250325160554152.htm",
+    label: "GHN, Who pays for Shopee returns",
+    detail: "Since 1 Apr 2025 the seller pays return shipping up to 40,000 VND per order (20,000 VND for express); Shopee covers the rest.",
+    url: "https://ghn.vn/blogs/tip-ban-hang/tra-hang-shopee-ai-chiu-phi",
   },
   {
     label: "Shopee Help Center, article 79559",
@@ -105,7 +105,7 @@ export const TLDR = {
     { k: "Starts with", v: "One tap: No answer · Rescheduled · Refused" },
     { k: "Does", v: "Chats now, calls if silent, extracts a context card" },
     { k: "Never", v: "Labels or returns an order without a person" },
-    { k: "Built on", v: "OpenAI Agents SDK and gpt-oss-20b, shipped with Codex" },
+    { k: "Built on", v: "GPT-Live-1, the Decisions API on GPT-6 Luna and GPT-5.6 Terra; built with Codex" },
   ],
 };
 
@@ -116,7 +116,7 @@ export const TLDR = {
 export const DEMO_VIDEO = { src: "", poster: "", length: "2:00", caption: "The full rescue, from the courier’s tap to the second drop" };
 
 export const HERO_STATS = [
-  { value: "₫40,000", text: "return fee the seller pays on each failed order", source: "Shopee Return & Refund Policy §7.1, Mar 2026" },
+  { value: "₫40,000", text: "return fee the seller pays on each failed order", source: "Shopee policy §7.1; ₫40,000 cap since Apr 2025 (GHN)" },
   { value: "8–12%", text: "of orders refused at the door, nationwide", source: "VECOM, Nguoi Lao Dong, 19 Jul 2025" },
   { value: "0", text: "delivery windows a Shopee buyer can choose", source: "Shopee Help Center, article 79559" },
   { value: "₫473M", text: "lost a month in one area of 4,000 orders a day", source: "Team cost model, PRD §18.8 (modelled)" },
@@ -261,9 +261,13 @@ export const TECH_DEMO: Tech[] = [
   { name: "Docker", note: "Compose, one VM", icon: "siDocker" },
 ];
 
-// Production, local-first per area (PRD §18.8.2): one GPU workstation, OpenAI only as a masked fallback.
+// Production per area (PRD §16.7, §18.8.2): OpenAI GPT-Live-1, Decisions API (GPT-6 Luna) and GPT-5.6 Terra,
+// with one local workstation for the gpt-oss-20b fallback, PhoWhisper memos and the data stores.
 export const TECH_PROD: Tech[] = [
-  { name: "gpt-oss-20b", note: "OpenAI open-weight, on the area server", icon: "siOpenai" },
+  { name: "GPT-Live-1", note: "Real-time voice calls", icon: "siOpenai" },
+  { name: "Decisions API", note: "Triage on GPT-6 Luna", icon: "siOpenai" },
+  { name: "GPT-5.6 Terra", note: "Orchestration", icon: "siOpenai" },
+  { name: "gpt-oss-20b", note: "Local fallback", icon: "siOpenai" },
   { name: "Ollama / vLLM", note: "Model serving", icon: "siOllama" },
   { name: "PhoWhisper", note: "Vietnamese ASR", icon: "/logos/vinai-mark.png" },
   { name: "Piper TTS", note: "Dynamic voice lines", mono: "Pi" },
@@ -370,7 +374,7 @@ export const FAQ = [
   },
   {
     q: "How is personal data handled?",
-    a: "Raw audio and transcripts stay inside a trusted zone with a deletion window. Only extracted JSON leaves it. Phone numbers and addresses are masked before any cloud model call.",
+    a: "AI calls run on GPT-Live-1 only after the recording consent in the opening line. Text sent to GPT-5.6 Terra and the Decisions API is masked first: no phone numbers, names or house numbers. Raw audio and transcripts are kept 30 days, encrypted.",
   },
   {
     q: "Do you need to fine-tune a model?",

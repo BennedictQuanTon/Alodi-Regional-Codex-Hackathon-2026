@@ -42,7 +42,7 @@ Same family as the demo UI and the film, so slides, charts and video read as one
 | Source line | Geist Mono | 18 px | 400 |
 | Wordmark | Be Vietnam Pro ExtraBold (outlined SVG from `04-brand/`) | — | — |
 
-Money is written **“194M VND”**, because Geist has no “₫” glyph.
+Money is written **“186M VND”**, because Geist has no “₫” glyph.
 
 ### 1.4 Rules
 
@@ -63,8 +63,8 @@ Money is written **“194M VND”**, because Geist has no “₫” glyph.
 | S5 | **One area, one month** | Day | Chart cols 1–8, hero number cols 9–12 | **473M VND** lost a month (≈ 5.7B VND a year) · 20 couriers · 4,000 orders a day | `charts/02-problem-monthly-loss-light` | “Modelled: Shopee §7.1, VECOM 8%, Shipsy 25% (vendor), GHN, Glints — PRD §18.8” |
 | S6 | **Alodi in one picture** | Day | Flow left → right: tap → chat → call → extract → card, with the human lane below | “One tap. One conversation. One card for the next courier.” | Simplified `02-technical/diagrams/alodi-flow.png` | — |
 | S7 | **Live demo** | Night | Four labelled frames (01 courier, 02 ops, 03 buyer, 04 control) | Switch to the devices | Screens from the build | — |
-| S8 | **OpenAI at the core** | Night | System diagram, hairlines; OpenAI logo once | gpt-oss-20b on the area server · Structured Outputs · OpenAI TTS · API fallback for the hard 10% · policy guard in code | PRD §18.8.2 diagram, restyled | “PRD §16, §18.8” |
-| S9 | **What it delivers** | Day | Before/after chart cols 1–8; three tiles below or right | **−194M VND a month (41%)** · ≈ 2.3B VND a year · costs 4% of the loss · **6 s** to context · **65%** handled alone | `charts/03-output-before-after-light`, `05-output-cost-share-light`, `08-output-three-numbers-light` | “Projected: Shipsy best-in-class 50–65% (vendor), PRD §18.8. 6 s and 65%: target until measured” |
+| S8 | **OpenAI at the core** | Night | System diagram, hairlines; OpenAI logo once | GPT-Live-1 · Decisions API (GPT-6 Luna) · GPT-5.6 Terra · Structured Outputs · OpenAI TTS · API fallback for the hard 10% · policy guard in code | PRD §18.8.2 diagram, restyled | “PRD §16, §18.8” |
+| S9 | **What it delivers** | Day | Before/after chart cols 1–8; three tiles below or right | **−186M VND a month (39%)** · ≈ 2.2B VND a year · costs 4% of the loss · **6 s** to context · **65%** handled alone | `charts/03-output-before-after-light`, `05-output-cost-share-light`, `08-output-three-numbers-light` | “Projected: Shipsy best-in-class 50–65% (vendor), PRD §18.8. 6 s and 65%: target until measured” |
 | S10 | **Team + ask** | Night | Four portraits, names, roles; one ask line | “Next: shadow mode at one area.” | `05-assets/team/` | — |
 
 Backup slides (appendix):
@@ -89,7 +89,7 @@ Labels:
 
 | Figure | Meaning | Type | Source |
 | --- | --- | --- | --- |
-| **40,000 VND** | Maximum return-shipping fee the seller pays per failed Shopee delivery (20,000 VND for express) | Sourced | Shopee Return & Refund Policy §7.1 (11 Mar 2026); VTV, 25 Mar 2025 |
+| **40,000 VND** | Maximum return-shipping fee the seller pays per failed Shopee delivery (20,000 VND for express) | Sourced | Shopee Return & Refund Policy §7.1; GHN (cap since 1 Apr 2025) |
 | **8–12%** | Orders refused nationwide; up to 20% remote; 25–30% in sale season; 10–15% today (expert) | Sourced | VECOM and Tran Anh Tung (UEF), Nguoi Lao Dong, 19 Jul 2025 |
 | **0** | Delivery windows a Shopee buyer can choose | Sourced | Shopee Help Center 79559 |
 | **2–3 contacts, ≤ 5 days** | Shopee’s redelivery frame (Alodi runs inside it) | Sourced | Shopee Help Center 79569 |
@@ -111,11 +111,11 @@ Labels:
 | Item | Value | Type |
 | --- | --- | --- |
 | One-time infrastructure | 75–98M VND (2 × RTX 5060 Ti 16 GB, workstation, UPS, 4G router) | Listed price + estimate |
-| Running cost | **20.9M VND a month** (4.4% of the loss): SIP calls, Zalo ZNS for risky orders, electricity, fibre, backup, OpenAI fallback, 0.1 FTE ops | Estimate |
+| Running cost | **29.0M VND a month** (6.1% of the loss): GPT-Live-1 calls, Decisions API triage on GPT-6 Luna, GPT-5.6 Terra orchestration, SIP, Zalo ZNS for risky orders, electricity, fibre, backup, 0.1 FTE ops | Estimate (OpenAI list prices) |
 | Gross saving, best-in-class | 214.7M VND a month (45%) | Projected |
-| **Net saving, best-in-class (headline)** | **193.8M VND a month = 41% of the loss; ≈ 2.33B VND a year**; server pays back in ~2 weeks | Projected |
-| Net saving, base / conservative | 98.8M (21%) / 54.6M (12%) a month | Projected |
-| vs AWS-managed design | 68.4M VND a month running cost → local-first is ~70% cheaper | Estimate |
+| **Net saving, best-in-class (headline)** | **185.7M VND a month = 39% of the loss; ≈ 2.23B VND a year**; server pays back in ~2 weeks | Projected |
+| Net saving, base / conservative | 90.7M (19%) / 46.5M (10%) a month | Projected |
+| vs AWS-managed design | 68.4M VND a month running cost → this design is ~58% cheaper | Estimate |
 
 The best-in-class assumption: today’s 25% rescue rises to 65%. Shipsy reports industry 20–30% and best-in-class 50–65% (vendor). The full model and every input are in PRD §18.8 and `02-technical/cost-model/cost_model.py`.
 
@@ -173,12 +173,12 @@ What makes Alodi different:
 | --- | --- | --- |
 | `01-problem-refusal-rates-{light,dark}` | S4 | Refusal rates by context |
 | `02-problem-monthly-loss-{light,dark}` | S5 | 473M VND loss, by item |
-| `03-output-before-after-{light,dark}` | S9 | Today vs with Alodi, −194M VND |
+| `03-output-before-after-{light,dark}` | S9 | Today vs with Alodi, −186M VND |
 | `04-output-scenarios-{light,dark}` | B1 | Conservative / base / best-in-class |
-| `05-output-cost-share-{light,dark}` | S9 | Running cost = 4.4% of the loss |
+| `05-output-cost-share-{light,dark}` | S9 | Running cost = 6.1% of the loss |
 | `06-problem-survey-buyers-MOCK-{light,dark}` | S3 | Buyer pain frequency (mock until real) |
 | `07-problem-survey-couriers-MOCK-{light,dark}` | S3 | Courier adoption (mock until real) |
-| `08-output-three-numbers-{light,dark}` | S9 | 194M VND · 6 s · 65% |
+| `08-output-three-numbers-{light,dark}` | S9 | 186M VND · 6 s · 65% |
 
 Re-render after the real survey arrives: `python3 charts/make_charts.py` (needs matplotlib). It reads `../06-survey/customers.csv`, `couriers.csv` and the cost model output.
 
@@ -187,8 +187,8 @@ Re-render after the real survey arrives: `python3 charts/make_charts.py` (needs 
 Cite in plain text (“Source: …”), never with numbered markers.
 
 **Problem**
-- Shopee Return & Refund Policy §7.1–7.2 (effective 11 Mar 2026): https://help.shopee.vn/portal/4/article/77251
-- VTV, 25 Mar 2025, Shopee fee packages: https://vtv.vn/kinh-te/shopee-ha-goi-dich-vu-phi-moi-sau-yeu-cau-bao-cao-cua-bo-cong-thuong-20250325160554152.htm
+- Shopee Return & Refund Policy §7.1–7.2 (checked 31 Oct 2026): https://help.shopee.vn/portal/4/article/77251
+- GHN, who pays for Shopee returns (₫40,000 cap since 1 Apr 2025): https://ghn.vn/blogs/tip-ban-hang/tra-hang-shopee-ai-chiu-phi
 - Shopee Help Center 79559 (no delivery-time choice): https://help.shopee.vn/portal/4/article/79559
 - Nguoi Lao Dong, 19 Jul 2025 (VECOM 8–12%; UEF 10–15%, 25–30%): https://tuoitre.vn/nld/nhuc-nhoi-nan-bom-hang-19625071822023801.htm
 - Shopee Help Center 79196 (COD disabled after 3 failures): https://help.shopee.vn/portal/4/article/79196
