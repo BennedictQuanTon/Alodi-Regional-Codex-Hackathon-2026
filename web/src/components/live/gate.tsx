@@ -8,13 +8,14 @@ import { Mark, Wordmark } from "@/components/site/brand";
 // The welcome screen in front of the demos: the cast gathers around the mark, and you choose how to run it.
 // People: "Notionists" by Zoish (CC0), rendered to web/public/people with DiceBear.
 
+// In the order a rescue moves through them.
 const CAST = [
   { id: "shipper", name: "Shipper" },
   { id: "buyer", name: "Buyer" },
-  { id: "seller", name: "Seller" },
-  { id: "next", name: "Next shipper" },
   { id: "cs", name: "Customer service" },
   { id: "ops", name: "Hub ops" },
+  { id: "next", name: "Next shipper" },
+  { id: "seller", name: "Seller" },
 ];
 
 // The live demo runs on the team's machine during the pitch. Set NEXT_PUBLIC_LIVE_READY=1 there to open /live directly;
@@ -35,29 +36,11 @@ export function DemoGate() {
   );
   return (
     <main className="gate">
-      <div className="gate-stage" aria-hidden>
-        {CAST.map((p, i) => {
-          const a = ((-150 + (i * 360) / CAST.length) * Math.PI) / 180;
-          return (
-            <motion.div
-              key={p.id}
-              className="gate-person"
-              style={{ left: `${(50 + 44 * Math.cos(a)).toFixed(3)}%`, top: `${(50 + 42 * Math.sin(a)).toFixed(3)}%` }}
-              initial={{ opacity: 0, scale: 0.6, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 24, delay: 0.05 + i * 0.05 }}
-            >
-              <img src={`/people/${p.id}.svg`} alt="" width={84} height={84} />
-              <span>{p.name}</span>
-            </motion.div>
-          );
-        })}
-      </div>
-
       <div className="gate-center">
-        <Wordmark className="text-[44px]" />
+        <Wordmark className="text-[40px]" />
         <h1>
-          Welcome. <em>Pick a demo.</em>
+          Welcome.<br />
+          <em>Pick a demo.</em>
         </h1>
         <p>One failed delivery, one tap, one second drop.</p>
 
@@ -80,6 +63,23 @@ export function DemoGate() {
             <b>Judges demo</b>
           </Link>
         </div>
+      </div>
+
+      <div className="gate-line" aria-hidden>
+        <motion.i className="gate-rail" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.15 }} />
+        <i className="gate-dot" />
+        {CAST.map((p, i) => (
+          <motion.div
+            key={p.id}
+            className="gate-person"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.2 + i * 0.07 }}
+          >
+            <img src={`/people/${p.id}.svg`} alt="" width={84} height={84} />
+            <span>{p.name}</span>
+          </motion.div>
+        ))}
       </div>
 
       <AnimatePresence>
