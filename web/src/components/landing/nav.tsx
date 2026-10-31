@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { LIVE_DEMO_URL } from "@/lib/content";
 import { useEffect, useState } from "react";
 import { Chevron, LogoLink } from "@/components/site/brand";
 
@@ -65,9 +64,9 @@ export function Nav() {
           <Link href="/console" className="btn btn-dark">
             Dashboard <Chevron />
           </Link>
-          <a href={LIVE_DEMO_URL} className="btn btn-primary">
+          <Link href="/start" className="btn btn-primary">
             Watch demo <Chevron />
-          </a>
+          </Link>
         </div>
         <button
           className="rounded-full border border-navy px-5 py-2 text-[14px] uppercase md:hidden"
@@ -85,9 +84,9 @@ export function Nav() {
               {l.label}
             </a>
           ))}
-          <a href={LIVE_DEMO_URL} className="btn btn-primary mt-3">
+          <Link href="/start" className="btn btn-primary mt-3">
             Watch demo <Chevron />
-          </a>
+          </Link>
         </div>
       )}
     </header>
