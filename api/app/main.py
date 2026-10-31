@@ -20,6 +20,8 @@ from app.db.models import (
     Hub,
     Message,
     Order,
+    RescueCase,
+    RescueMessage,
     RouteWindow,
     ScenarioFixture,
 )
@@ -37,6 +39,8 @@ from app.schemas import (
     OrderView,
 )
 from app.settings import ConfigurationError, Settings, load_settings
+from app.state import WorkflowService
+from app.workflow_routes import case_view, workflow_router
 
 
 def order_view(order: Order) -> OrderView:
@@ -61,6 +65,7 @@ def order_view(order: Order) -> OrderView:
         status=order.status,
         context_version=order.context_version,
         generation_id=order.generation_id,
+        original_delivery_date=order.original_delivery_date,
         window_note=window_note(order),
     )
 
@@ -83,6 +88,7 @@ def create_app(settings: Settings | None = None, *, clock: BusinessClock | None 
                 pack = load_seed_pack(settings.mock_pack_dir)
                 await seed_database(database, settings, pack)
             app.state.morning = MorningService(database, settings, clock=clock)
+            app.state.workflow = WorkflowService(app.state.morning)
             async with database.sessions() as session:
                 state = await session.get(DemoState, 1)
                 if state:
@@ -93,6 +99,7 @@ def create_app(settings: Settings | None = None, *, clock: BusinessClock | None 
 
     app = FastAPI(title="Alodi local API", version="0.1.0", lifespan=lifespan)
     app.state.settings = settings
+    app.include_router(workflow_router())
 
     @app.exception_handler(WorkflowError)
     async def workflow_error(request: Request, error: WorkflowError):
@@ -129,7 +136,7 @@ def create_app(settings: Settings | None = None, *, clock: BusinessClock | None 
         return {
             "status": "ok",
             "database": "ok",
-            "implementation_stage": "morning_availability",
+            "implementation_stage": "courier_workflow",
             "app_env": settings.app_env,
             "ai_mode": settings.effective_ai_mode,
             "ai_adapters_ready": False,
@@ -227,9 +234,41 @@ def create_app(settings: Settings | None = None, *, clock: BusinessClock | None 
                     .order_by(Message.created_at, Message.id)
                 )
             ).all()
+            rescue_cases = (
+                await session.scalars(
+                    select(RescueCase)
+                    .where(RescueCase.tracking_id == tracking_id)
+                    .order_by(RescueCase.cycle)
+                )
+            ).all()
+            rescue_messages = (
+                await session.scalars(
+                    select(RescueMessage)
+                    .where(RescueMessage.tracking_id == tracking_id)
+                    .order_by(RescueMessage.created_at, RescueMessage.id)
+                )
+            ).all()
             return OrderDetail(
                 order=order_view(order),
                 context=order.context,
+                pending_event=order.context.get("pending_event"),
+                context_card=order.context.get("card"),
+                rescue_cases=[case_view(case, settings) for case in rescue_cases],
+                rescue_messages=[
+                    {
+                        "id": message.id,
+                        "case_id": message.rescue_case_id,
+                        "kind": message.kind,
+                        "text": message.text,
+                        "status": message.status,
+                        "data_source": message.data_source,
+                        "created_at": message.created_at.astimezone(settings.timezone).isoformat(),
+                        "sent_at": message.sent_at.astimezone(settings.timezone).isoformat()
+                        if message.sent_at
+                        else None,
+                    }
+                    for message in rescue_messages
+                ],
                 slots_offered=[
                     {
                         "id": window.window_id,

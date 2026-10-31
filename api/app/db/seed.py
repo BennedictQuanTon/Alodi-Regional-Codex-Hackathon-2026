@@ -265,6 +265,7 @@ async def seed_database(
         orders = [
             {
                 **order.model_dump(),
+                "original_delivery_date": order.delivery_date,
                 "context_version": 0,
                 "context": initial_context(order.tracking_id, pack.windows),
                 "generation_id": generation,

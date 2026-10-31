@@ -22,7 +22,7 @@ from app.db.models import (
 )
 
 
-async def test_migration_matches_models_and_can_be_applied_again(database):
+async def test_migration_matches_models_and_can_be_applied_again(database, head_revision):
     async with database.engine.connect() as connection:
 
         def verify(sync_connection):
@@ -35,7 +35,9 @@ async def test_migration_matches_models_and_can_be_applied_again(database):
         await connection.run_sync(verify)
     await upgrade_database(database)
     async with database.sessions() as session:
-        assert await session.scalar(text("SELECT version_num FROM alembic_version")) == "0002"
+        assert (
+            await session.scalar(text("SELECT version_num FROM alembic_version")) == head_revision
+        )
 
 
 async def test_empty_database_migration_downgrade_upgrade(database):

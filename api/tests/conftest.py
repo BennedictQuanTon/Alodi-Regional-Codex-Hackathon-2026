@@ -5,9 +5,10 @@ from uuid import uuid4
 
 import pytest
 import pytest_asyncio
+from alembic.script import ScriptDirectory
 from sqlalchemy import insert
 
-from app.db.migrate import upgrade_database
+from app.db.migrate import migration_config, upgrade_database
 from app.db.models import Courier, DemoState, Hub, Order, OrderContextRevision, RouteWindow
 from app.db.seed import initial_context, load_seed_pack, seed_database
 from app.db.session import Database
@@ -32,6 +33,11 @@ def settings(tmp_path):
         database_url=f"sqlite+aiosqlite:///{tmp_path / 'test.db'}",
         recordings_dir=tmp_path / "recordings",
     )
+
+
+@pytest.fixture(scope="session")
+def head_revision():
+    return ScriptDirectory.from_config(migration_config()).get_current_head()
 
 
 @pytest.fixture(scope="session")
@@ -113,6 +119,7 @@ async def morning(database, settings, pack):
             [
                 {
                     **order.model_dump(),
+                    "original_delivery_date": order.delivery_date,
                     "context_version": 0,
                     "context": initial_context(order.tracking_id, pack.windows),
                     "generation_id": generation,

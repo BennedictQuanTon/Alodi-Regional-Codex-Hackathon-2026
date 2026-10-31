@@ -113,6 +113,7 @@ class Order(Base):
     risk_flags: Mapped[list[str]] = mapped_column(JSON, default=list)
     delivery_date: Mapped[date] = mapped_column(Date)
     # Completed delivery attempts only. Creating an appointment never increments this counter.
+    original_delivery_date: Mapped[date | None] = mapped_column(Date)
     attempt_count: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[str] = mapped_column(String, default="scheduled")
     context_version: Mapped[int] = mapped_column(Integer, default=0)
@@ -203,6 +204,8 @@ class RescueCase(Base):
     created_at: Mapped[datetime] = mapped_column(UTCDateTime)
     closed_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     generation_id: Mapped[str] = mapped_column(String)
+    reason: Mapped[str | None] = mapped_column(String)
+    assigned_to: Mapped[str | None] = mapped_column(String)
 
 
 class RescueResult(Base):
@@ -356,3 +359,24 @@ class Message(Base):
     idempotency_key: Mapped[str] = mapped_column(String)
     data_source: Mapped[str] = mapped_column(String, default="synthetic")
     channel: Mapped[str] = mapped_column(String, default="demo_chat")
+
+
+class RescueMessage(Base):
+    __tablename__ = "rescue_messages"
+    __table_args__ = (
+        UniqueConstraint("generation_id", "idempotency_key"),
+        CheckConstraint("status IN ('queued','sent','cancelled')", name="status"),
+    )
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    generation_id: Mapped[str] = mapped_column(String)
+    tracking_id: Mapped[str] = mapped_column(ForeignKey("orders.tracking_id"), index=True)
+    rescue_case_id: Mapped[int] = mapped_column(ForeignKey("rescue_case.id"), index=True)
+    kind: Mapped[str] = mapped_column(String)
+    text: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String, default="queued")
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    sent_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    context_version: Mapped[int] = mapped_column(Integer)
+    idempotency_key: Mapped[str] = mapped_column(String)
+    data_source: Mapped[str] = mapped_column(String, default="synthetic")

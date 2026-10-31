@@ -21,6 +21,7 @@ class OrderView(BaseModel):
     context_version: int
     generation_id: str
     window_note: str | None = None
+    original_delivery_date: date | None = None
 
 
 class OrderPage(BaseModel):
@@ -49,6 +50,10 @@ class OrderDetail(BaseModel):
     data_source: str
     availability: dict[str, Any] | None = None
     messages: list["MessageView"] = Field(default_factory=list)
+    pending_event: dict[str, Any] | None = None
+    context_card: dict[str, Any] | None = None
+    rescue_cases: list[dict[str, Any]] = Field(default_factory=list)
+    rescue_messages: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class MessageView(BaseModel):

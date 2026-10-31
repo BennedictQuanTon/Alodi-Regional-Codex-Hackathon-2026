@@ -110,7 +110,9 @@ def availability_context(order: Order, question: AvailabilityReply, status: str,
         "question_id": question.id,
         "service_date": question.service_date.isoformat(),
         # Keep a fixed morning horizon even if another morning run asks again tomorrow.
-        "horizon_anchor": previous.get("horizon_anchor", question.service_date.isoformat()),
+        "horizon_anchor": order.original_delivery_date.isoformat()
+        if order.original_delivery_date
+        else previous.get("horizon_anchor", question.service_date.isoformat()),
         "status": status,
         "answer_type": question.answer_type,
         "windows": list(question.windows),
