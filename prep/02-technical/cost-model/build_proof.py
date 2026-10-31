@@ -74,7 +74,7 @@ INPUTS = [
     ("Door time lost per failure", f"{cm.DOOR_MIN_PER_FAIL} min", "Estimate", "Two calls plus waiting at the door"),
     ("CS calls per failure × minutes", f"{cm.CS_CALLS_PER_FAIL} × {cm.CS_MIN_PER_CALL} min", "Estimate", "Team assumption"),
     ("CS cost per hour", f"₫{cm.CS_COST_HOUR:,}", "Estimate", "Team assumption"),
-    ("Days a month · exchange rate", f"{cm.DAYS} · ₫{cm.FX:,}/$", "Estimate", "Prices checked 30 Oct 2026"),
+    ("Days a month · exchange rate", f"{cm.DAYS} · ₫{cm.FX:,}/$", "Estimate", "Prices checked 31 Oct 2026"),
 ]
 
 failed = L["failed_per_day"]
@@ -163,7 +163,7 @@ cost_rows = "".join(f'<tr><td>{e(k)}</td><td class="r num">{m(v, 2)}</td></tr>' 
 hw_rows = "".join(f'<tr><td>{e(k)}</td><td class="r num">{m(v[0], 1)}–{m(v[1], 1)}</td></tr>' for k, v in cm.HARDWARE.items())
 running = page(4, "Cost", f"""
 <div class="eyebrow">03 · What Alodi costs</div><h2>{m(BEST['cost_month'], 1)} a month to run. {BEST['cost_month'] / MID:.1%} of the loss.</h2>
-<p class="sub">Local-first: one workstation per area runs OpenAI’s open-weight gpt-oss-20b, PhoWhisper and Piper. The OpenAI API is only a masked fallback for ~10% of requests.</p>
+<p class="sub">Local-first: one workstation per area runs PhoWhisper and the gpt-oss-20b fallback. GPT-Live-1, the Decisions API on GPT-6 Luna and GPT-6.1 Terra run in the cloud, on masked text.</p>
 <table><thead><tr><th>Monthly running cost</th><th class="r">VND</th></tr></thead><tbody>{cost_rows}
 <tr class="sum"><td>Total</td><td class="r num">{m(BEST['cost_month'], 1)}</td></tr></tbody></table>
 <table><thead><tr><th>One-time hardware per area (not in the monthly figures)</th><th class="r">VND</th></tr></thead><tbody>{hw_rows}
@@ -188,7 +188,7 @@ savings = page(5, "Savings", f"""
 <tr><td>Net a year</td>{''.join(f'<td class="r num">₫{r["net_year"] / 1e9:.2f}B</td>' for _, r, _ in sc)}</tr>
 <tr><td>Hardware pays back in</td>{''.join(f'<td class="r num">{r["hardware_payback_months"] * 4.35:.0f} weeks</td>' for _, r, _ in sc)}</tr>
 </tbody></table>
-<div class="calc mono">41% = {m(BEST['net_month'], 1)} ÷ {m(MID, 1)} &nbsp;·&nbsp; {m(BEST['net_month'], 1)} = {m(BEST['gross_month'], 1)} − {m(BEST['cost_month'], 1)}</div>
+<div class="calc mono">{BEST['net_pct']:.1%} = {m(BEST['net_month'], 1)} ÷ {m(MID, 1)} &nbsp;·&nbsp; {m(BEST['net_month'], 1)} = {m(BEST['gross_month'], 1)} − {m(BEST['cost_month'], 1)}</div>
 <div class="note">Columns: extra rescue points · redelivery attempts per failed order after Alodi · share of CS calls the agent handles. Everything on this page is projected until a pilot measures Alodi’s own rescue rate.</div>
 """)
 

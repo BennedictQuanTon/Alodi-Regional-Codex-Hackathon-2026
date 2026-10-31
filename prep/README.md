@@ -91,7 +91,7 @@ These come from the project rules and should survive the rebuild:
 | Kind | Where | Status |
 | --- | --- | --- |
 | Problem figures (40,000 VND, 8–12%, 0 windows, 473M VND a month per area) | `01-pitch/4-SLIDES.md` §3 | Sourced from public documents; models are labelled |
-| Money saved (194M VND a month, 41%, best-in-class) | `02-technical/PRD.md` §18.8 | **Projected** (vendor rescue range) |
+| Money saved (187M VND a month, 40%, best-in-class) | `02-technical/PRD.md` §18.8 | **Projected** (vendor rescue range) |
 | Survey results | `06-survey/` | **Mock** until the real interviews replace them |
 | Output metrics on `/metrics` and the dashboard KPIs | current web build | **Mock** until the eval runs — replace with real numbers before showing them as results |
 | Demo case (Minh Hoang, air fryer, Tower B…) | demo engine | Fictional data |

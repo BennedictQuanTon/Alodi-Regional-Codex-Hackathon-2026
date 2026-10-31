@@ -6,6 +6,10 @@ Charts: [`charts/`](charts/), rendered by `charts/make_charts.py` from the cost 
 
 ---
 
+**Current deck order (`Alodi-Pitch.pptx`, 15 slides):** cover · skit video · TL;DR · our story · problem 1, survey · problem 2, research · why we built Alodi · demo film · live demo (blank) · tech stack and OpenAI APIs · metrics and output · future plan · team · thank you · references. The slide table in §2 describes the earlier order; figures below still apply.
+
+---
+
 ## 1. Deck design
 
 ### 1.1 Canvas and grid
@@ -42,7 +46,7 @@ Same family as the demo UI and the film, so slides, charts and video read as one
 | Source line | Geist Mono | 18 px | 400 |
 | Wordmark | Be Vietnam Pro ExtraBold (outlined SVG from `04-brand/`) | — | — |
 
-Money is written **“186M VND”**, because Geist has no “₫” glyph.
+Money is written **“187M VND”**, because Geist has no “₫” glyph.
 
 ### 1.4 Rules
 
@@ -63,8 +67,8 @@ Money is written **“186M VND”**, because Geist has no “₫” glyph.
 | S5 | **One area, one month** | Day | Chart cols 1–8, hero number cols 9–12 | **473M VND** lost a month (≈ 5.7B VND a year) · 20 couriers · 4,000 orders a day | `charts/02-problem-monthly-loss-light` | “Modelled: Shopee §7.1, VECOM 8%, Shipsy 25% (vendor), GHN, Glints — PRD §18.8” |
 | S6 | **Alodi in one picture** | Day | Flow left → right: tap → chat → call → extract → card, with the human lane below | “One tap. One conversation. One card for the next courier.” | Simplified `02-technical/diagrams/alodi-flow.png` | — |
 | S7 | **Live demo** | Night | Four labelled frames (01 courier, 02 ops, 03 buyer, 04 control) | Switch to the devices | Screens from the build | — |
-| S8 | **OpenAI at the core** | Night | System diagram, hairlines; OpenAI logo once | GPT-Live-1 · Decisions API (GPT-6 Luna) · GPT-5.6 Terra · Structured Outputs · OpenAI TTS · API fallback for the hard 10% · policy guard in code | PRD §18.8.2 diagram, restyled | “PRD §16, §18.8” |
-| S9 | **What it delivers** | Day | Before/after chart cols 1–8; three tiles below or right | **−186M VND a month (39%)** · ≈ 2.2B VND a year · costs 4% of the loss · **6 s** to context · **65%** handled alone | `charts/03-output-before-after-light`, `05-output-cost-share-light`, `08-output-three-numbers-light` | “Projected: Shipsy best-in-class 50–65% (vendor), PRD §18.8. 6 s and 65%: target until measured” |
+| S8 | **OpenAI at the core** | Night | System diagram, hairlines; OpenAI logo once | GPT-Live-1 · Decisions API (GPT-6 Luna) · GPT-6.1 Terra · Structured Outputs · OpenAI TTS · API fallback for the hard 10% · policy guard in code | PRD §18.8.2 diagram, restyled | “PRD §16, §18.8” |
+| S9 | **What it delivers** | Day | Before/after chart cols 1–8; three tiles below or right | **−187M VND a month (40%)** · ≈ 2.25B VND a year · costs 6% of the loss · **6 s** to context · **65%** handled alone | `charts/03-output-before-after-light`, `05-output-cost-share-light`, `08-output-three-numbers-light` | “Projected: Shipsy best-in-class 50–65% (vendor), PRD §18.8. 6 s and 65%: target until measured” |
 | S10 | **Team + ask** | Night | Four portraits, names, roles; one ask line | “Next: shadow mode at one area.” | `05-assets/team/` | — |
 
 Backup slides (appendix):
@@ -111,10 +115,10 @@ Labels:
 | Item | Value | Type |
 | --- | --- | --- |
 | One-time infrastructure | 75–98M VND (2 × RTX 5060 Ti 16 GB, workstation, UPS, 4G router) | Listed price + estimate |
-| Running cost | **29.0M VND a month** (6.1% of the loss): GPT-Live-1 calls, Decisions API triage on GPT-6 Luna, GPT-5.6 Terra orchestration, SIP, Zalo ZNS for risky orders, electricity, fibre, backup, 0.1 FTE ops | Estimate (OpenAI list prices) |
+| Running cost | **27.3M VND a month** (5.8% of the loss): GPT-Live-1 calls, Decisions API triage on GPT-6 Luna, GPT-6.1 Terra orchestration, SIP, Zalo ZNS for risky orders, electricity, fibre, backup, 0.1 FTE ops | Estimate (OpenAI list prices) |
 | Gross saving, best-in-class | 214.7M VND a month (45%) | Projected |
-| **Net saving, best-in-class (headline)** | **185.7M VND a month = 39% of the loss; ≈ 2.23B VND a year**; server pays back in ~2 weeks | Projected |
-| Net saving, base / conservative | 90.7M (19%) / 46.5M (10%) a month | Projected |
+| **Net saving, best-in-class (headline)** | **187.4M VND a month = 40% of the loss; ≈ 2.25B VND a year**; server pays back in ~2 weeks | Projected |
+| Net saving, base / conservative | 92.4M (20%) / 48.3M (10%) a month | Projected |
 | vs AWS-managed design | 68.4M VND a month running cost → this design is ~58% cheaper | Estimate |
 
 The best-in-class assumption: today’s 25% rescue rises to 65%. Shipsy reports industry 20–30% and best-in-class 50–65% (vendor). The full model and every input are in PRD §18.8 and `02-technical/cost-model/cost_model.py`.
@@ -173,12 +177,12 @@ What makes Alodi different:
 | --- | --- | --- |
 | `01-problem-refusal-rates-{light,dark}` | S4 | Refusal rates by context |
 | `02-problem-monthly-loss-{light,dark}` | S5 | 473M VND loss, by item |
-| `03-output-before-after-{light,dark}` | S9 | Today vs with Alodi, −186M VND |
+| `03-output-before-after-{light,dark}` | S9 | Today vs with Alodi, −187M VND |
 | `04-output-scenarios-{light,dark}` | B1 | Conservative / base / best-in-class |
-| `05-output-cost-share-{light,dark}` | S9 | Running cost = 6.1% of the loss |
+| `05-output-cost-share-{light,dark}` | S9 | Running cost = 5.8% of the loss |
 | `06-problem-survey-buyers-MOCK-{light,dark}` | S3 | Buyer pain frequency (mock until real) |
 | `07-problem-survey-couriers-MOCK-{light,dark}` | S3 | Courier adoption (mock until real) |
-| `08-output-three-numbers-{light,dark}` | S9 | 186M VND · 6 s · 65% |
+| `08-output-three-numbers-{light,dark}` | S9 | 187M VND · 6 s · 65% |
 
 Re-render after the real survey arrives: `python3 charts/make_charts.py` (needs matplotlib). It reads `../06-survey/customers.csv`, `couriers.csv` and the cost model output.
 

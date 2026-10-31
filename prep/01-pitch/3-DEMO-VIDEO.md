@@ -66,7 +66,7 @@ Rules:
 | Wordmark | Be Vietnam Pro ExtraBold (outlined SVG in `04-brand/logo/`) | — | — | — |
 
 - Not used: Source Serif 4 (landing only), Playfair (dashboard only), any coding-style monospace other than Geist Mono.
-- Geist has no “₫” glyph, so money is written **“194M VND”**.
+- Geist has no “₫” glyph, so money is written **“187M VND”**.
 - Sentence case. No exclamation marks. Words enter one at a time.
 
 ### 3.3 Logo in motion (mark C: ring + sound bars)
@@ -219,9 +219,9 @@ Every receipt shows its source line in Geist Mono for at least 2 s: `Source: Sho
 | --- | --- | --- | --- | --- |
 | 01:30:00 | Headline types in | **We tested it on [N] real cases.** *(fill after the eval; otherwise “on 47 test conversations”)* | *[fill]* | Ticks |
 | 01:33:00 | Eval numbers count up | **F1 [measured] · 0 calls out of hours · 0 labels without approval** | *[fill with measured numbers]* | Boom on each |
-| 01:37:00 | Chart 03: the “Today” bar (473M) stands; the “With Alodi” bar drops to 279M; the orange cost sliver appears | **−194M VND a month** | *At best-in-class rescue, one area saves about a hundred ninety million dong a month…* | Silence pocket, then boom |
-| 01:42:00 | The counter rolls to the year | **≈ 2.3B VND a year · 41% of the loss** | *…two point three billion a year.* | Boom |
-| 01:45:00 | Chart 05: the cost bar fills to 4.4 % | **21M VND a month to run · 4% of the loss** | *It costs four percent of what is lost.* | Tick |
+| 01:37:00 | Chart 03: the “Today” bar (473M) stands; the “With Alodi” bar drops to 286M; the orange cost sliver appears | **−187M VND a month** | *At best-in-class rescue, one area saves about a hundred eighty-seven million dong a month…* | Silence pocket, then boom |
+| 01:42:00 | The counter rolls to the year | **≈ 2.25B VND a year · 40% of the loss** | *…two point two five billion a year.* | Boom |
+| 01:45:00 | Chart 05: the cost bar fills to 5.8 % | **27M VND a month to run · 6% of the loss** | *It costs six percent of what is lost.* | Tick |
 | 01:48:00 | Chart 08 tiles 2 and 3 flip in | **6 s to context · 65% handled alone** | *Six seconds from answer to card. Two in three cases handled alone.* | Two blips |
 | 01:51:00 | Label line | `Money projected · Shipsy best-in-class (vendor) · PRD §18.8` | — | — |
 
@@ -280,7 +280,7 @@ const BEAT = 0.5; // seconds
 | The tap | *Macro push-in on a phone; a thumb taps an orange “A · No answer” button; a thin 2-minute ring sweeps; the iPad in soft focus behind shows the same event appearing as “pending”.* |
 | The call | *Laptop rings; the Alodi logo’s four sound bars detach and follow the voice waveform; the transcript appears as spoken in white Geist on navy; the sentence then splits into three labelled fields that fly into a card with confidence bars filling.* |
 | OpenAI core | *Hairlines draw a five-node system on navy, 2 px, with nodes popping on the beat; one node expands to show “gpt-oss-20b · on site” with the OpenAI logo; a strict JSON schema types out; six rules each get a ring-and-check stamp.* |
-| Output | *Two thin columns: “Today 473M VND” and “With Alodi 279M VND”, with an orange sliver for the running cost; a large “−194M VND a month” counts in, then “≈ 2.3B VND a year · 41%”; the label “projected” stays visible.* |
+| Output | *Two thin columns: “Today 473M VND” and “With Alodi 286M VND”, with an orange sliver for the running cost; a large “−187M VND a month” counts in, then “≈ 2.25B VND a year · 40%”; the label “projected” stays visible.* |
 | End | *Four team portraits slide in on beats; the Alodi lockup forms (the ring draws, the bars rise, the wordmark lifts); the bars pulse three times, then hold in silence.* |
 
 ### 8.3 Work worth studying (for the bar, not to copy)

@@ -1592,7 +1592,7 @@ flowchart TB
 ### 16.6 Security and privacy (all environments)
 
 - Recording consent in the pre-recorded opening of every call; refusal ends the call and continues by chat or CS.
-- Phone numbers, addresses and names masked before any text reaches a model (GPT-5.6 Terra, the Decisions API or the local fallback); raw audio and transcripts encrypted with a 30-day TTL.
+- Phone numbers, addresses and names masked before any text reaches a model (GPT-6.1 Terra, the Decisions API or the local fallback); raw audio and transcripts encrypted with a 30-day TTL.
 - AI calls run on GPT-Live-1 in the OpenAI cloud only after the buyer hears the recording notice; call audio cannot be masked, so this path needs the transfer impact assessment in §18.6 before production.
 - Every write to an order’s context is versioned with an actor (agent, buyer, courier, CS) and a timestamp.
 - Opt-out checked before every job.
@@ -1604,13 +1604,13 @@ The production agent runs on three OpenAI services, each doing the job it is bui
 
 1. **GPT-Live-1** talks to the buyer. A full-duplex voice model that listens while it speaks and hands reasoning and tool use to a backend agent; it runs on the Live endpoint (`v1/live/sessions`), not the Realtime API.
 2. **The Decisions API on GPT-6 Luna** sorts every incoming signal first: which case it is (no answer, rescheduled, refused, opt-out), which window the buyer chose, and how confident that is. It answers predicate, choice and score questions with probabilities, which map directly onto the 0.85 threshold.
-3. **GPT-5.6 Terra** orchestrates the cases triage escalates: it runs the agent loop across the buyer, the courier and the carrier’s systems, applies company policy through the guard, and writes the context card with Structured Outputs, so the buyer and the courier exchange as few messages as possible.
+3. **GPT-6.1 Terra** orchestrates the cases triage escalates: it runs the agent loop across the buyer, the courier and the carrier’s systems, applies company policy through the guard, and writes the context card with Structured Outputs, so the buyer and the courier exchange as few messages as possible.
 
 | Component | Role in Alodi | Runs where | Demo (31 Oct) | Production |
 | --- | --- | --- | --- | --- |
 | **GPT-Live-1** (`gpt-live-1`) | Real-time voice calls with the buyer; delegates to the Terra agent | OpenAI cloud, `v1/live/sessions`, $0.05 a minute | In-browser call + TTS | AI calls over the branded SIP line |
 | **Decisions API** on **GPT-6 Luna** (`/v1/decisions`) | Triage of every message: case type, chosen window, confidence | OpenAI cloud, $0.10 per 1M input tokens, no output charge | — | First step for every signal |
-| **GPT-5.6 Terra** (`gpt-5.6-terra`) | Orchestration and extraction for escalated cases (~20% of traffic, estimate) | OpenAI cloud, Responses API, $2 / $12 per 1M tokens | OpenAI API | Agent brain |
+| **GPT-6.1 Terra** (`gpt-6.1-terra`) | Orchestration and extraction for escalated cases (~20% of traffic, estimate) | OpenAI cloud, Responses API, $1 / $5 per 1M tokens | OpenAI API | Agent brain |
 | **OpenAI Agents SDK** | One run per order: tools, CS handoff, guardrails, tracing | Alodi backend | State machine in the API | Orchestration framework around Terra |
 | **gpt-oss-20b** (open weights) | Fallback when the cloud is unreachable; keeps the area working offline | Area server, vLLM or Ollama | — | Fallback |
 | **OpenAI Evals** | Graders on the held-out set (§23); gate every prompt, schema or model change | OpenAI platform | Codex-run loop | Release gate |
@@ -1868,7 +1868,7 @@ Recommendation: **pilot on option 1**, keep raw audio, transcripts and phone num
 
 All numbers come from [`cost-model/cost_model.py`](cost-model/cost_model.py) (`python3 -I cost_model.py`; output in `cost_model_output.json`). One area = 20 couriers, 4,000 orders a day, 30 days a month, ₫26,000 = $1. Prices were checked on 30 October 2026. Every input is typed: **Sourced** (public document) · **Vendor** (company claim) · **Listed price** (shop or provider price list) · **Estimate** (team assumption). Savings are **projected**. The headline uses the **best-in-class** rescue rate published by Shipsy (vendor) until the pilot measures Alodi’s own.
 
-**Headline (best-in-class, OpenAI stack + one area server):** the area loses **₫473M a month**. Alodi costs **₫75–98M once** and **₫29M a month** to run (6.1% of the loss), and cuts **39% of the loss: ≈ ₫186M a month, ≈ ₫2.2B a year**.
+**Headline (best-in-class, OpenAI stack + one area server):** the area loses **₫473M a month**. Alodi costs **₫75–98M once** and **₫27M a month** to run (5.8% of the loss), and cuts **40% of the loss: ≈ ₫187M a month, ≈ ₫2.25B a year**.
 
 #### 18.8.1 What one area loses today, per month
 
@@ -1890,7 +1890,7 @@ Volume per area is small: about 2,400 LLM requests, 100 minutes of speech and 13
 | Job | Runs on | Model or service | Why |
 | --- | --- | --- | --- |
 | Triage of every message | Cloud | **Decisions API on GPT-6 Luna**, masked text | Cheap, fast, returns probabilities for the 0.85 threshold |
-| Orchestration + extraction | Cloud | **GPT-5.6 Terra** through the Responses API and Agents SDK, masked text, ~20% of traffic | Runs the agent loop and writes the context card |
+| Orchestration + extraction | Cloud | **GPT-6.1 Terra** through the Responses API and Agents SDK, masked text, ~20% of traffic | Runs the agent loop and writes the context card |
 | AI calls | Cloud + telco | **GPT-Live-1** on the Live endpoint over the Viettel SIP trunk | Full-duplex voice; recording notice first |
 | Fallback when the cloud is down | Local GPU 1 | **gpt-oss-20b** (OpenAI open-weight, ~16 GB with MXFP4), vLLM or Ollama | The area keeps working offline |
 | Vietnamese speech to text | Local GPU 2 | **PhoWhisper** (VinAI, open source) | Vietnamese-trained; free; audio stays on the server |
@@ -1914,7 +1914,7 @@ flowchart LR
   APP --> DB
   APP -->|"SIP"| SIP["Viettel Mobile SIP trunk"]
   APP -->|"templates"| ZNS["Zalo ZNS"]
-  APP -->|"masked text"| OAI["OpenAI · Decisions API (GPT-6 Luna) · GPT-5.6 Terra"]
+  APP -->|"masked text"| OAI["OpenAI · Decisions API (GPT-6 Luna) · GPT-6.1 Terra"]
   APP -->|"live call"| LIVE["OpenAI · GPT-Live-1"]
   DB -. "nightly encrypted dump" .-> S3["Amazon S3"]
   APP -. "4G failover" .-> NET["Internet"]
@@ -1937,7 +1937,7 @@ A single RTX 5090 (32 GB) would also work, but it lists at about ₫115–119M i
 | Cost item | Per month | Basis and source |
 | --- | --- | --- |
 | Decisions API on GPT-6 Luna | ₫0.5M | 6.0M input tokens a day × $0.10 per 1M, no output charge (developers.openai.com) |
-| GPT-5.6 Terra | ₫3.2M | 20% of 6.0M input + 0.72M output tokens a day at $2 / $12 per 1M (developers.openai.com); the 20% escalation share is an estimate |
+| GPT-6.1 Terra | ₫1.5M | 20% of 6.0M input + 0.72M output tokens a day at $1 / $5 per 1M (developers.openai.com); the 20% escalation share is an estimate |
 | GPT-Live-1 | ₫5.2M | 134 billed call minutes a day × $0.05 a minute (developers.openai.com) |
 | Local models (gpt-oss-20b fallback, PhoWhisper for memos) | ₫0 | Open weights, run on the area server |
 | Viettel Mobile SIP trunk | ₫3.2M | ≤ 134 billed min a day × ₫780/min off-net + ₫50,000 a month per line (Viettel reseller price list, 1 s + 1 s billing; confirm a 2026 quote) |
@@ -1947,9 +1947,9 @@ A single RTX 5090 (32 GB) would also work, but it lists at about ₫115–119M i
 | Off-site backup on Amazon S3 | ₫0.1M | ~10 GB, encrypted |
 | Remote operations, 0.1 FTE shared across areas | ₫3.6M | Estimate |
 | Hardware upkeep reserve | ₫0.4M | 5% of hardware a year |
-| **Total** | **₫29.0M a month** (6.1% of the loss) | |
+| **Total** | **₫27.3M a month** (5.8% of the loss) | |
 
-With the window question sent to **all** 4,000 buyers by ZNS, the total is **₫72.7M** (ZNS alone ₫55.0M). For comparison, the AWS-managed design (EKS, RDS Multi-AZ, Bedrock, Transcribe, Connect, 1-year commitment) costs **₫68.4M** with risky-only messaging, so this design is about **58% cheaper**.
+With the window question sent to **all** 4,000 buyers by ZNS, the total is **₫71.0M** (ZNS alone ₫55.0M). For comparison, the AWS-managed design (EKS, RDS Multi-AZ, Bedrock, Transcribe, Connect, 1-year commitment) costs **₫68.4M** with risky-only messaging, so this design is about **58% cheaper**.
 
 #### 18.8.5 Savings and the share of the loss cut (excluding one-time setup)
 
@@ -1962,10 +1962,10 @@ With the window question sent to **all** 4,000 buyers by ZNS, the total is **₫
 | CS calls handled by the agent (40% / 60% / 65% of cases) | ₫17.9M | ₫26.9M | **₫29.1M** |
 | **Gross saving / month** | ₫75.5M | ₫119.7M | **₫214.7M** |
 | Gross as % of the monthly loss (₫473M) | 16.0% | 25.3% | **45.4%** |
-| Running cost / month | ₫29.0M | ₫29.0M | **₫29.0M** |
-| **Net saving / month** | ₫46.5M | ₫90.7M | **₫185.7M** |
-| **Net as % of the monthly loss** | 9.8% | 19.2% | **39.3%** |
-| **Net saving / year** | ₫558M | ₫1.09B | **₫2.23B** |
+| Running cost / month | ₫27.3M | ₫27.3M | **₫27.3M** |
+| **Net saving / month** | ₫48.3M | ₫92.4M | **₫187.4M** |
+| **Net as % of the monthly loss** | 10.2% | 19.5% | **39.6%** |
+| **Net saving / year** | ₫579M | ₫1.11B | **₫2.25B** |
 | Infrastructure pays back in | ~8 weeks | ~4 weeks | **~2 weeks** |
 
 Where the best-in-class figure comes from: Shipsy reports an industry-average rescue rate of 20–30% and best-in-class 50–65% (vendor). The headline assumes Alodi reaches the top of that range, 65%. ClickPost reports 15–40% fewer returns with automated outreach (vendor). The theoretical ceiling, where every loss disappears and only the running cost remains, is about 95%. That is not achievable, because refused orders get no contact (BR-07) and some buyers are truly unreachable.
@@ -1973,9 +1973,9 @@ Where the best-in-class figure comes from: Shipsy reports an industry-average re
 #### 18.8.6 What to say
 
 1. **One area loses about ₫473M a month (≈ ₫5.7B a year)** from failed deliveries: ₫288M of it is return fees, the rest is redelivery, courier time and CS calls.
-2. **Alodi costs ₫75–98M once and ₫29M a month (about 6% of what is lost).**
-3. **At best-in-class rescue it cuts 39% of the loss: ≈ ₫186M a month, ≈ ₫2.2B a year.** The base case is 19% (≈ ₫91M a month).
-4. It is about 58% cheaper to run than the AWS-managed design: the Decisions API triages cheaply, so only escalated cases pay for GPT-5.6 Terra.
+2. **Alodi costs ₫75–98M once and ₫27M a month (about 6% of what is lost).**
+3. **At best-in-class rescue it cuts 40% of the loss: ≈ ₫187M a month, ≈ ₫2.25B a year.** The base case is 20% (≈ ₫92M a month).
+4. It is about 60% cheaper to run than the AWS-managed design: the Decisions API triages cheaply, so only escalated cases pay for GPT-6.1 Terra.
 5. All savings are projected until the pilot measures Alodi’s real rescue rate.
 
 #### 18.8.7 Self-hosted models: limits
@@ -3134,7 +3134,7 @@ The engine already handles `hello`, `takeover` and `state` messages, so nothing 
 | Database | **PostgreSQL** (HA, PITR) | `postgresql.svg` |
 | Recordings | S3-compatible object storage / **MinIO**, encrypted, 30-day lifecycle | `minio.svg` |
 | Triage | **OpenAI Decisions API** on **GPT-6 Luna**, masked text | `openai.svg` |
-| Agent brain | **OpenAI GPT-5.6 Terra** (Responses API + Agents SDK), masked text; **gpt-oss-20b** on vLLM / **NVIDIA** GPUs as offline fallback | `openai.svg`, `nvidia.svg` |
+| Agent brain | **OpenAI GPT-6.1 Terra** (Responses API + Agents SDK), masked text; **gpt-oss-20b** on vLLM / **NVIDIA** GPUs as offline fallback | `openai.svg`, `nvidia.svg` |
 | Chat | **Shopee** Chat API, **Zalo** ZNS (approved templates) | `shopee.svg`, `zalo.svg` |
 | Calls | **OpenAI GPT-Live-1** (Live endpoint) over a SIP trunk with a verified brand name; **Asterisk** or FreeSWITCH media bridge | `openai.svg`, `asterisk.svg` |
 | ASR | GPT-Live-1 inside calls; **PhoWhisper** (VinAI), self-hosted, for voice memos and as fallback | `vinai-phowhisper.png` |
@@ -3318,7 +3318,7 @@ failed      = orders_per_day × fail_rate                         (one area: 4,0
 fees_saved  = failed × extra_rescue_rate × 40,000 VND            (extra_rescue_rate is ASSUMED)
 cs_hours    = failed × auto_share × 2 calls × 4 min ÷ 60
 cs_saved    = cs_hours × 35,000 VND/hour                         (team assumption)
-agent_cost  = running cost per area (§18.8.4: ≈ ₫29.0M a month, OpenAI stack + area server)
+agent_cost  = running cost per area (§18.8.4: ≈ ₫27.3M a month, OpenAI stack + area server)
 net         = fees_saved + cs_saved − agent_cost
 ```
 
@@ -3465,7 +3465,7 @@ Problem figures and Shopee rules are listed with full links in [`../01-pitch/4-S
 - AWS Local Zone in Hanoi — AWS announcement: https://aws.amazon.com/about-aws/whats-new/2026/06/aws-local-zones-hanoi-vietnam/ · W.Media: https://w.media/aws-launches-local-zone-in-hanoi-to-expand-cloud-infrastructure-in-vietnam/
 - FPT AI Factory H100 price — https://factory.fpt.ai/ai-insights/h100-cost
 - AssemblyAI pricing and streaming languages — https://www.assemblyai.com/universal-streaming · https://assemblyai.com/docs/streaming/multilingual-transcription
-- OpenAI model pages (prices checked 31 Oct 2026): GPT-Live-1 https://developers.openai.com/api/docs/models/gpt-live-1 · GPT-5.6 Terra https://developers.openai.com/api/docs/models/gpt-5.6-terra · Decisions API https://openai.com/index/decisions-api/
+- OpenAI model pages (prices checked 31 Oct 2026): GPT-Live-1 https://developers.openai.com/api/docs/models/gpt-live-1 · GPT-6.1 Terra https://developers.openai.com/api/docs/models/gpt-6.1-terra · Decisions API https://openai.com/index/decisions-api/
 - OpenAI model prices (third-party lists; confirm on OpenAI’s pricing page) — https://pricepertoken.com/pricing-page/model/openai-gpt-5-mini · https://intuitionlabs.ai/articles/chatgpt-api-pricing-2026-token-costs-limits
 - Zalo ZNS prices (reseller quotes) — 8x8: https://cpaas.8x8.com/en/pricing/messaging-apps-pricing/ · Nhanh: https://pos.manual.nhanh.vn/pos/cai-dat/gui-zalo-zns/cac-loai-tin-cua-oa
 - Vietnam mobile call rates — Plivo: https://www.plivo.com/sip-trunking/pricing/vn/ · Twilio: https://www.twilio.com/en-us/voice/pricing/vn

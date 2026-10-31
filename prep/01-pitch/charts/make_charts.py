@@ -161,7 +161,7 @@ def chart_before_after(theme):
 # ------------------------------------------------------------------ 4. scenarios
 def chart_scenarios(theme):
     t = THEMES[theme]
-    fig = frame(t, "Net saving per area, per month", "After the 21M VND running cost · share of the monthly loss in brackets")
+    fig = frame(t, "Net saving per area, per month", f"After the {M(HEAD['cost_month'])} running cost · share of the monthly loss in brackets")
     ax = axes(fig, t, (0.26, 0.16, 0.66, 0.62))
     rows = [("Conservative · 40% rescue", SCEN["conservative"]), ("Base · 45% rescue", SCEN["base"]),
             ("Best-in-class · 65% rescue", SCEN["best_in_class"])]

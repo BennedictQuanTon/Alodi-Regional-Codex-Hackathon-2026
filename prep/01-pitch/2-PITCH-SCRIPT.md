@@ -31,7 +31,7 @@ Total: **5:00** = 2:00 talk + 3:00 live demo (or play the 2-minute video if the 
 | Alodi | One tap, one conversation, one card | Courier tap, chat, AI call, context card | “Fully automatic” |
 | Demo | It works, live, on four screens | — | — |
 | OpenAI core | The agent is real and safe | gpt-oss-20b runs locally; Structured Outputs; the policy guard is code | “Runs locally” for the demo if it calls cloud APIs |
-| Output | It pays for itself | 194M VND a month (41%), costs 4% of the loss, 6 s, 65% | Money as measured — it is *projected* |
+| Output | It pays for itself | 187M VND a month (40%), costs 6% of the loss, 6 s, 65% | Money as measured — it is *projected* |
 | Close | What happens next | Shadow mode at one area | Promises about dates you can’t keep |
 
 ## 3. Numbers you may say
@@ -42,8 +42,8 @@ Total: **5:00** = 2:00 talk + 3:00 live demo (or play the 2-minute video if the 
 | “Eight to twelve percent of orders are refused” | 8–12% (up to 20% remote, 25–30% sale season) | Sourced | VECOM; Tran Anh Tung (UEF), Nguoi Lao Dong, 19 Jul 2025 |
 | “Buyers have zero ways to pick a time” | 0 | Sourced | Shopee Help Center 79559 |
 | “One area loses about 470 million dong a month” | 473M VND (447–499M), ≈ 5.7B VND a year | Modelled | PRD §18.8: Shopee §7.1, VECOM, Shipsy, GHN, Glints |
-| “Alodi costs about 21 million a month to run, four percent of what is lost” | 20.9M VND a month; one-time server 75–98M VND | Estimate | PRD §18.8: Phong Vu, Viettel SIP, Zalo ZNS, EVN |
-| “At best-in-class rescue, it saves about 190 million a month, 41 percent” | 193.8M VND a month; ≈ 2.3B VND a year | **Projected** | Shipsy best-in-class 50–65% (vendor); PRD §18.8 |
+| “Alodi costs about 27 million a month to run, six percent of what is lost” | 27.3M VND a month; one-time server 75–98M VND | Estimate | PRD §18.8: Phong Vu, Viettel SIP, Zalo ZNS, EVN |
+| “At best-in-class rescue, it saves about 187 million a month, 40 percent” | 187.4M VND a month; ≈ 2.25B VND a year | **Projected** | Shipsy best-in-class 50–65% (vendor); PRD §18.8 |
 | “The courier’s card appears six seconds after the buyer answers” | 6 s | **Mock / target** until measured in the demo | Demo event log |
 | “Two out of three failed deliveries are resolved without a person, with zero calls out of hours” | 65%; 0 | **Mock / target** until the eval run | Eval report |
 | Survey lines | from `../06-survey/` | **Fill with the real results** | Alodi buyer survey (n = …) and courier interviews (n = …), Oct 2026 |
@@ -67,7 +67,7 @@ Total: **5:00** = 2:00 talk + 3:00 live demo (or play the 2-minute video if the 
 
 **Where does 473M a month come from?** One area, 4,000 orders a day, 8% fail, 75% of those return: 288M in return fees, plus redelivery pay, courier time and CS calls. Every input has a source in PRD §18.8.
 
-**Is 41% realistic?** It assumes Alodi reaches the best-in-class rescue rate Shipsy publishes (65%). The base case is 21%. All money figures are projected until a pilot measures them.
+**Is 40% realistic?** It assumes Alodi reaches the best-in-class rescue rate Shipsy publishes (65%). The base case is 20%. All money figures are projected until a pilot measures them.
 
 **Why can’t Shopee just add a time picker?** It helps the first attempt only. It doesn’t capture “leave it with security” or “call my wife”, and buyers rarely open an app after a missed call.
 

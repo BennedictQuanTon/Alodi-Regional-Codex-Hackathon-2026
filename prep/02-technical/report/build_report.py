@@ -32,7 +32,7 @@ CONS = ROWS[("local_first", "risky_only", "conservative")]
 AWS = ROWS[("aws_managed", "risky_only", "best_in_class")]
 DAY = json.loads((ROOT / "prep/02-technical/mock-data/expected-day-summary.json").read_text())
 DOOR = L["items"]["Courier time lost when the buyer doesn't answer"]
-VERSION = "0.4 · working draft"
+VERSION = "0.5 · working draft"
 DATE = "31 October 2026"
 
 
@@ -137,7 +137,7 @@ c1 = chapter(1, "Executive summary", "A failed delivery is a time negotiation th
 cannot choose a delivery window. When a courier can’t reach a buyer, the context that would fix the next attempt is compressed into one error code.
 For one area of 20 couriers and 4,000 orders a day, that costs about {m(MID)} a month (modelled).</p>
 <p><b>Product.</b> The courier taps one button: No answer, Rescheduled or Refused. Alodi messages the buyer at once and calls if there is silence
-(60 minutes, then 2 hours, only 08:00–20:30). GPT-Live-1 holds the call, the Decisions API on GPT-6 Luna triages every answer, and GPT-5.6 Terra
+(60 minutes, then 2 hours, only 08:00–20:30). GPT-Live-1 holds the call, the Decisions API on GPT-6 Luna triages every answer, and GPT-6.1 Terra
 orchestrates the case and writes a context card with when, where and who. Refusals, labels and returns always go to a person.</p>
 <p><b>Proof.</b> Three outcomes are measured on stage: time-to-context under 10 seconds, per-field F1 of at least 0.90, and zero high-stakes actions
 without a person. Money is projected: at best-in-class rescue Alodi saves {m(BEST['net_month'], 1)} a month per area ({net_pct:.0%} of the loss)
@@ -150,7 +150,7 @@ national rollout by 2028.</p>
 {sub("1.2", "Why now")}
 <ul class="cols"><li><b>The cost moved to sellers.</b> Since April 2025 Shopee sellers pay return shipping on failed orders, up to ₫40,000 each.</li>
 <li><b>Volume keeps growing.</b> The four largest marketplaces sold ₫429.7T in 2025, up 34.75% (Metric); call teams cannot grow that fast.</li>
-<li><b>The models are ready.</b> GPT-Live-1 makes a natural voice call possible, the Decisions API makes triage cheap, GPT-5.6 Terra handles the orchestration.</li>
+<li><b>The models are ready.</b> GPT-Live-1 makes a natural voice call possible, the Decisions API makes triage cheap, GPT-6.1 Terra handles the orchestration.</li>
 <li><b>The rules are clear.</b> Shopee’s 2–3 contacts within 5 days give the agent a fixed frame to work inside.</li></ul>
 """)
 
@@ -214,27 +214,27 @@ c5 = chapter(5, "The product", "Four screens and one agent, kept in sync on a fa
 c6 = chapter(6, "Architecture", "An agent layer between the buyer and the carrier. It replaces nothing and fails open.", """
 <div class="arch">
   <div class="col"><h4>Carrier + buyer</h4><div>Route planner · SPX</div><div>Order system · SPX</div><div>Courier tap</div><div>Buyer chat · Shopee / Zalo</div><div>AI call · GPT-Live-1 over SIP</div></div>
-  <div class="core"><h4>alodi · agent layer</h4><div><b>Alodi Agent</b> · GPT-5.6 Terra, Agents SDK</div><div><b>Triage</b> · Decisions API on GPT-6 Luna</div><div><b>Policy guard</b> · rules in code, masks PII</div><div><b>Scheduler</b> · Temporal timers</div><p>PostgreSQL · Redis · MinIO · gpt-oss-20b fallback</p></div>
+  <div class="core"><h4>alodi · agent layer</h4><div><b>Alodi Agent</b> · GPT-6.1 Terra, Agents SDK</div><div><b>Triage</b> · Decisions API on GPT-6 Luna</div><div><b>Policy guard</b> · rules in code, masks PII</div><div><b>Scheduler</b> · Temporal timers</div><p>PostgreSQL · Redis · MinIO · gpt-oss-20b fallback</p></div>
   <div class="col"><h4>Back to the carrier</h4><div>Context card → courier</div><div>CS queue → a person</div><div>Ops dashboard</div></div>
 </div>
 """ + table(["Component", "Demo (31 Oct)", "Production (per area)"], [
  ["Clients", "Next.js PWA on a phone, iPad console, laptop buyer view", "SPX driver app, a screen in the SPX dashboard, Shopee Chat / Zalo"],
  ["API + realtime", "FastAPI, REST + WebSocket", "FastAPI behind Caddy"],
- ["Agent", "State machine + tool calling", "GPT-5.6 Terra on the Agents SDK; workers on a Temporal queue"],
- ["Models", "OpenAI API, OpenAI TTS, AssemblyAI", "GPT-Live-1, Decisions API (GPT-6 Luna), GPT-5.6 Terra; gpt-oss-20b and PhoWhisper locally"],
+ ["Agent", "State machine + tool calling", "GPT-6.1 Terra on the Agents SDK; workers on a Temporal queue"],
+ ["Models", "OpenAI API, OpenAI TTS, AssemblyAI", "GPT-Live-1, Decisions API (GPT-6 Luna), GPT-6.1 Terra; gpt-oss-20b and PhoWhisper locally"],
  ["Data", "SQLite, recordings folder", "PostgreSQL, Redis, Temporal, MinIO (encrypted, 30-day TTL)"],
  ["Hosting", "One VM, Docker Compose", "OpenAI cloud + one workstation with two 16 GB GPUs per area; Kubernetes per region at scale"],
 ]) + note("Source: PRD §16, §16.7, §18.8. The same interfaces run in demo and production; only implementations swap."))
 
-c7 = chapter(7, "OpenAI at the core", "GPT-Live-1 talks to the buyer, the Decisions API triages, GPT-5.6 Terra orchestrates. Codex builds it.", f"""
+c7 = chapter(7, "OpenAI at the core", "GPT-Live-1 talks to the buyer, the Decisions API triages, GPT-6.1 Terra orchestrates. Codex builds it.", f"""
 <p>With OpenAI’s stack, Alodi talks to buyers through <b>GPT-Live-1</b>, OpenAI’s full-duplex voice model, so the call feels like a conversation rather than
 an IVR. Every incoming signal is first sorted by the <b>Decisions API on GPT-6 Luna</b>: which case it is, which window the buyer chose, and how confident that
-is. Once the information is classified and trimmed, <b>GPT-5.6 Terra</b> orchestrates the workflow between the order data, the buyer and the courier in the
+is. Once the information is classified and trimmed, <b>GPT-6.1 Terra</b> orchestrates the workflow between the order data, the buyer and the courier in the
 shortest time, applies company policy through the guard, and cuts the back-and-forth between buyer and courier to a single context card.</p>
 {table(["Component", "Role in Alodi", "Endpoint · price", "Demo", "Production"], [
  ["<b>GPT-Live-1</b>", "Real-time voice calls with the buyer; listens while it speaks and delegates reasoning to the Terra agent", "v1/live/sessions · $0.05 a minute", "In-browser call + TTS", "AI calls over the SIP line"],
  ["<b>Decisions API</b> on <b>GPT-6 Luna</b>", "Triage of every message: case type, chosen window, confidence (predicate, choice and score questions with probabilities)", "/v1/decisions · $0.10 per 1M input tokens", "–", "First step for every signal"],
- ["<b>GPT-5.6 Terra</b>", "Orchestration and extraction for escalated cases (~20% of traffic, estimate); Structured Outputs for the card", "Responses API · $2 / $12 per 1M tokens", "OpenAI API", "Agent brain"],
+ ["<b>GPT-6.1 Terra</b>", "Orchestration and extraction for escalated cases (~20% of traffic, estimate); Structured Outputs for the card", "Responses API · $1 / $5 per 1M tokens", "OpenAI API", "Agent brain"],
  ["<b>Agents SDK</b>", "One run per order: tools, CS handoff, guardrails, tracing", "Python SDK", "State machine", "Framework around Terra"],
  ["<b>gpt-oss-20b</b>", "Offline fallback on the area server (~16 GB with MXFP4)", "vLLM or Ollama · open weights", "–", "Fallback"],
  ["<b>Evals</b>", "Graders on the held-out set; gate every prompt, schema or model change", "OpenAI platform", "Codex loop", "Release gate"],
@@ -250,7 +250,7 @@ log next to the audit trail.</p>
 """)
 
 c8 = chapter(8, "Data, privacy and rules", "Text to the cloud is masked; calls run only after the recording notice.", """<ul class="cols">
-<li>Phone numbers, names and house numbers are masked before any text reaches GPT-5.6 Terra, the Decisions API or the local fallback.</li>
+<li>Phone numbers, names and house numbers are masked before any text reaches GPT-6.1 Terra, the Decisions API or the local fallback.</li>
 <li>AI calls run on GPT-Live-1 only after the buyer hears the recording notice; refusal ends the call and continues by chat or CS.</li>
 <li>Raw audio and transcripts are encrypted with a 30-day TTL; every change to an order’s context is versioned with the actor and time.</li>
 <li>Opt-out is checked before every scheduled job; no real number is dialled in the demo (TEST-0001 … TEST-2000).</li>
@@ -261,7 +261,7 @@ c8 = chapter(8, "Data, privacy and rules", "Text to the cloud is masked; calls r
 <tr><td>Buyer phone, name, address</td><td>Personal</td><td>orders (phone encrypted)</td><td>Carrier policy</td><td>Masked only</td></tr>
 <tr><td>Live call audio</td><td>Personal, sensitive</td><td>GPT-Live-1 session</td><td>Session only</td><td>Yes, to OpenAI after the recording notice</td></tr>
 <tr><td>Recorded call and memo audio</td><td>Personal, sensitive</td><td>Recordings store (MinIO)</td><td>30 days</td><td>No</td></tr>
-<tr><td>Masked transcript and chat text</td><td>Pseudonymised</td><td>recordings, events</td><td>30 days</td><td>To the Decisions API and GPT-5.6 Terra</td></tr>
+<tr><td>Masked transcript and chat text</td><td>Pseudonymised</td><td>recordings, events</td><td>30 days</td><td>To the Decisions API and GPT-6.1 Terra</td></tr>
 <tr><td>Extracted JSON, context card</td><td>Operational</td><td>rescue_result</td><td>Order lifetime</td><td>Yes, to the courier app and SPX</td></tr>
 <tr><td>Event log and traces</td><td>Operational</td><td>events</td><td>Monthly partitions</td><td>Aggregates only</td></tr>
 </tbody></table>
@@ -313,7 +313,7 @@ c12 = chapter(12, "Roadmap", "From a stage demo to a national rollout.", table([
  ["Driver-app integration for the tap and the card", "The courier never leaves the app they already use", "Q1 2027"],
  ["Shopee Chat API and approved Zalo ZNS templates", "Real buyer messages for risky orders", "Q2 2027"],
  ["A SIP trunk with a verified brand name", "Buyers answer calls they can identify", "Q2 2027"],
- ["OpenAI organisation access: GPT-Live-1, Decisions API, GPT-5.6 Terra", "The production stack", "Q1 2027"],
+ ["OpenAI organisation access: GPT-Live-1, Decisions API, GPT-6.1 Terra", "The production stack", "Q1 2027"],
  ["CS time to label shadow-mode cases", "Ground truth for thresholds and evals", "Q1 2027"],
  ["Data protection impact and transfer assessments", "PDPL and Decree 53 before any buyer contact", "Before Q2 2027"],
 ]) + note("Source: PRD §26, §28."))
@@ -345,7 +345,7 @@ SRC = [
  ("Shipsy, NDR management", "Industry rescue 20–30%, best-in-class 50–65%", "shipsy.ai/insights/what-is-ndr-non-delivery-report-management", "Verified; vendor claim"),
  ("Metric, e-commerce report 2025", "₫429.7T across four marketplaces; +34.75%", "via daibieunhandan.vn, vneconomy.vn", "Verified via press; single provider"),
  ("OpenAI, GPT-Live-1 model page", "gpt-live-1; v1/live/sessions; $0.05 a minute; delegates to a backend agent", "developers.openai.com/api/docs/models/gpt-live-1", "Verified 31 Oct 2026; languages not listed"),
- ("OpenAI, GPT-5.6 Terra model page", "gpt-5.6-terra; 1.05M context; $2 / $12 per 1M tokens; Responses API", "developers.openai.com/api/docs/models/gpt-5.6-terra", "Verified 31 Oct 2026"),
+ ("OpenAI, GPT-6.1 Terra model page", "gpt-6.1-terra; 1.05M context; $1 / $5 per 1M tokens; Responses API", "developers.openai.com/api/docs/models/gpt-6.1-terra", "Verified 31 Oct 2026"),
  ("OpenAI, Decisions API", "/v1/decisions on gpt-6-luna; predicate, choice, score questions; $0.10 per 1M input tokens", "openai.com/index/decisions-api · Vercel AI Gateway listing", "Verified via listings; official page not machine-readable"),
  ("OpenAI, gpt-oss-20b", "Runs within 16 GB with MXFP4", "Azure AI catalog · vLLM recipes", "Verified"),
  ("Glints, Phong Vu, Viettel reseller, oazns.vn, EVN", "Courier income, GPU prices, SIP, ZNS and power tariffs", "see PRD §18.8", "Listed prices, checked by the team"),
@@ -354,7 +354,7 @@ c15 = chapter(15, "Sources and verification", "Every external figure, where it c
 
 CSS = font_css + """
 @page { size: A4; margin: 20mm 18mm 20mm;
-  @bottom-left { content: "Alodi · Project report · v0.4"; font-family: 'Geist'; font-size: 7.5pt; color: #8a91a6; }
+  @bottom-left { content: "Alodi · Project report · v0.5"; font-family: 'Geist'; font-size: 7.5pt; color: #8a91a6; }
   @bottom-right { content: counter(page) " / " counter(pages); font-family: 'Geist'; font-size: 7.5pt; color: #8a91a6; }
   @top-right { content: "Team Develarper · 31 Oct 2026"; font-family: 'Geist'; font-size: 7.5pt; color: #b0b5c3; }
 }

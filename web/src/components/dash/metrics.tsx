@@ -69,7 +69,7 @@ function Money() {
   const [failRate, setFailRate] = useState(8);
   const [uplift, setUplift] = useState(40);
   const [auto, setAuto] = useState(65);
-  const [running, setRunning] = useState(29.0);
+  const [running, setRunning] = useState(27.3);
   const failed = orders * (failRate / 100);
   const fee = failed * (uplift / 100) * 40000 * 30;
   const redelivery = failed * (uplift / 100) * 0.75 * 7000 * 30;

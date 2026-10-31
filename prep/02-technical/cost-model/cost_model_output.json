@@ -37,7 +37,7 @@
       "scenario": "conservative",
       "cost_items": {
         "Decisions API on GPT-6 Luna (triage of every message)": 468000.0000000001,
-        "GPT-5.6 Terra (orchestration, ~20% of LLM traffic after triage)": 3219840.0,
+        "GPT-6.1 Terra (orchestration, ~20% of LLM traffic after triage)": 1497599.9999999998,
         "GPT-Live-1 (AI calls, $0.05 a minute)": 5226000.0,
         "Local models: gpt-oss-20b fallback, PhoWhisper for memos": 0,
         "Viettel Mobile SIP trunk (calls + line)": 3185600,
@@ -48,7 +48,7 @@
         "Remote ops 0.1 FTE (shared across hubs)": 3600000,
         "Hardware upkeep reserve (5% of hardware a year)": 360000.0
       },
-      "cost_month": 28977920.0,
+      "cost_month": 27255680.0,
       "saving_items": {
         "Return fees avoided": 57600000.0,
         "Redelivery attempts avoided": 0.0,
@@ -57,10 +57,10 @@
       },
       "gross_month": 75520000.0,
       "gross_pct": 0.15969001214504655,
-      "net_month": 46542080.0,
-      "net_pct": 0.09841505985772946,
-      "net_year": 558504960.0,
-      "hardware_payback_months": 1.8563845878826215
+      "net_month": 48264320.0,
+      "net_pct": 0.10205680411774912,
+      "net_year": 579171840.0,
+      "hardware_payback_months": 1.7901422831607283
     },
     {
       "setup": "local_first",
@@ -68,7 +68,7 @@
       "scenario": "base",
       "cost_items": {
         "Decisions API on GPT-6 Luna (triage of every message)": 468000.0000000001,
-        "GPT-5.6 Terra (orchestration, ~20% of LLM traffic after triage)": 3219840.0,
+        "GPT-6.1 Terra (orchestration, ~20% of LLM traffic after triage)": 1497599.9999999998,
         "GPT-Live-1 (AI calls, $0.05 a minute)": 5226000.0,
         "Local models: gpt-oss-20b fallback, PhoWhisper for memos": 0,
         "Viettel Mobile SIP trunk (calls + line)": 3185600,
@@ -79,7 +79,7 @@
         "Remote ops 0.1 FTE (shared across hubs)": 3600000,
         "Hardware upkeep reserve (5% of hardware a year)": 360000.0
       },
-      "cost_month": 28977920.0,
+      "cost_month": 27255680.0,
       "saving_items": {
         "Return fees avoided": 76800000.0,
         "Redelivery attempts avoided": 10079999.999999994,
@@ -88,10 +88,10 @@
       },
       "gross_month": 119657435.89743589,
       "gross_pct": 0.2530203574113701,
-      "net_month": 90679515.89743589,
-      "net_pct": 0.19174540512405297,
-      "net_year": 1088154190.7692306,
-      "hardware_payback_months": 0.952806145301037
+      "net_month": 92401755.89743589,
+      "net_pct": 0.19538714938407262,
+      "net_year": 1108821070.7692306,
+      "hardware_payback_months": 0.9350471661588583
     },
     {
       "setup": "local_first",
@@ -99,7 +99,7 @@
       "scenario": "best_in_class",
       "cost_items": {
         "Decisions API on GPT-6 Luna (triage of every message)": 468000.0000000001,
-        "GPT-5.6 Terra (orchestration, ~20% of LLM traffic after triage)": 3219840.0,
+        "GPT-6.1 Terra (orchestration, ~20% of LLM traffic after triage)": 1497599.9999999998,
         "GPT-Live-1 (AI calls, $0.05 a minute)": 5226000.0,
         "Local models: gpt-oss-20b fallback, PhoWhisper for memos": 0,
         "Viettel Mobile SIP trunk (calls + line)": 3185600,
@@ -110,7 +110,7 @@
         "Remote ops 0.1 FTE (shared across hubs)": 3600000,
         "Hardware upkeep reserve (5% of hardware a year)": 360000.0
       },
-      "cost_month": 28977920.0,
+      "cost_month": 27255680.0,
       "saving_items": {
         "Return fees avoided": 153600000.0,
         "Redelivery attempts avoided": 20160000.000000004,
@@ -119,10 +119,10 @@
       },
       "gross_month": 214674871.7948718,
       "gross_pct": 0.45393846509744956,
-      "net_month": 185696951.7948718,
-      "net_pct": 0.39266351281013245,
-      "net_year": 2228363421.5384617,
-      "hardware_payback_months": 0.46527419629074396
+      "net_month": 187419191.7948718,
+      "net_pct": 0.39630525707015213,
+      "net_year": 2249030301.5384617,
+      "hardware_payback_months": 0.46099867987139664
     },
     {
       "setup": "local_first",
@@ -130,7 +130,7 @@
       "scenario": "conservative",
       "cost_items": {
         "Decisions API on GPT-6 Luna (triage of every message)": 468000.0000000001,
-        "GPT-5.6 Terra (orchestration, ~20% of LLM traffic after triage)": 3219840.0,
+        "GPT-6.1 Terra (orchestration, ~20% of LLM traffic after triage)": 1497599.9999999998,
         "GPT-Live-1 (AI calls, $0.05 a minute)": 5226000.0,
         "Local models: gpt-oss-20b fallback, PhoWhisper for memos": 0,
         "Viettel Mobile SIP trunk (calls + line)": 3185600,
@@ -141,7 +141,7 @@
         "Remote ops 0.1 FTE (shared across hubs)": 3600000,
         "Hardware upkeep reserve (5% of hardware a year)": 360000.0
       },
-      "cost_month": 72717920.0,
+      "cost_month": 70995680.0,
       "saving_items": {
         "Return fees avoided": 57600000.0,
         "Redelivery attempts avoided": 0.0,
@@ -150,10 +150,10 @@
       },
       "gross_month": 75520000.0,
       "gross_pct": 0.15969001214504655,
-      "net_month": 2802080.0,
-      "net_pct": 0.005925108437915679,
-      "net_year": 33624960.0,
-      "hardware_payback_months": 30.834237423628164
+      "net_month": 4524320.0,
+      "net_pct": 0.009566852697935342,
+      "net_year": 54291840.0,
+      "hardware_payback_months": 19.096792446157654
     },
     {
       "setup": "local_first",
@@ -161,7 +161,7 @@
       "scenario": "base",
       "cost_items": {
         "Decisions API on GPT-6 Luna (triage of every message)": 468000.0000000001,
-        "GPT-5.6 Terra (orchestration, ~20% of LLM traffic after triage)": 3219840.0,
+        "GPT-6.1 Terra (orchestration, ~20% of LLM traffic after triage)": 1497599.9999999998,
         "GPT-Live-1 (AI calls, $0.05 a minute)": 5226000.0,
         "Local models: gpt-oss-20b fallback, PhoWhisper for memos": 0,
         "Viettel Mobile SIP trunk (calls + line)": 3185600,
@@ -172,7 +172,7 @@
         "Remote ops 0.1 FTE (shared across hubs)": 3600000,
         "Hardware upkeep reserve (5% of hardware a year)": 360000.0
       },
-      "cost_month": 72717920.0,
+      "cost_month": 70995680.0,
       "saving_items": {
         "Return fees avoided": 76800000.0,
         "Redelivery attempts avoided": 10079999.999999994,
@@ -181,10 +181,10 @@
       },
       "gross_month": 119657435.89743589,
       "gross_pct": 0.2530203574113701,
-      "net_month": 46939515.89743589,
-      "net_pct": 0.09925545370423919,
-      "net_year": 563274190.7692306,
-      "hardware_payback_months": 1.8406666184795415
+      "net_month": 48661755.89743589,
+      "net_pct": 0.10289719796425885,
+      "net_year": 583941070.7692306,
+      "hardware_payback_months": 1.775521626924125
     },
     {
       "setup": "local_first",
@@ -192,7 +192,7 @@
       "scenario": "best_in_class",
       "cost_items": {
         "Decisions API on GPT-6 Luna (triage of every message)": 468000.0000000001,
-        "GPT-5.6 Terra (orchestration, ~20% of LLM traffic after triage)": 3219840.0,
+        "GPT-6.1 Terra (orchestration, ~20% of LLM traffic after triage)": 1497599.9999999998,
         "GPT-Live-1 (AI calls, $0.05 a minute)": 5226000.0,
         "Local models: gpt-oss-20b fallback, PhoWhisper for memos": 0,
         "Viettel Mobile SIP trunk (calls + line)": 3185600,
@@ -203,7 +203,7 @@
         "Remote ops 0.1 FTE (shared across hubs)": 3600000,
         "Hardware upkeep reserve (5% of hardware a year)": 360000.0
       },
-      "cost_month": 72717920.0,
+      "cost_month": 70995680.0,
       "saving_items": {
         "Return fees avoided": 153600000.0,
         "Redelivery attempts avoided": 20160000.000000004,
@@ -212,10 +212,10 @@
       },
       "gross_month": 214674871.7948718,
       "gross_pct": 0.45393846509744956,
-      "net_month": 141956951.7948718,
-      "net_pct": 0.3001735613903187,
-      "net_year": 1703483421.5384617,
-      "hardware_payback_months": 0.6086352158705707
+      "net_month": 143679191.7948718,
+      "net_pct": 0.3038153056503384,
+      "net_year": 1724150301.5384617,
+      "hardware_payback_months": 0.6013396854525165
     },
     {
       "setup": "aws_managed",
