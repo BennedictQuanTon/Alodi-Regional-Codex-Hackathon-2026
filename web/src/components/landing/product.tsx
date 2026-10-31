@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { FEATURES, MONEY, NUMBERS_PDF, OUTPUT_METRICS } from "@/lib/content";
+import { AREA_GAINS, FEATURES, NUMBERS_PDF, OUTPUT_METRICS } from "@/lib/content";
 import { Mark, SourceNote } from "@/components/site/brand";
 import { ArchitectureDiagram } from "./architecture";
 import { Figure, Reveal, RevealText } from "./motion";
@@ -55,85 +55,82 @@ export function Features() {
 }
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const LOSS = 472.9;
-const GROSS = 214.7;
-const COST = 20.9;
 
-/** Proportional bar: the monthly loss, the part Alodi recovers, and the running cost taken out of it. */
-function MoneyBar() {
-  const pct = (v: number) => `${(v / LOSS) * 100}%`;
+function cellBorder(i: number) {
+  return `${i > 0 ? "border-t border-ash sm:border-t-0" : ""} ${i % 2 === 1 ? "sm:border-l" : ""} ${i >= 2 ? "sm:border-t xl:border-t-0" : ""} ${i > 0 ? "xl:border-l" : ""}`;
+}
+
+function RowLabel({ children, right }: { children: React.ReactNode; right?: string }) {
   return (
-    <div>
-      <div className="relative h-3 overflow-hidden rounded-full bg-ash-soft">
-        <motion.div
-          className="absolute inset-y-0 left-0 flex overflow-hidden rounded-full"
-          initial={{ width: 0 }}
-          whileInView={{ width: pct(GROSS) }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 1.4, ease: EASE }}
-        >
-          <span className="h-full bg-orange" style={{ width: `${((GROSS - COST) / GROSS) * 100}%` }} />
-          <span className="h-full bg-navy" style={{ width: `${(COST / GROSS) * 100}%` }} />
-        </motion.div>
-      </div>
-      <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-4">
-        {MONEY.map((m, i) => (
-          <motion.div
-            key={m.label}
-            initial={{ opacity: 0, y: 6 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ delay: 0.3 + i * 0.1, duration: 0.5, ease: EASE }}
-            className="flex items-start gap-2.5"
-          >
-            <span className={`mt-1.5 size-2 shrink-0 rounded-full ${i === 0 ? "bg-ash" : i === 1 ? "bg-orange/50" : i === 2 ? "bg-navy" : "bg-orange"}`} />
-            <span>
-              <span className={`t-number block text-[28px] leading-none ${i === 3 ? "text-orange-deep" : ""}`}>{m.value}</span>
-              <span className="mt-1.5 block text-[13px] text-graphite">{m.label}</span>
-            </span>
-          </motion.div>
-        ))}
-      </div>
+    <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ash px-7 py-3.5 md:px-8">
+      <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-navy">{children}</span>
+      {right && <span className="text-[12px] text-smoke">{right}</span>}
     </div>
   );
 }
 
 export function Outcomes() {
+  const net = 193.8;
+  const loss = 472.9;
   return (
     <section id="metrics" className="scroll-mt-28 py-20 md:py-24">
       <div className="container-page">
         <Reveal>
-          <div className="t-eyebrow">Expected outcomes</div>
+          <div className="t-eyebrow">Outcomes</div>
         </Reveal>
         <RevealText text="What we will be judged on." className="t-h1 mt-5" stagger={0.035} />
 
         <Reveal className="mt-10">
           <div className="overflow-hidden rounded-[24px] border border-ash">
+            <RowLabel right="PRD §2.3 · §23">Measured on stage</RowLabel>
             <div className="grid sm:grid-cols-2 xl:grid-cols-4">
               {OUTPUT_METRICS.map((m, i) => (
-                <div
-                  key={m.metric}
-                  className={`flex flex-col p-7 md:p-8 ${i > 0 ? "border-t border-ash sm:border-t-0" : ""} ${i % 2 === 1 ? "sm:border-l" : ""} ${i >= 2 ? "sm:border-t xl:border-t-0" : ""} ${i > 0 ? "xl:border-l" : ""}`}
-                >
-                  <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-smoke">{m.metric}</span>
-                  <div className={`t-number mt-8 whitespace-nowrap text-[64px] leading-none md:text-[76px] ${i === 3 ? "text-orange-deep" : ""}`}>
+                <div key={m.metric} className={`flex flex-col p-7 md:p-8 ${cellBorder(i)}`}>
+                  <span className="text-[12px] uppercase tracking-[0.08em] text-smoke">{m.metric}</span>
+                  <div className="t-number mt-6 whitespace-nowrap text-[56px] leading-none md:text-[64px]">
                     <Figure value={m.target} />
                   </div>
-                  <p className="mt-5 max-w-[240px] text-[14px] leading-[1.45] text-graphite">{m.how}</p>
+                  <p className="mt-4 max-w-[230px] text-[14px] leading-[1.45] text-graphite">{m.how}</p>
                 </div>
               ))}
             </div>
-            <div className="grid items-end gap-8 border-t border-ash bg-paper p-7 md:p-8 xl:grid-cols-[1fr_auto] xl:gap-14">
-              <div>
-                <div className="mb-5 text-[12px] font-medium uppercase tracking-[0.08em] text-smoke">Where ₫194M a month comes from · one area</div>
-                <MoneyBar />
+
+            <div className="border-t border-ash bg-paper">
+              <RowLabel right="PRD §18.8 · projected">What one area gets back</RowLabel>
+              <div className="grid sm:grid-cols-2 xl:grid-cols-4">
+                {AREA_GAINS.map((g, i) => (
+                  <div key={g.label} className={`flex flex-col p-7 md:p-8 ${cellBorder(i)}`}>
+                    <span className="text-[12px] uppercase tracking-[0.08em] text-smoke">a day</span>
+                    <div className="t-number mt-6 whitespace-nowrap text-[56px] leading-none md:text-[64px]">
+                      <Figure value={g.value} />
+                    </div>
+                    <p className="mt-4 text-[14px] leading-[1.45] text-graphite">{g.label}</p>
+                    <p className="mt-1 text-[12px] text-smoke">{g.note}</p>
+                  </div>
+                ))}
+                <div className={`flex flex-col p-7 md:p-8 ${cellBorder(3)}`}>
+                  <span className="text-[12px] uppercase tracking-[0.08em] text-smoke">a month, net</span>
+                  <div className="t-number mt-6 whitespace-nowrap text-[56px] leading-none text-orange-deep md:text-[64px]">
+                    <Figure value="₫194M" />
+                  </div>
+                  <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-ash-soft">
+                    <motion.div
+                      className="h-full rounded-full bg-orange"
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${(net / loss) * 100}%` }}
+                      viewport={{ once: true, margin: "-60px" }}
+                      transition={{ duration: 1.3, ease: EASE }}
+                    />
+                  </div>
+                  <p className="mt-2 text-[12px] text-smoke">41% of the ₫473M lost each month</p>
+                  <a href={NUMBERS_PDF} target="_blank" rel="noreferrer" className="mt-5 text-[13px] font-medium text-navy underline decoration-orange decoration-2 underline-offset-4 hover:text-orange-deep">
+                    See every formula · PDF →
+                  </a>
+                </div>
               </div>
-              <a href={NUMBERS_PDF} target="_blank" rel="noreferrer" className="btn btn-dark justify-self-start">
-                The numbers, proved · PDF
-              </a>
             </div>
           </div>
-          <SourceNote className="mt-4">Team cost model, PRD §18.8. Best-in-class rescue, 25% → 65% (Shipsy vendor range). Base case ₫99M a month. Money is projected; the other three are measured on stage.</SourceNote>
+          <SourceNote className="mt-4">PRD §2.3, §23 targets; §18.8 team cost model, best-in-class rescue 25% → 65% (Shipsy vendor range); base case ₫99M a month.</SourceNote>
         </Reveal>
       </div>
     </section>

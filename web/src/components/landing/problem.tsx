@@ -22,8 +22,10 @@ function SurveyPhotos() {
       {has ? (
         <div className={`grid h-full gap-1 ${SURVEY_PHOTOS.length > 1 ? "grid-rows-2" : ""}`}>
           {SURVEY_PHOTOS.slice(0, 2).map((p) => (
-            <div key={p.src} className="relative">
-              <Image src={p.src} alt={p.alt} fill sizes="(min-width: 1024px) 40vw, 100vw" className="photo-tone object-cover" />
+            <div key={p.src} className="relative min-h-[420px]">
+              <Image src={p.src} alt={p.alt} fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/70 to-transparent" />
+              {p.caption && <figcaption className="absolute bottom-5 left-6 text-[12px] font-medium uppercase tracking-[0.08em] text-parchment/85">{p.caption}</figcaption>}
             </div>
           ))}
         </div>
@@ -44,35 +46,33 @@ function SurveyBand() {
     { who: "Couriers", n: SURVEY.couriers.n, sub: SURVEY.couriers.from, stats: SURVEY.couriers.stats },
   ];
   return (
-    <div className="rounded-[24px] bg-ink px-7 py-6 text-parchment">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="t-eyebrow text-parchment/50">We asked both sides</span>
-        <span className="text-[11px] text-parchment/40">
-          {SURVEY.status === "MOCK" ? "Placeholder values until the interview export replaces them" : "Source: team survey, Oct 2026"}
-        </span>
+    <div className="overflow-hidden rounded-[24px] bg-ink text-parchment">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-white/10 px-7 py-4">
+        <span className="t-eyebrow text-parchment/55">We asked both sides</span>
+        {SURVEY.status === "MOCK" && <span className="text-[11px] text-parchment/35">Placeholder values until the interview export lands</span>}
       </div>
-      <div className="mt-5 grid gap-6 md:grid-cols-2 md:gap-0">
+      <div className="grid md:grid-cols-2">
         {groups.map((g, gi) => (
-          <div key={g.who} className={gi === 1 ? "md:border-l md:border-white/10 md:pl-7" : "md:pr-7"}>
+          <div key={g.who} className={`px-7 py-5 ${gi === 1 ? "border-t border-white/10 md:border-l md:border-t-0" : ""}`}>
             <div className="flex items-baseline gap-2 text-[12px]">
               <span className="font-medium uppercase tracking-[0.08em] text-orange">{g.who}</span>
-              <span className="text-parchment/45">
+              <span className="text-parchment/40">
                 n = {g.n} · {g.sub}
               </span>
             </div>
-            <ul className="mt-4 grid grid-cols-2 gap-5">
-              {g.stats.map((s, i) => (
+            <ul className="mt-4 grid grid-cols-2 gap-6">
+              {g.stats.map((st, i) => (
                 <motion.li
-                  key={s.text}
+                  key={st.text}
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ delay: 0.1 + (gi * 2 + i) * 0.1, duration: 0.55, ease: EASE }}
                 >
-                  <div className="t-number text-[40px] leading-none">
-                    <Figure value={s.value} />
+                  <div className="t-number text-[44px] leading-none">
+                    <Figure value={st.value} />
                   </div>
-                  <div className="mt-2 text-[12px] leading-[1.4] text-parchment/65">{s.text}</div>
+                  <div className="mt-2 text-[13px] leading-[1.4] text-parchment/65">{st.text}</div>
                 </motion.li>
               ))}
             </ul>

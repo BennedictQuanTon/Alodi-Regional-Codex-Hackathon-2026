@@ -145,7 +145,9 @@ export const PHOTOS = {
  * Photo slot in the problem section, reserved for the team’s own field-survey photos.
  * Drop files in web/public/photos/survey/ and list them here; empty shows a placeholder frame.
  */
-export const SURVEY_PHOTOS: { src: string; alt: string }[] = [];
+export const SURVEY_PHOTOS: { src: string; alt: string; caption?: string }[] = [
+  { src: "/photos/survey/spx-hub.webp", alt: "An SPX Express hub on Bui Minh Truc street, Ho Chi Minh City", caption: "Field visit · SPX Express hub, Ho Chi Minh City" },
+];
 
 /**
  * Survey headline numbers (prep/06-survey/summary_MOCK.csv). `status` mirrors the files’ data_status:
@@ -163,7 +165,7 @@ export const SURVEY = {
   },
   couriers: {
     n: 12,
-    from: "SPX, GHN, J&T, BEST, GHTK, Viettel Post",
+    from: "6 carriers",
     stats: [
       { value: "27%", text: "of their calls to buyers go unanswered" },
       { value: "83%", text: "would use an Alodi-like system" },
@@ -222,19 +224,19 @@ export const FEATURES = [
   },
 ];
 
+/** Output metrics from PRD §2.3 and §23: measured on stage from the event log and the eval set. */
 export const OUTPUT_METRICS = [
-  { metric: "Time-to-context", target: "< 10 s", how: "Buyer’s answer to the courier’s card, from the event log" },
+  { metric: "Time-to-context", target: "< 10 s", how: "Buyer’s answer to the card on the courier’s phone, median" },
   { metric: "Extraction F1", target: "≥ 0.90", how: "Per field, on a held-out set of chat, call and memo samples" },
-  { metric: "Safe autonomy", target: "0", how: "Calls out of hours or labels without a person" },
-  { metric: "Net saving", target: "₫194M", how: "A month in one area, after running costs (41% of the loss)" },
+  { metric: "Wrong auto-applies", target: "< 2%", how: "Of the cases the agent closes on its own" },
+  { metric: "Without a person", target: "0", how: "Labels, returns or calls out of hours" },
 ];
 
-/** The money chain behind the outcome row (PRD §18.8, best-in-class rescue; projected). */
-export const MONEY = [
-  { value: "₫473M", label: "lost a month today" },
-  { value: "₫215M", label: "recovered by Alodi" },
-  { value: "−₫21M", label: "to run it" },
-  { value: "₫194M", label: "net saving, 41% of the loss" },
+/** What one area gets back each day (PRD §18.8 best-in-class case, SLIDES §3.4). Projected. */
+export const AREA_GAINS = [
+  { value: "416", label: "CS calls handled by the agent", note: "≈ 28 staff-hours" },
+  { value: "96", label: "fewer wasted courier trips", note: "320 × 0.3 attempts" },
+  { value: "24 min", label: "back per courier", note: "96 trips × 5 min ÷ 20" },
 ];
 
 /** Downloadable proof of every number: formulas, inputs, sources (generated from prep/02-technical/cost-model). */
