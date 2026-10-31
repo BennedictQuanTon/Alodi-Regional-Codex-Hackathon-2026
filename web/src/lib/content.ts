@@ -105,7 +105,7 @@ export const TLDR = {
     { k: "Starts with", v: "One tap: No answer · Rescheduled · Refused" },
     { k: "Does", v: "Chats now, calls if silent, extracts a context card" },
     { k: "Never", v: "Labels or returns an order without a person" },
-    { k: "Built on", v: "OpenAI Agents SDK and gpt-oss-20b, shipped with Codex" },
+    { k: "Built on", v: "GPT-Live-1, the Decisions API on GPT-6 Luna and GPT-5.6 Terra; built with Codex" },
   ],
 };
 
@@ -261,9 +261,13 @@ export const TECH_DEMO: Tech[] = [
   { name: "Docker", note: "Compose, one VM", icon: "siDocker" },
 ];
 
-// Production, local-first per area (PRD §18.8.2): one GPU workstation, OpenAI only as a masked fallback.
+// Production per area (PRD §16.7, §18.8.2): OpenAI GPT-Live-1, Decisions API (GPT-6 Luna) and GPT-5.6 Terra,
+// with one local workstation for the gpt-oss-20b fallback, PhoWhisper memos and the data stores.
 export const TECH_PROD: Tech[] = [
-  { name: "gpt-oss-20b", note: "OpenAI open-weight, on the area server", icon: "siOpenai" },
+  { name: "GPT-Live-1", note: "Real-time voice calls", icon: "siOpenai" },
+  { name: "Decisions API", note: "Triage on GPT-6 Luna", icon: "siOpenai" },
+  { name: "GPT-5.6 Terra", note: "Orchestration", icon: "siOpenai" },
+  { name: "gpt-oss-20b", note: "Local fallback", icon: "siOpenai" },
   { name: "Ollama / vLLM", note: "Model serving", icon: "siOllama" },
   { name: "PhoWhisper", note: "Vietnamese ASR", icon: "/logos/vinai-mark.png" },
   { name: "Piper TTS", note: "Dynamic voice lines", mono: "Pi" },
@@ -370,7 +374,7 @@ export const FAQ = [
   },
   {
     q: "How is personal data handled?",
-    a: "Raw audio and transcripts stay inside a trusted zone with a deletion window. Only extracted JSON leaves it. Phone numbers and addresses are masked before any cloud model call.",
+    a: "AI calls run on GPT-Live-1 only after the recording consent in the opening line. Text sent to GPT-5.6 Terra and the Decisions API is masked first: no phone numbers, names or house numbers. Raw audio and transcripts are kept 30 days, encrypted.",
   },
   {
     q: "Do you need to fine-tune a model?",
