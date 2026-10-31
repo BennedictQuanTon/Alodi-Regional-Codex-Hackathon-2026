@@ -48,8 +48,10 @@ export class TourAudio implements StepDirector {
   /** Call inside the Start tap, so the browser allows every later clip on this element. */
   unlock() {
     this.voice ||= new Audio();
-    this.ringing ||= Object.assign(new Audio("/tour/sfx-ring.mp3"), { loop: true, volume: 0.4 });
+    this.ringing ||= Object.assign(new Audio("/tour/sfx-ring.mp3"), { loop: true, volume: 0.15 });
     this.setMuted(this.muted);
+    // Fetch every clip up front, so a slow network doesn't leave gaps in the story.
+    for (const id of Object.keys(CLIPS)) new Audio(`/tour/${id}.mp3`).preload = "auto";
   }
 
   setMuted(muted: boolean) {
@@ -71,6 +73,7 @@ export class TourAudio implements StepDirector {
       this.finish = resolve;
       voice.onended = voice.onerror = () => this.settle();
       voice.src = `/tour/${step.id}.mp3`;
+      voice.playbackRate = 1.12;
       voice.play().catch(() => this.settle());
     });
   };
@@ -128,7 +131,7 @@ export function useTourEffects(s: DemoState, audio: TourAudio) {
     const before = seen.current;
     if (s.chat.length === before.chat + 1) audio.effect("pop");
     if (s.shipper.screen !== before.screen && s.shipper.screen === "waiting") audio.effect("tap");
-    if (s.card && !before.card) audio.effect("chime");
+    if ((s.card && !before.card) || (s.shipper.screen !== before.screen && s.shipper.screen === "delivered")) audio.effect("chime");
     seen.current = { chat: s.chat.length, screen: s.shipper.screen, card: !!s.card };
   }, [audio, s.chat.length, s.shipper.screen, s.card]);
 }

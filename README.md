@@ -284,7 +284,7 @@ The website deploys to Vercel with **Root Directory** `web`, framework Next.js a
 | `/start` | Choose the live or judges' demo |
 | `/demo` | Scripted stage: shipper app, buyer phone, operations panel |
 | `/demo/shipper`, `/demo/buyer`, `/demo/console` | The same demo, one screen per window |
-| `/tour` | One-screen narrated demo that plays by itself with sound; needs no backend |
+| `/tour` | Narrated demo that plays by itself with sound, on shipper, customer, SPX and agent screens; needs no backend |
 | `/live?session=<id>`, `/live/shipper?session=<id>` | Live demo dashboard and phone for one session |
 | `/console` | Operations dashboard |
 | `/metrics` | Output metrics and savings calculator |
@@ -373,6 +373,6 @@ Checked 31 October 2026.
 
 ## Credits
 
-Illustrated people: Notionists by Zoish (CC0) via DiceBear. Interface sounds: Kenney (CC0). Voices: Kokoro-82M (Apache-2.0). Photos: CC0 via Wikimedia Commons, credited in the deck. Film media: [`story/CREDITS.md`](prep/01-pitch/video/story/CREDITS.md) and [`skit/CREDITS.md`](prep/01-pitch/video/skit/CREDITS.md).
+Illustrated people: Notionists by Zoish (CC0) via DiceBear. Interface sounds: Kenney (CC0). Voices: Kokoro-82M (Apache-2.0), and OpenAI TTS for `/tour`. Photos: CC0 via Wikimedia Commons, credited in the deck. Film media: [`story/CREDITS.md`](prep/01-pitch/video/story/CREDITS.md) and [`skit/CREDITS.md`](prep/01-pitch/video/skit/CREDITS.md).
 
 <sub>All people, orders and records in this repository are fictional or synthetic.</sub>
