@@ -335,9 +335,9 @@ Checked 31 October 2026.
 
 <table>
   <tr>
-    <td align="center" width="25%"><img src="web/public/team/nomura-yoshio.jpg" alt="Nomura Yoshio" width="140" /><br/><b>Nomura Yoshio</b><br/><sub>Team Lead, Presenter</sub></td>
-    <td align="center" width="25%"><img src="web/public/team/long-quan-ton.jpg" alt="Long Quan Ton" width="140" /><br/><b>Long Quan Ton</b><br/><sub>AI Engineer, Solution Architect</sub></td>
-    <td align="center" width="25%"><img src="web/public/team/khanh-tuong-huynh.jpg" alt="Khanh Tuong Huynh" width="140" /><br/><b>Khanh Tuong Huynh</b><br/><sub>AI Engineer, Deployment Engineer</sub></td>
+    <td align="center" width="25%"><img src="web/public/team/nomura-yoshio.jpg" alt="Nomura Yoshio" width="140" /><br/><b>Nomura Yoshio</b><br/><sub>Team Lead, Project Presenter</sub></td>
+    <td align="center" width="25%"><img src="web/public/team/long-quan-ton.jpg" alt="Long Quan Ton" width="140" /><br/><b>Long Quan Ton</b><br/><sub>Product Manager, AI Engineer</sub></td>
+    <td align="center" width="25%"><img src="web/public/team/khanh-tuong-huynh.jpg" alt="Khanh Tuong Huynh" width="140" /><br/><b>Khanh Tuong Huynh</b><br/><sub>Applied AI Software Engineer</sub></td>
     <td align="center" width="25%"><img src="web/public/team/thanh-loi-tran.jpg" alt="Thanh Loi Tran" width="140" /><br/><b>Thanh Loi Tran</b><br/><sub>Data Engineer, Backend Developer</sub></td>
   </tr>
 </table>

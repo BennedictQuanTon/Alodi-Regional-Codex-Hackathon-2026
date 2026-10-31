@@ -435,7 +435,7 @@ async function cover(file, w, h, pos = "centre") {
     const s = pres.addSlide({ masterName: "Light", sectionTitle: "Close" });
     eyebrow(s, "08", "Team");
     title(s, "Team Develarper.", "Four people, one agent.", { w: 11.5, h: 0.9 });
-    const team = [["nomura-yoshio.jpg", "Nomura Yoshio", "Team Lead · Presenter", "Product, demo script, pitch"], ["long-quan-ton.jpg", "Long Quan Ton", "AI Engineer · Solution Architect", "Orchestrator, voice agent, eval loop"], ["khanh-tuong-huynh.jpg", "Khanh Tuong Huynh", "AI Engineer · Deployment", "Context extractor, ASR, policy guard"], ["thanh-loi-tran.jpg", "Thanh Loi Tran", "Data Engineer · Backend", "Order Context Object, APIs, metrics log"]];
+    const team = [["nomura-yoshio.jpg", "Nomura Yoshio", "Team Lead · Project Presenter", "Team, demo script, pitch"], ["long-quan-ton.jpg", "Long Quan Ton", "Product Manager · AI Engineer", "Product, research, voice agent"], ["khanh-tuong-huynh.jpg", "Khanh Tuong Huynh", "Applied AI Software Engineer", "Context extractor, ASR, policy guard"], ["thanh-loi-tran.jpg", "Thanh Loi Tran", "Data Engineer · Backend", "Order Context Object, APIs, metrics log"]];
     for (const [i, [f, n, r, d]] of team.entries()) {
       const x = M + i * 3.07, w = 2.92;
       card(s, x, 2.0, w, 4.6, { name: `Member ${i + 1}` });

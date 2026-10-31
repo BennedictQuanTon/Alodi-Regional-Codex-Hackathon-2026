@@ -334,9 +334,9 @@ export const COMPETITORS = {
 };
 
 export const TEAM = [
-  { name: "Nomura Yoshio", role: "Team Lead", role2: "Project Presenter", focus: "Product, demo script, pitch", photo: "/team/nomura-yoshio.jpg", pos: "50% 30%" },
-  { name: "Long Quan Ton", role: "AI Engineer", role2: "Solution Architect", focus: "Orchestrator, voice agent, eval loop", photo: "/team/long-quan-ton.jpg", pos: "53% 22%" },
-  { name: "Khanh Tuong Huynh", role: "AI Engineer", role2: "Deployment Engineer", focus: "Context extractor, ASR, policy guard", photo: "/team/khanh-tuong-huynh.jpg", pos: "50% 30%" },
+  { name: "Nomura Yoshio", role: "Team Lead", role2: "Project Presenter", focus: "Team, demo script, pitch", photo: "/team/nomura-yoshio.jpg", pos: "50% 30%" },
+  { name: "Long Quan Ton", role: "Product Manager", role2: "AI Engineer", focus: "Product, research, voice agent", photo: "/team/long-quan-ton.jpg", pos: "53% 22%" },
+  { name: "Khanh Tuong Huynh", role: "Applied AI", role2: "Software Engineer", focus: "Context extractor, ASR, policy guard", photo: "/team/khanh-tuong-huynh.jpg", pos: "50% 30%" },
   { name: "Thanh Loi Tran", role: "Data Engineer", role2: "Backend Developer", focus: "Order Context Object, APIs, metrics log", photo: "/team/thanh-loi-tran.jpg", pos: "50% 30%" },
 ];
 

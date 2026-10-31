@@ -174,7 +174,7 @@ SOURCES = [
     ("Competitor comparison", "ClickPost, Shipsy and others, from public product pages", "Report PDF, chapter 11"),
     ("Notionists by Zoish", "Illustrated people in the product (CC0)", "dicebear.com/styles/notionists"),
 ]
-TEAM = [("nomura-yoshio", "Nomura Yoshio", "Team Lead · Presenter"), ("long-quan-ton", "Long Quan Ton", "AI Engineer · Solution Architect"), ("khanh-tuong-huynh", "Khanh Tuong Huynh", "AI Engineer · Deployment"), ("thanh-loi-tran", "Thanh Loi Tran", "Data Engineer · Backend")]
+TEAM = [("nomura-yoshio", "Nomura Yoshio", "Team Lead, Project Presenter"), ("long-quan-ton", "Long Quan Ton", "Product Manager, AI Engineer"), ("khanh-tuong-huynh", "Khanh Tuong Huynh", "Applied AI Software Engineer"), ("thanh-loi-tran", "Thanh Loi Tran", "Data Engineer · Backend")]
 
 
 def portrait(k):
