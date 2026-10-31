@@ -1,0 +1,137 @@
+<template>
+<style>
+@font-face{font-family:"Geist";src:url("assets/fonts/Geist.ttf");font-weight:100 900}
+@font-face{font-family:"Emoji";src:local("Segoe UI Emoji")}
+#root{position:absolute;inset:0;overflow:hidden;background:#f6f3f1;font-family:"Geist",sans-serif;-webkit-font-smoothing:antialiased}
+.a{position:absolute}
+.role{position:absolute;bottom:44px;padding:14px 34px;border-radius:18px;font-size:44px;font-weight:600;letter-spacing:-.02em}
+.bub{position:absolute;top:50px;width:800px;padding:30px 40px;box-sizing:border-box;border-radius:36px;font-size:58px;font-weight:600;letter-spacing:-.03em;line-height:1.12;opacity:0}
+.bc{left:60px;background:#fff;color:#1f2a44;box-shadow:0 0 0 3px #1f2a44}.bb{left:1060px;background:#fff;color:#1f2a44}
+.bub:after{content:"";position:absolute;bottom:-26px;width:44px;height:44px;background:#fff;transform:rotate(45deg)}
+.bc:after{left:260px;border-right:3px solid #1f2a44;border-bottom:3px solid #1f2a44}.bb:after{left:360px}
+.miss{position:absolute;left:1060px;padding:8px 18px;border-radius:12px;background:#f05a00;color:#121a2c;font-size:34px;font-weight:600;white-space:nowrap;opacity:0}
+.emo{position:absolute;font-family:"Emoji";line-height:1;opacity:0}
+</style>
+<div id="root" data-composition-id="skit" data-start="0" data-duration="20" data-width="1920" data-height="1080">
+  <div id="left" class="a" style="left:0;top:0;width:960px;height:1080px;background:#f6f3f1"></div>
+  <div id="right" class="a" style="left:960px;top:0;width:960px;height:1080px;background:#1f2a44"></div>
+  <svg class="a" viewBox="0 0 1920 1080" width="1920" height="1080" style="left:0;top:0">
+    <!-- shipper's side: the buyer's door -->
+    <rect x="60" y="300" width="250" height="780" rx="10" fill="#e9e3de"/><rect x="84" y="326" width="202" height="754" fill="#d9d1ca"/><circle cx="256" cy="720" r="13" fill="#1f2a44"/>
+    <!-- customer's side: whiteboard and desk -->
+    <rect x="1130" y="330" width="620" height="400" rx="14" fill="#f6f3f1"/>
+    <rect x="1190" y="620" width="70" height="60" fill="#c9c3bd"/><rect x="1290" y="560" width="70" height="120" fill="#c9c3bd"/><rect x="1530" y="520" width="70" height="160" fill="#c9c3bd"/><rect x="1630" y="460" width="70" height="220" fill="#f05a00"/>
+
+    <!-- SHIPPER -->
+    <g id="c-all">
+      <g id="c-box"><rect x="210" y="770" width="220" height="190" rx="8" fill="#c79a6b"/><rect x="210" y="850" width="220" height="26" fill="#a97f53"/></g>
+      <g id="c-body">
+        <rect x="430" y="610" width="240" height="470" rx="60" fill="#f05a00"/>
+        <circle cx="550" cy="760" r="42" fill="none" stroke="#f6f3f1" stroke-width="20"/>
+        <rect x="530" y="748" width="8" height="24" rx="4" fill="#f6f3f1"/><rect x="546" y="738" width="8" height="44" rx="4" fill="#f6f3f1"/><rect x="562" y="748" width="8" height="24" rx="4" fill="#f6f3f1"/>
+        <rect x="400" y="650" width="70" height="280" rx="35" fill="#d94f00" transform="rotate(14 435 650)"/>
+        <g id="c-head">
+          <circle cx="550" cy="490" r="130" fill="#d9a47a"/>
+          <path d="M412 480 a138 138 0 0 1 276 0 l26 12 v22 H412 z" fill="#1f2a44"/>
+          <circle cx="550" cy="395" r="20" fill="#f05a00"/>
+          <rect id="c-bl" x="482" y="528" width="44" height="10" rx="5" fill="#121a2c"/><rect id="c-br" x="578" y="528" width="44" height="10" rx="5" fill="#121a2c"/>
+          <circle class="c-eye" cx="504" cy="552" r="11" fill="#121a2c"/><circle class="c-eye" cx="600" cy="552" r="11" fill="#121a2c"/>
+          <ellipse id="c-m" cx="552" cy="592" rx="30" ry="5" fill="#7c2d12"/>
+        </g>
+        <g><rect x="660" y="640" width="70" height="210" rx="35" fill="#d94f00" transform="rotate(-158 695 650)"/><rect x="660" y="430" width="44" height="130" rx="10" fill="#121a2c"/></g>
+      </g>
+    </g>
+
+    <!-- CUSTOMER -->
+    <g id="b-all">
+      <g id="b-body">
+        <rect x="1320" y="620" width="240" height="460" rx="60" fill="#b8bfcf"/>
+        <path d="M1405 620 h70 l-35 90 z" fill="#f6f3f1"/>
+        <g id="b-head">
+          <path d="M1302 470 a138 150 0 0 1 276 0 v170 h-276 z" fill="#121a2c"/>
+          <circle cx="1440" cy="490" r="122" fill="#e6b794"/>
+          <path d="M1320 470 a122 122 0 0 1 240 -20 q-100 10 -140 -40 q-30 50 -100 60 z" fill="#121a2c"/>
+          <rect id="b-bl" x="1368" y="524" width="44" height="9" rx="4" fill="#121a2c"/><rect id="b-br" x="1468" y="524" width="44" height="9" rx="4" fill="#121a2c"/>
+          <circle class="b-eye" cx="1390" cy="550" r="11" fill="#121a2c"/><circle class="b-eye" cx="1490" cy="550" r="11" fill="#121a2c"/>
+          <ellipse id="b-m" cx="1440" cy="588" rx="26" ry="5" fill="#8a2a1a"/>
+        </g>
+      </g>
+      <rect x="1040" y="920" width="880" height="160" fill="#121a2c"/>
+      <rect x="1540" y="790" width="240" height="140" rx="10" fill="#5a6173"/><rect x="1520" y="925" width="280" height="14" rx="7" fill="#b8bfcf"/>
+      <g id="b-phone-g"><rect id="b-phone" x="1120" y="875" width="120" height="52" rx="10" fill="#f6f3f1"/><rect x="1132" y="885" width="96" height="32" rx="4" fill="#f05a00"/></g>
+      <g id="b-buzz" fill="none" stroke="#f05a00" stroke-width="9" stroke-linecap="round">
+        <path d="M1100 875 q-20 25 0 50"/><path d="M1076 862 q-30 38 0 76"/><path d="M1260 875 q20 25 0 50"/><path d="M1284 862 q30 38 0 76"/>
+      </g>
+      <g id="b-arm"><rect x="1215" y="660" width="70" height="240" rx="35" fill="#a4acc0" transform="rotate(18 1250 660)"/></g>
+      <g id="b-armup" style="opacity:0"><rect x="1250" y="440" width="70" height="240" rx="35" fill="#a4acc0" transform="rotate(10 1285 660)"/><rect x="1270" y="430" width="44" height="130" rx="10" fill="#f6f3f1"/></g>
+    </g>
+  </svg>
+  <div id="m1" class="miss" style="top:790px">Missed call</div><div id="m2" class="miss" style="top:720px">Missed call (2)</div>
+  <div id="r-s" class="role" style="left:360px;background:#1f2a44;color:#f6f3f1">Shipper</div>
+  <div class="role" style="left:1330px;background:#f05a00;color:#121a2c">Buyer</div>
+  <div id="b-t1" class="bub bc">Come on… pick up.</div>
+  <div id="b-t2" class="bub bc">Hello?… Anyone there?</div>
+  <div id="b-t3" class="bub bc">Okay. Next stop.</div>
+  <div id="b-t4" class="bub bb">Oh! Two missed calls?</div>
+  <div id="b-t5" class="bub bb">Hello? Hi, you called me?</div>
+  <div id="b-t6" class="bub bb">Hello…?</div>
+  <div id="fade" class="a" style="inset:0;background:#121a2c;opacity:0"></div>
+  <svg id="heart" class="a" viewBox="-960 -540 1920 1080" width="1920" height="1080" style="left:0;top:0;opacity:0">
+    <defs><clipPath id="cl"><polygon points="-400,-300 0,-300 0,-160 28,-90 -26,-30 30,30 -24,90 8,300 -400,300"/></clipPath><clipPath id="cr"><polygon points="400,-300 0,-300 0,-160 28,-90 -26,-30 30,30 -24,90 8,300 400,300"/></clipPath></defs>
+    <g id="hs" transform="scale(1)">
+      <path id="hw" d="M0 190 C-40 110 -200 60 -200 -60 C-200 -140 -130 -190 -70 -190 C-30 -190 -10 -170 0 -140 C10 -170 30 -190 70 -190 C130 -190 200 -140 200 -60 C200 60 40 110 0 190 Z" fill="#f05a00"/>
+      <g id="hl"><g clip-path="url(#cl)"><path d="M0 190 C-40 110 -200 60 -200 -60 C-200 -140 -130 -190 -70 -190 C-30 -190 -10 -170 0 -140 C10 -170 30 -190 70 -190 C130 -190 200 -140 200 -60 C200 60 40 110 0 190 Z" fill="#f05a00"/></g></g>
+      <g id="hr"><g clip-path="url(#cr)"><path d="M0 190 C-40 110 -200 60 -200 -60 C-200 -140 -130 -190 -70 -190 C-30 -190 -10 -170 0 -140 C10 -170 30 -190 70 -190 C130 -190 200 -140 200 -60 C200 60 40 110 0 190 Z" fill="#f05a00"/></g></g>
+    </g>
+  </svg>
+  <div id="e1" class="emo" style="left:240px;top:400px;font-size:96px">📞</div>
+  <div id="e2" class="emo" style="left:760px;top:330px;font-size:104px">😐</div>
+  <div id="e3" class="emo" style="left:240px;top:400px;font-size:96px">📞</div>
+  <div id="e4" class="emo" style="left:760px;top:330px;font-size:110px">😟</div>
+  <div id="e5" class="emo" style="left:760px;top:330px;font-size:110px">😞</div>
+  <div id="e6" class="emo" style="left:1650px;top:340px;font-size:104px">💬</div>
+  <div id="e7" class="emo" style="left:1650px;top:330px;font-size:124px">😳</div>
+  <div id="e8" class="emo" style="left:1130px;top:340px;font-size:100px">📞</div>
+  <div id="e9" class="emo" style="left:1650px;top:330px;font-size:110px">😟</div>
+  <div id="e10" class="emo" style="left:1650px;top:330px;font-size:130px">😢</div>
+</div>
+<script>
+(function(){
+const tl=gsap.timeline({paused:true});
+const V={"t1":0.6,"t2":3.1,"t3":5.8,"t4":9,"t5":11.5,"t6":14.3},W={"t1":"c","t2":"c","t3":"c","t4":"b","t5":"b","t6":"b"},E={"t1":[0,0,0,0,0,0,0,0,0,0,0,0.18,0.27,0.75,0.78,0.49,0.51,0.51,0.69,0.78,0.92,1,0.82,0.61,0.47,0.42,0.36,0.36,0.18,0.01,0.18,0.16,0.75,0.7,0.12,0.01,0.18,0.65,0.67,0.54,0.19,0.09,0.03,0,0.03,0.03,0.01,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"t2":[0,0,0,0,0,0,0,0,0,0,0,0.02,0.11,0.23,0.73,0.4,0.36,0.39,0.86,1,0.91,0.62,0.34,0.13,0.06,0.04,0.01,0.01,0.47,0.48,0.48,0.48,0.37,0.31,0.23,0.3,0.4,0.39,0.36,0.34,0.34,0.24,0.35,0.43,0.32,0.2,0.1,0.07,0.04,0.02,0.02,0.01,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"t3":[0,0,0,0,0,0,0,0,0,0,0,0,0,0.06,0.37,0.81,1,0.91,0.23,0.04,0.15,0.16,0.57,0.62,0.71,0.72,0.57,0.4,0.33,0.37,0.4,0.41,0.4,0.4,0.42,0.12,0.09,0.31,0.36,0.33,0.26,0.02,0.29,0.66,0.67,0.66,0.56,0.31,0.15,0.08,0.04,0.01,0,0.04,0.01,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"t4":[0,0,0,0,0,0,0,0.22,0.54,0.8,0.56,0.26,0.07,0,0.47,0.54,0.15,0.79,1,0.74,0.6,0.49,0.56,0.32,0.3,0.15,0.38,0.04,0.19,0.14,0.2,0.57,0.35,0.34,0.2,0.13,0.08,0.05,0.03,0.15,0.24,0.19,0.08,0.02,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"t5":[0,0,0,0,0,0,0,0.05,0.15,0.7,0.54,0.54,0.73,0.64,0.48,0.34,0.13,0.05,0.03,0.01,0,0.01,0.03,0.11,0.18,0.73,0.94,1,0.81,0.6,0.32,0.11,0.05,0.04,0.06,0.09,0.26,0.32,0.01,0.42,0.18,0.17,0.32,0.35,0.33,0.28,0.3,0.05,0.04,0.34,0.16,0.11,0.06,0.03,0.01,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"t6":[0,0,0,0,0,0,0.01,0.13,0.24,0.32,0.25,0.38,1,0.73,0.59,0.36,0.54,0.69,0.73,0.72,0.64,0.58,0.53,0.45,0.31,0.17,0.11,0.08,0.08,0.05,0.05,0.04,0.03,0.02,0.01,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},D={"t1":2.01,"t2":2.264,"t3":2.413,"t4":2.101,"t5":2.503,"t6":1.779};
+const $=(s)=>document.querySelector(s),cm=$("#c-m"),bm=$("#b-m"),ch=$("#c-head"),bh=$("#b-head"),ca=$("#c-all"),ba=$("#b-all");
+const ce=[...document.querySelectorAll(".c-eye")],be=[...document.querySelectorAll(".b-eye")];
+const level=(who,t)=>{for(const k in V){if(W[k]!==who)continue;const d=t-V[k];if(d>=0&&d<D[k]){const a=E[k];return a[Math.min(Math.floor(d*30),a.length-1)]||0}}return 0};
+const ease=(x)=>{x=Math.max(0,Math.min(1,x));return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2};
+function R(t){
+ const lc=level("c",t),lb=level("b",t);
+ const talk=t<8.7?(.35+.35*Math.sin(t*7))*(Math.sin(t*2.1)>-.3?1:0):0;
+ cm.setAttribute("ry",(4+lc*30).toFixed(1));cm.setAttribute("rx",(26+lc*8).toFixed(1));
+ bm.setAttribute("ry",(4+Math.max(lb*30,talk*12)).toFixed(1));
+ const blink=(x)=>((t+x)%3.3)<.1?.15:1;ce.forEach(e=>e.setAttribute("ry",(11*blink(.4)).toFixed(1)));be.forEach(e=>e.setAttribute("ry",(11*blink(1.6)).toFixed(1)));
+ const down=t>5.8?1:0;
+ ch.setAttribute("transform","translate(0,"+(-lc*8+down*18).toFixed(1)+") rotate("+(down*4+lc*1.6*Math.sin(t*11)).toFixed(2)+" 550 560)");
+ const look=t<8.7?5:t<11.2?-7:t<14.9?-3:-3,drop=t>15?22:0;
+ bh.setAttribute("transform","translate(0,"+(-lb*7+drop).toFixed(1)+") rotate("+(look+lb*2*Math.sin(t*12)).toFixed(2)+" 1440 560)");
+ const wk=ease((t-7.2)/1.5),walk=t>7.2&&t<8.7?Math.abs(Math.sin(t*9))*-16:0;
+ ca.setAttribute("transform","translate("+(-1100*wk).toFixed(1)+","+walk.toFixed(1)+")");
+ const wor=t<3?-0:t<5.8?12:18;$("#c-bl").setAttribute("transform","rotate("+(-wor)+" 504 533)");$("#c-br").setAttribute("transform","rotate("+wor+" 600 533)");
+ const sad=t>=9?-16:0;$("#b-bl").setAttribute("transform","rotate("+sad+" 1390 528)");$("#b-br").setAttribute("transform","rotate("+(-sad)+" 1490 528)");
+ const B=[[.4,.9],[1.2,1.7],[2,2.5],[3.2,3.7],[4,4.5],[4.8,5.3]],buzzing=B.some(([a,b])=>t>a&&t<b);
+ $("#b-buzz").style.opacity=buzzing?1:0;$("#b-phone-g").setAttribute("transform","translate("+(buzzing?Math.sin(t*90)*7:0).toFixed(1)+",0)");
+ const up=t>=11.2;$("#b-phone-g").style.opacity=up?0:1;$("#b-arm").style.opacity=up?0:1;$("#b-armup").style.opacity=up?1:0;
+}
+const p={t:0};tl.to(p,{t:20,duration:20,ease:"none",onUpdate(){R(p.t)}},0);R(0);
+tl.fromTo("#m1",{opacity:0,y:12},{opacity:1,y:0,duration:.25,ease:"back.out(1.4)"},2.7);tl.fromTo("#m2",{opacity:0,y:12},{opacity:1,y:0,duration:.25,ease:"back.out(1.4)"},5.4);tl.to("#m1,#m2",{opacity:0,duration:.15},11.1);
+tl.to("#r-s",{opacity:0,duration:.2},8.5);tl.set("#hw",{opacity:0},18.45);
+tl.to("#fade",{opacity:1,duration:.5,ease:"power2.inOut"},16.9);
+tl.fromTo("#heart",{opacity:0},{opacity:1,duration:.2},17.2);tl.fromTo("#hs",{scale:.3,svgOrigin:"0 0"},{scale:1.9,duration:.7,ease:"expo.out"},17.2);
+tl.to("#hs",{scale:2.05,duration:.14,yoyo:true,repeat:1,ease:"power2.inOut"},18.0);
+tl.to("#hl",{x:-90,y:40,rotation:-14,svgOrigin:"0 190",duration:1.0,ease:"expo.out"},18.45);tl.to("#hr",{x:90,y:40,rotation:14,svgOrigin:"0 190",duration:1.0,ease:"expo.out"},18.45);
+for(const k in V){tl.fromTo("#b-"+k,{opacity:0,scale:.9},{opacity:1,scale:1,duration:.22,ease:"back.out(1.4)"},V[k]);tl.to("#b-"+k,{opacity:0,duration:.08},Math.min(V[k]+D[k]+.04,19.9))}
+[["e1",0.4,2.7],["e2",1,2.8],["e3",3,5.4],["e4",3.3,5.5],["e5",6,7.2],["e6",0.4,8.6],["e7",9,11.1],["e8",11.3,14.2],["e9",12.4,14.9],["e10",15,16.9]].forEach(([id,a,b])=>{tl.fromTo("#"+id,{opacity:0,scale:.4,y:20},{opacity:1,scale:1,y:0,duration:.3,ease:"back.out(1.7)"},a);tl.to("#"+id,{opacity:0,duration:.12},Math.min(b,19.86))});
+tl.set({}, {}, 20);
+window.__timelines["skit"]=tl;
+})();
+</script>
+</template>
