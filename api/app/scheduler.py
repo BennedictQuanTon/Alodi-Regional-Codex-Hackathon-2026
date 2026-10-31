@@ -126,6 +126,18 @@ class Scheduler:
                 if task:
                     task.status, task.result = "completed", {"status": "cancelled"}
 
+    def retire_generation(self, generation):
+        for adapter in self.adapters.values():
+            retire = getattr(adapter, "retire_generation", None)
+            if retire:
+                retire(generation)
+
+    def activate_generation(self, generation):
+        for adapter in self.adapters.values():
+            activate = getattr(adapter, "activate_generation", None)
+            if activate:
+                activate(generation)
+
     async def tick(self, expected_generation=None, *, wait_for_providers=True, _round=0):
         pending = []
         async with self.lock:
@@ -472,6 +484,9 @@ class Scheduler:
                     adapter.extract(envelope), self.settings.ai_request_timeout_seconds
                 )
                 result = await self.flow.apply_proposal(proposal)
+                observed = getattr(adapter, "observe_result", None)
+                if observed:
+                    await observed(envelope, proposal, result)
                 if result["status"] == "rejected_stale":
                     await self.failure(
                         envelope, kind, ValueError("Invalid or superseded provider result")

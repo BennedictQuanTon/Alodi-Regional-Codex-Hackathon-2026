@@ -167,7 +167,10 @@ async def test_stale_playback_and_blocked_tail_cannot_open_input(harness):
 
 
 @pytest.mark.asyncio
-async def test_confirmation_requires_played_and_verified_full_readback(harness):
+@pytest.mark.parametrize("affirmation", ["đúng rồi", "Yes, that is correct."])
+async def test_confirmation_requires_played_and_verified_full_readback(
+    harness, affirmation
+):
     session, _, _, bridge, _ = harness
     session.candidate, session.candidate_revision = candidate(), 1
     await session.read_back(None)
@@ -192,21 +195,23 @@ async def test_confirmation_requires_played_and_verified_full_readback(harness):
     )
     assert session.input_revision == 0 and not session.readback_played
     await drain(session)
-    await buyer(session, "đúng rồi")
+    await buyer(session, affirmation)
     assert session.phase == "notes" and session.confirmed
     assert bridge.state.context_version == 1 and session.notes_timer is None
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("negative_notes", ["dạ không", "No more notes. Thank you."])
 async def test_negative_notes_finalizes_once_and_keeps_media_until_farewell_drain(
     harness,
+    negative_notes,
 ):
     session, _, call, bridge, events = harness
     session.candidate, session.candidate_revision = candidate(), 1
     session.confirmed = True
     await session.say(None, "Notes?", "notes")
     await drain(session)
-    await buyer(session, "dạ không")
+    await buyer(session, negative_notes)
     assert bridge.state.context_version == 2 and session.phase == "closing"
     assert call.status == "connected" and not any(
         e["type"] == "media_stop" for e in events
@@ -261,6 +266,47 @@ async def test_notes_timeout_starts_after_prompt_and_noise_restarts_silence(
     wait.set()
     await real_sleep(0.02)
     assert bridge.state.context_version == 2 and session.phase == "closing"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("trigger", ["direct", "notes_silence"])
+async def test_finalize_failure_is_visible_and_ends_media(
+    harness, monkeypatch, trigger
+):
+    session, _, call, bridge, events = harness
+    session.candidate, session.candidate_revision = candidate(), 1
+    session.confirmed = True
+    elapsed = asyncio.Event()
+    real_sleep = asyncio.sleep
+
+    async def controlled_sleep(seconds):
+        if seconds == 8:
+            await elapsed.wait()
+        else:
+            await real_sleep(seconds)
+
+    async def fail_submit(*args):
+        raise ValueError("synthetic private exception detail")
+
+    monkeypatch.setattr(bridge, "submit", fail_submit)
+    monkeypatch.setattr(live.asyncio, "sleep", controlled_sleep)
+    if trigger == "notes_silence":
+        await session.say(None, "Notes?", "notes")
+        await drain(session)
+        timer = session.notes_timer
+        elapsed.set()
+        await timer  # The timer must complete without an unhandled task exception.
+    else:
+        await session.finalize(None)
+    assert call.status == "ended" and not session.finalizing
+    assert bridge.state.context_version == 1
+    assert any(event.get("code") == "finalization_failed" for event in events)
+    assert any(event["type"] == "media_stop" for event in events)
+    assert not any(
+        event["type"] == "result" and event.get("status") == "applied"
+        for event in events
+    )
+    assert "synthetic private exception detail" not in json.dumps(events)
 
 
 @pytest.mark.asyncio
@@ -408,6 +454,172 @@ async def test_late_revision_during_extraction_is_processed_again(harness, monke
 
 
 @pytest.mark.asyncio
+async def test_speculative_delegation_keeps_buyer_audio_tail_eligible(
+    harness, monkeypatch
+):
+    session, _, _, _, _ = harness
+    seen = []
+
+    async def extracted(settings, snapshot, text, source, metrics):
+        seen.append(text)
+        return candidate()
+
+    monkeypatch.setattr(live, "extract", extracted)
+    await session.say(None, "Hello", "greeting")
+    await drain(session)
+    session.user_active = True
+    await provider_event(
+        session,
+        {
+            "type": "session.input_transcript.delta",
+            "delta": "At the security desk.",
+            "start_ms": 21,
+            "end_ms": 30,
+        },
+    )
+    await provider_event(
+        session,
+        {
+            "type": "session.delegation.created",
+            "delegation": {"id": "early"},
+            "offset_ms": 30,
+        },
+    )
+    await provider_event(
+        session,
+        {
+            "type": "session.input_transcript.delta",
+            "delta": " Please call when arriving.",
+            "start_ms": 31,
+            "end_ms": 39,
+        },
+    )
+    assert session.inputs[-1][2] == " Please call when arriving."
+    assert session.listening_windows[-1][1] is None
+    session.user_active = False
+    session.last_input_activity = 0
+    await session.task
+    assert seen == ["At the security desk. Please call when arriving."]
+
+
+@pytest.mark.asyncio
+async def test_tail_after_proposal_reextracts_without_another_delegation(
+    harness, monkeypatch
+):
+    session, _, _, bridge, _ = harness
+    seen = []
+
+    async def extracted(
+        settings, snapshot, text, source, metrics, expected_context=None
+    ):
+        if source == "assistant_readback":
+            return expected_context
+        seen.append(text)
+        return candidate().model_copy(
+            update={
+                "delivery_notes": "Call when arriving"
+                if "call when arriving" in text
+                else None,
+            }
+        )
+
+    monkeypatch.setattr(live, "extract", extracted)
+    await session.say(None, "Hello", "greeting")
+    await drain(session)
+    await buyer(session, "Tomorrow after five at the security desk.", start=21, end=30)
+    await drain(session, start=40, end=50)
+    assert session.input_allowed and session.verified_readback
+    await provider_event(
+        session,
+        {
+            "type": "session.input_transcript.delta",
+            "delta": " Please call when arriving.",
+            "start_ms": 31,
+            "end_ms": 39,
+        },
+    )
+    session.last_input_activity = 0
+    await session.tail_task
+    assert len(seen) == 2 and seen[-1].endswith("Please call when arriving.")
+    assert session.candidate.delivery_notes == "Call when arriving"
+    assert session.candidate_revision == 2 and not session.confirmed
+    assert not session.input_allowed and not session.verified_readback
+    assert session.readback_attempts == 1 and bridge.state.context_version == 1
+
+
+@pytest.mark.asyncio
+async def test_tail_from_previous_confirming_turn_invalidates_new_confirming_proposal(
+    harness, monkeypatch
+):
+    session, _, _, bridge, _ = harness
+
+    async def extracted(
+        settings, snapshot, text, source, metrics, expected_context=None
+    ):
+        if source == "assistant_readback":
+            return expected_context
+        return candidate().model_copy(
+            update={
+                "delivery_notes": "Call when arriving"
+                if "call when arriving" in text
+                else None,
+            }
+        )
+
+    monkeypatch.setattr(live, "extract", extracted)
+    await session.say(None, "Hello", "greeting")
+    await drain(session)
+    await buyer(session, "Tomorrow after five at security.", start=21, end=30)
+    await drain(session, start=40, end=50)
+    assert session.phase == "confirming" and session.input_allowed
+    old_turn = session.turn_id
+    await buyer(session, "Actually after six.", start=51, end=60)
+    await drain(session, start=70, end=80)
+    assert session.phase == "confirming" and session.turn_id != old_turn
+    await provider_event(
+        session,
+        {
+            "type": "session.input_transcript.delta",
+            "delta": " Please call when arriving.",
+            "start_ms": 61,
+            "end_ms": 69,
+        },
+    )
+    session.last_input_activity = 0
+    await session.tail_task
+    assert session.candidate_revision == 3
+    assert session.candidate.delivery_notes == "Call when arriving"
+    assert not session.verified_readback and not session.confirmed
+    assert bridge.state.context_version == 1
+
+
+@pytest.mark.asyncio
+async def test_repeated_readback_mismatch_ends_without_accepting_changed_notes(
+    harness, monkeypatch
+):
+    session, _, call, bridge, events = harness
+    session.candidate, session.candidate_revision = candidate(), 1
+
+    async def mismatched(*args):
+        return candidate().model_copy(update={"delivery_notes": "Call when arriving"})
+
+    monkeypatch.setattr(live, "extract", mismatched)
+    await session.read_back(None)
+    for start in (10, 30, 50):
+        await drain(session, start=start, end=start + 10)
+    assert session.readback_attempts == 3 and call.status == "ended"
+    assert not session.input_allowed and bridge.state.context_version == 1
+    assert any(
+        event.get("code") == "readback_verification_failed" and event["type"] == "error"
+        for event in events
+    )
+    assert not any(
+        event["type"] == "result" and event.get("status") == "applied"
+        for event in events
+    )
+
+
+@pytest.mark.asyncio
 async def test_new_audio_invalidates_readback_permission(harness):
     session, *_ = harness
     session.candidate, session.candidate_revision = candidate(), 1
@@ -443,6 +655,9 @@ async def test_new_audio_invalidates_readback_permission(harness):
         "không cần gì nữa",
         "hết rồi",
         "no more",
+        "No more notes.",
+        "No, thank you.",
+        "No more notes. Thank you.",
     ],
 )
 def test_natural_negative_notes(text):
@@ -451,10 +666,55 @@ def test_natural_negative_notes(text):
 
 @pytest.mark.parametrize(
     "text",
-    ["không, đổi sang sáu giờ", "không gọi trước nhé", "không đúng", "không nhận được"],
+    [
+        "không, đổi sang sáu giờ",
+        "không gọi trước nhé",
+        "không đúng",
+        "không nhận được",
+        "No, change the time to six",
+        "No more notes, but leave it at reception",
+        "No, thank you, call before arriving",
+    ],
 )
 def test_corrections_are_not_negative_notes(text):
     assert not no_more_notes(text)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "drop_type,label", [("security_desk", "bàn bảo vệ"), ("reception", "lễ tân")]
+)
+async def test_readback_names_exact_distinct_location_category(
+    harness, drop_type, label
+):
+    session, _, _, _, _ = harness
+    session.candidate, session.candidate_revision = candidate(), 1
+    session.candidate.drop_location.type = drop_type
+    session.candidate.drop_location.note = ""
+    await session.read_back(None)
+    assert f"Tên địa điểm phải đọc chính xác là '{label}'" in session.last_content
+    assert f'"type": "{drop_type}"' in session.last_content
+
+
+@pytest.mark.asyncio
+async def test_security_desk_readback_never_accepts_reception_substitution(
+    harness, monkeypatch
+):
+    session, _, _, bridge, events = harness
+    session.candidate, session.candidate_revision = candidate(), 1
+    session.candidate.drop_location.note = ""
+    heard = candidate()
+    heard.drop_location.type, heard.drop_location.note = "reception", ""
+
+    async def substituted(*args):
+        return heard
+
+    monkeypatch.setattr(live, "extract", substituted)
+    await session.read_back(None)
+    await drain(session)
+    assert not session.input_allowed and not session.verified_readback
+    assert bridge.state.context_version == 1
+    assert any(event.get("code") == "readback_mismatch" for event in events)
 
 
 @pytest.mark.asyncio
@@ -589,6 +849,83 @@ async def test_duplicate_and_concurrent_mute_reuse_acknowledged_state(harness):
 
 
 @pytest.mark.asyncio
+async def test_playing_recovers_one_lost_mute_ack_without_opening_input(
+    harness, monkeypatch
+):
+    session, _, call, _, events = harness
+    session.input_muted, session.input_allowed = False, True
+    session.ws.auto_ack = False
+    monkeypatch.setattr(live, "AUDIO_CONTROL_ACK_TIMEOUT", 0.1)
+    second = asyncio.Event()
+    original_send = session.ws.send
+    requests = []
+
+    async def drop_first(raw):
+        await original_send(raw)
+        message = json.loads(raw)
+        if message["type"] == "session.input_audio.mute":
+            requests.append(message["event_id"])
+            if len(requests) == 2:
+                # The first request's late ACK cannot satisfy the new request.
+                await session.ws.queue.put(
+                    json.dumps(
+                        {
+                            "type": "session.input_audio.muted",
+                            "client_event_id": requests[0],
+                        }
+                    )
+                )
+                second.set()
+
+    monkeypatch.setattr(session.ws, "send", drop_first)
+    playing = asyncio.create_task(playback(session, "playing", playback_revision=1))
+    await asyncio.wait_for(second.wait(), 1)
+    assert (
+        not session.input_allowed
+        and session.input_muted is False
+        and call.status == "connected"
+    )
+    await provider_event(
+        session, {"type": "session.input_audio.muted", "client_event_id": requests[1]}
+    )
+    await playing
+    assert (
+        session.input_muted is True
+        and not session.input_allowed
+        and call.status == "connected"
+    )
+    assert any(event.get("code") == "input_gate_retry" for event in events)
+
+
+@pytest.mark.asyncio
+async def test_playing_missing_mute_ack_ends_visibly_after_one_retry(
+    harness, monkeypatch
+):
+    session, _, call, bridge, events = harness
+    session.input_muted, session.input_allowed = False, True
+    session.ws.auto_ack = False
+    monkeypatch.setattr(live, "AUDIO_CONTROL_ACK_TIMEOUT", 0.01)
+    await playback(session, "playing", playback_revision=1)
+    assert call.status == "ended" and not session.input_allowed
+    assert (
+        len(
+            [
+                item
+                for item in session.ws.sent
+                if item["type"] == "session.input_audio.mute"
+            ]
+        )
+        == 2
+    )
+    assert any(event.get("code") == "input_gate_failed" for event in events)
+    assert any(
+        event["type"] == "media_stop" and event.get("reason") == "input_gate_failed"
+        for event in events
+    )
+    assert bridge.state.context_version == 1
+
+
+@pytest.mark.asyncio
 async def test_repeated_blocked_report_does_not_echo_state(harness):
     session, _, _, _, events = harness
     await session.say(None, "Hello", "greeting")
@@ -627,3 +964,31 @@ async def test_checklist_verifier_accepts_canonical_equivalence_but_rejects_chan
         assert not session.input_allowed and session.turn_id == initial_turn + 1
     else:
         assert session.input_allowed and session.verified_readback is not None
+
+
+@pytest.mark.asyncio
+async def test_route_a_local_gate_avoids_provider_ack_and_requires_explicit_finish(
+    harness,
+):
+    session, _, call, bridge, _ = harness
+    gates = []
+
+    async def local_gate(muted):
+        gates.append(muted)
+
+    call.local_input_gate, call.explicit_finish = local_gate, True
+    session.ws.auto_ack = False
+    session.candidate, session.candidate_revision, session.confirmed = (
+        candidate(),
+        1,
+        True,
+    )
+    await session.say(None, "Any notes? Say no or hang up.", "notes")
+    await drain(session)
+    assert session.notes_timer is None and bridge.state.context_version == 1
+    assert gates == [True, False]
+    assert not any(
+        item["type"].startswith("session.input_audio.") for item in session.ws.sent
+    )
+    await buyer(session, "No more notes.")
+    assert bridge.state.context_version == 2 and session.phase == "closing"

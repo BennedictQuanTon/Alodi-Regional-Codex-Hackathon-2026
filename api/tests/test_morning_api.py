@@ -90,9 +90,11 @@ async def test_cannot_today_selected_monday_is_removed_from_today_route(morning)
 
 
 async def test_api_validation_stale_and_late_requests(morning):
+    # Startup checkpoints and pauses the current business time for the paired demo.
+    # Start before the morning window rather than rewinding a running generation.
+    morning.clock.set("06:28")
     async with client_for(morning) as (client, _):
         body = {"generation_id": morning.generation}
-        morning.clock.set("06:28")
         assert (await client.post("/jobs/morning-load", json=body)).json()[
             "code"
         ] == "morning_closed"

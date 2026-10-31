@@ -391,6 +391,14 @@ def test_confirmation_requires_an_unqualified_affirmation():
         "đúng rồi ạ",
         "yes",
         "correct",
+        "Yes, that is correct.",
+        "yes that's right",
+        "Yes, it is correct",
+        "Yes. That is correct.",
+        "That's correct",
+        "that’s right",
+        "it is correct",
+        "yes, correct",
     ):
         assert is_confirmation(phrase)
     for phrase in (
@@ -399,6 +407,12 @@ def test_confirmation_requires_an_unqualified_affirmation():
         "không đúng",
         "không đồng ý",
         "yes no",
+        "Yes, that is correct, but after six",
+        "yes that's right except at reception",
+        "That is correct only if tomorrow",
+        "Yes, that is not correct",
+        "yes, but that is correct",
+        "yescorrect",
     ):
         assert not is_confirmation(phrase)
 

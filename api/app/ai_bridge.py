@@ -17,6 +17,14 @@ from app.db.models import CallAttempt, DemoState, Order, ProviderRequest, Rescue
 from app.morning import WorkflowError
 from app.policy import call_time, deadline
 
+DROP_LOCATION_LABELS = {
+    "hand_to_buyer": "Hand to buyer",
+    "security_desk": "Security desk",
+    "reception": "Reception",
+    "neighbour": "Neighbour",
+    "locker": "Locker",
+}
+
 
 @dataclass
 class HostSnapshot(Snapshot):
@@ -238,7 +246,16 @@ class WorkflowBridge:
     ):
         if source == "ai_call" and not confirmation and not proposal.opt_out:
             return "needs_clarification"
-        fields = Extraction.model_validate(proposal.model_dump(by_alias=True, mode="json"))
+        values = proposal.model_dump(by_alias=True, mode="json")
+        drop = values.get("drop_location")
+        if drop and not drop["note"].strip():
+            if drop["type"] == "other":
+                return "needs_clarification"
+            # The AI contract permits an omitted descriptive note when the enum
+            # already names the location. Store that category's display label;
+            # do not invent an address, receiver or additional instructions.
+            drop["note"] = DROP_LOCATION_LABELS[drop["type"]]
+        fields = Extraction.model_validate(values)
         # same_district does not establish a ward. Unresolved corrections go to review.
         digest = hashlib.sha256(
             json.dumps(
@@ -338,8 +355,31 @@ class LiveAdapter:
             raise WorkflowError("rejected_stale", "Provider request superseded")
         if not request.text:
             raise WorkflowError("invalid_memo", "Ephemeral memo job has expired")
+        self.runtime.observations.append(
+            snapshot,
+            {
+                "type": "models",
+                "extraction": self.settings.openai_model,
+            },
+        )
+        self.runtime.observations.append(
+            snapshot,
+            {
+                "type": "status",
+                "status": "extraction_processing",
+                "job_id": request.request_id,
+            },
+        )
         fields = await extract(self.settings, snapshot, request.text, request.source)
         values = fields.model_dump(by_alias=True, mode="json")
+        self.runtime.observations.append(
+            snapshot,
+            {
+                "type": "proposal",
+                "revision": 1,
+                "context": values,
+            },
+        )
         return Proposal(
             request_id=request.request_id,
             tracking_id=request.tracking_id,
@@ -350,6 +390,23 @@ class LiveAdapter:
             mode="live",
             fields=Extraction.model_validate(values),
         )
+
+    async def observe_result(self, request, proposal, result):
+        snapshot = await self.bridge.snapshot(request.tracking_id)
+        if snapshot.demo_epoch == request.generation_id:
+            context = proposal.fields.model_dump(by_alias=True, mode="json")
+            if context.get("address_correction"):
+                context["address_correction"].pop("ward", None)
+            self.runtime.observations.append(
+                snapshot,
+                {
+                    "type": "result",
+                    "status": result["status"],
+                    "message": result.get("reason"),
+                    "context": context,
+                    "job_id": request.request_id,
+                },
+            )
 
     async def request_call(self, request):
         if (request.generation_id, request.call_id) in self.cancelled:
@@ -369,11 +426,23 @@ class LiveAdapter:
         self.bridge.bind(workflow)
 
     async def cancel_generation(self, generation):
+        jobs = [
+            (job_id, task)
+            for job_id, task in self.runtime.job_tasks.items()
+            if self.runtime.jobs[job_id].get("generation_id") == generation
+        ]
+        for job_id, task in jobs:
+            if not task.done():
+                self.runtime.jobs[job_id]["status"] = "cancelled"
+                task.cancel()
+        await asyncio.gather(*(task for _, task in jobs), return_exceptions=True)
         for call in list(self.runtime.calls.values()):
             if call.snapshot.demo_epoch == generation:
                 self.cancelled.add((generation, call.id))
                 await self.runtime.end(call, "generation_cancelled")
-        jobs = list(self.runtime.job_tasks.values())
-        for task in jobs:
-            task.cancel()
-        await asyncio.gather(*jobs, return_exceptions=True)
+
+    def retire_generation(self, generation):
+        self.runtime.retire_generation(generation)
+
+    def activate_generation(self, generation):
+        self.runtime.observations.activate(generation)

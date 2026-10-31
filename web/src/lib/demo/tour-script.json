@@ -1,0 +1,23 @@
+{
+  "p_fetch": { "voice": "narrator", "text": "Six thirty in the morning, in Binh Thanh. Alodi picks up today's orders and flags the ones likely to fail, like this air fryer, paid cash on delivery." },
+  "p_slots": { "voice": "narrator", "text": "It asks the buyer to choose a delivery window, with quick replies from the route planner." },
+  "p_cutoff": { "voice": "narrator", "text": "There's no reply by eight o'clock, when the route locks. So the route runs as planned." },
+  "p_arrive": { "voice": "narrator", "text": "Just after ten, the shipper arrives and calls twice. No answer. On most days, that's where the trail goes cold." },
+  "p_choose": { "voice": "narrator", "text": "Instead of typing a note, the shipper taps one button." },
+  "a_press": { "voice": "narrator", "text": "From here, the agent takes over, and the shipper moves on to the next stop." },
+  "a_chat": { "voice": "narrator", "text": "The buyer gets a message right away, while the missed call is still on their screen." },
+  "a_wait60": { "voice": "narrator", "text": "An hour passes with no reply. We've sped up the clock here. Alodi checks that it's within calling hours, and then it calls." },
+  "a_answer": { "voice": "narrator", "text": "This time, the screen shows a verified brand name, not a stranger's number." },
+  "c_hello": { "voice": "agent", "text": "Hello Mr. Minh, this is the automated delivery assistant calling about your air fryer. This call is recorded so we get the delivery right. Is that okay?" },
+  "c_consent": { "voice": "buyer", "text": "Sure, go ahead." },
+  "c_ask": { "voice": "agent", "text": "Our shipper missed you this morning. Tomorrow we have 8 to 12, or 5 to 8 in the evening. Which works for you?" },
+  "c_reply": { "voice": "buyer", "text": "Tomorrow after five, please. I'm out until late, so leave it with security in Tower B. Or call my wife, zero nine zero three, two two two, two one four." },
+  "c_confirm": { "voice": "agent", "text": "Confirming: Sunday the first of November, 5 to 8 pm, left with Tower B security, and your wife's number if needed. Is that right?" },
+  "c_ok": { "voice": "buyer", "text": "That's right." },
+  "c_bye": { "voice": "agent", "text": "Thank you, Mr. Minh. Have a good afternoon." },
+  "a_extract": { "voice": "narrator", "text": "The conversation becomes structured data: the time window, the drop-off point and a stand-in receiver, each with a confidence score." },
+  "a_apply": { "voice": "narrator", "text": "Every field scores above point eight five, so it's applied automatically. Anything lower would go to a person." },
+  "a_nextday": { "voice": "narrator", "text": "The next evening, the order is back on the route, in the window the buyer asked for." },
+  "a_deliver": { "voice": "narrator", "text": "The shipper reads the context card, and knows exactly when and where to go." },
+  "a_end": { "voice": "narrator", "text": "Delivered on the second attempt. Alodi. Make the second drop land." }
+}

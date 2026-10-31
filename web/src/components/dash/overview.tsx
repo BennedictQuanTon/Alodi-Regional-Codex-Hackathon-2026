@@ -2,20 +2,18 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useState } from "react";
-import { useDemo } from "@/lib/demo/engine";
-import { MOCK_CASES, type MockCase } from "@/lib/demo/mock-cases";
-import { ORDER, fmtClock } from "@/lib/demo/scenarios";
-import type { CaseStage, DemoState } from "@/lib/demo/types";
-import { CS_QUEUE, DAY, FAILS_BY_HOUR, HUB, ROUTES, type RouteRow } from "@/lib/dash/hub-day";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { CaseStage } from "@/lib/demo/types";
+import type { RouteRow, QueueRow } from "@/lib/dash/hub-day";
+import { useDashboard, caseStage, type DashboardData, type DashboardDay } from "@/lib/dash/live-dashboard";
 import { STAGE_LABEL } from "@/components/demo/console-parts";
-import { LiveCaseDetail, MockCaseDetail, stageChip, stageProgress } from "./case-detail";
+import { stageChip, stageProgress } from "./case-detail";
 import { CountUp } from "./charts";
 import { DashShell } from "./shell";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const fmt = (n: number) => n.toLocaleString("en-US");
-const pct = (a: number, b: number) => `${((a / b) * 100).toFixed(1)}%`;
+const pct = (a: number, b: number) => `${(b ? (a / b) * 100 : 0).toFixed(1)}%`;
 
 const TABS: { k: string; label: string; match: (s: CaseStage) => boolean }[] = [
   { k: "all", label: "All", match: () => true },
@@ -29,9 +27,6 @@ const TRIGGER: Record<string, string> = { NO_ANSWER: "No answer", RESCHEDULE: "R
 
 type Row = { id: string; buyer: string; district: string; trigger: string; stage: CaseStage; shipper: string; updated: string; live?: boolean };
 
-function liveRow(s: DemoState): Row {
-  return { id: ORDER.tracking, buyer: ORDER.buyer, district: "Binh Thanh", trigger: s.oco.trigger, stage: s.stage, shipper: ORDER.shipper, updated: fmtClock(s.clock), live: true };
-}
 
 function Card({ title, sub, right, children, className = "", id }: { title: string; sub?: string; right?: React.ReactNode; children: React.ReactNode; className?: string; id?: string }) {
   return (
@@ -56,6 +51,7 @@ function Card({ title, sub, right, children, className = "", id }: { title: stri
 
 /* ---------- KPI strip ---------------------------------------------------- */
 
+function KpiStrip({ day: DAY }: { day: DashboardDay }) {
 const failed = DAY.failed_first_attempt.total;
 const KPI = [
   { label: "Orders today", value: fmt(DAY.orders), note: `${fmt(DAY.attempted_today)} attempted · ${fmt(DAY.morning.cannot_today)} moved to tomorrow` },
@@ -64,8 +60,6 @@ const KPI = [
   { label: "Rescued, card sent", value: fmt(DAY.rescheduled_with_card), note: `${pct(DAY.rescheduled_with_card, failed)} of failed`, primary: true },
   { label: "With customer service", value: fmt(DAY.cs_queue.total), note: `Refused ${DAY.cs_queue.refused} · unreachable ${DAY.cs_queue.unreachable} · low conf. ${DAY.cs_queue.low_confidence}` },
 ];
-
-function KpiStrip() {
   return (
     <div className="d-card grid overflow-hidden sm:grid-cols-2 xl:grid-cols-5">
       {KPI.map((k, i) => (
@@ -90,7 +84,8 @@ function KpiStrip() {
 /* ---------- rescue pipeline (the eight business steps) ------------------ */
 
 type Seg = { label: string; n: number; tone?: "primary" | "good" | "warn" | "muted" };
-const STAGES: { step: string; title: string; total: number; segs: Seg[] }[] = [
+function pipelineStages(DAY: DashboardDay) {
+const result: { step: string; title: string; total: number; segs: Seg[] }[] = [
   {
     step: "1–3",
     title: "Morning window question",
@@ -104,7 +99,7 @@ const STAGES: { step: string; title: string; total: number; segs: Seg[] }[] = [
   {
     step: "4",
     title: "Shipper taps after a failed attempt",
-    total: failed,
+    total: DAY.failed_first_attempt.total,
     segs: [
       { label: "A · No answer", n: DAY.failed_first_attempt.A, tone: "primary" },
       { label: "B · Rescheduled", n: DAY.failed_first_attempt.B, tone: "good" },
@@ -145,6 +140,9 @@ const STAGES: { step: string; title: string; total: number; segs: Seg[] }[] = [
   },
 ];
 
+return result;
+}
+
 const TONE: Record<NonNullable<Seg["tone"]>, string> = {
   primary: "var(--d-primary)",
   good: "var(--d-text)",
@@ -152,7 +150,8 @@ const TONE: Record<NonNullable<Seg["tone"]>, string> = {
   muted: "var(--d-chart-track)",
 };
 
-function Pipeline() {
+function Pipeline({ day }: { day: DashboardDay }) {
+  const STAGES = pipelineStages(day);
   return (
     <div className="divide-y divide-[var(--d-border)]">
       {STAGES.map((s, si) => (
@@ -193,8 +192,8 @@ function Pipeline() {
 
 /* ---------- failures by hour + guard ------------------------------------ */
 
-function FailsByHour() {
-  const max = Math.max(...FAILS_BY_HOUR.map((h) => h.a + h.b + h.refused));
+function FailsByHour({ rows: FAILS_BY_HOUR }: { rows: DashboardData["fails_by_hour"] }) {
+  const max = Math.max(1, ...FAILS_BY_HOUR.map((h) => h.a + h.b + h.refused));
   const keys = [
     { k: "a", label: "No answer", c: "var(--d-primary)" },
     { k: "b", label: "Rescheduled", c: "var(--d-text)" },
@@ -241,18 +240,18 @@ function FailsByHour() {
   );
 }
 
+function Guard({ day: DAY, policy }: { day: DashboardDay; policy: DashboardData["policy_guard"] }) {
+  const measured = (value: number | null) => value === null ? "Not measured" : String(value);
 const GUARD = [
-  { k: "Calls outside 08:00–20:30", v: "0", ok: true },
-  { k: "Cycles over 2 calls", v: "0", ok: true },
-  { k: "Labels applied without a person", v: "0", ok: true },
+  { k: "Calls outside 08:00–20:30", v: measured(policy.calls_outside_window), ok: policy.calls_outside_window === 0 },
+  { k: "Cycles over 2 calls", v: measured(policy.cycles_over_two_calls), ok: policy.cycles_over_two_calls === 0 },
+  { k: "Labels applied without a person", v: measured(policy.labels_without_human), ok: policy.labels_without_human === 0 },
   { k: "Buyers who opted out (contact stopped)", v: String(DAY.opt_out), ok: true },
   { k: "AI calls placed", v: fmt(DAY.calls_placed) },
   { k: "Answered call minutes", v: `${DAY.call_minutes_answered}` },
   { k: "Messages sent", v: fmt(DAY.messages_sent) },
-  { k: "Shipper memo audio", v: `${Math.round(DAY.memo_seconds / 60)} min` },
+  { k: "Shipper memo audio", v: DAY.memo_seconds === null ? "Not measured" : `${Math.round(DAY.memo_seconds / 60)} min` },
 ];
-
-function Guard() {
   return (
     <ul className="divide-y divide-[var(--d-border)]">
       {GUARD.map((g) => (
@@ -269,17 +268,17 @@ function Guard() {
 
 type SortKey = "route" | "failed" | "rate";
 const routeFailed = (r: RouteRow) => r.a + r.b + r.refused;
-const routeRate = (r: RouteRow) => routeFailed(r) / (r.delivered + routeFailed(r));
+const routeRate = (r: RouteRow) => routeFailed(r) / Math.max(1, r.delivered + routeFailed(r));
 
-function Routes() {
+function Routes({ rows: ROUTES }: { rows: RouteRow[] }) {
   const [sort, setSort] = useState<SortKey>("failed");
   const rows = useMemo(() => {
     const out = [...ROUTES];
     if (sort === "failed") out.sort((a, b) => routeFailed(b) - routeFailed(a));
     if (sort === "rate") out.sort((a, b) => routeRate(b) - routeRate(a));
     return out;
-  }, [sort]);
-  const worst = Math.max(...ROUTES.map(routeRate));
+  }, [sort, ROUTES]);
+  const worst = Math.max(0.001, ...ROUTES.map(routeRate));
   return (
     <>
       <div className="-mt-1 mb-3 flex gap-1">
@@ -343,7 +342,7 @@ function Routes() {
 
 const REASONS = ["All", "Refused at door", "Unreachable after 2 calls", "Low confidence"] as const;
 
-function CsBacklog() {
+function CsBacklog({ rows: CS_QUEUE }: { rows: QueueRow[] }) {
   const [r, setR] = useState<(typeof REASONS)[number]>("All");
   const [all, setAll] = useState(false);
   const list = CS_QUEUE.filter((q) => r === "All" || q.reason === r);
@@ -401,29 +400,27 @@ function CsBacklog() {
 /* ---------- page -------------------------------------------------------- */
 
 export function Overview() {
-  const { state, engine } = useDemo();
+  const { data, observed, error } = useDashboard();
+  const { day: DAY, hub: HUB, routes: ROUTES, cs_queue: CS_QUEUE } = data;
   const [tab, setTab] = useState("all");
   const [open, setOpen] = useState<string | null>(null);
-  const [resolved, setResolved] = useState<Record<string, string>>({});
 
-  const all: Row[] = useMemo(
-    () => [
-      liveRow(state),
-      ...MOCK_CASES.map((c: MockCase) => ({
-        id: c.id,
-        buyer: c.buyer,
-        district: c.district,
-        trigger: c.trigger,
-        stage: (resolved[c.id] ? "closed" : c.stage) as CaseStage,
-        shipper: c.shipper,
-        updated: c.updated,
-      })),
-    ],
-    [state, resolved],
-  );
+  const all: Row[] = useMemo(() => data.cases.map((row) => ({ id: row.id, buyer: row.buyer, district: row.district, trigger: row.trigger || "", stage: caseStage(row), shipper: row.shipper, updated: row.updated, live: row.id === data.selected_order?.tracking_id })), [data.cases, data.selected_order]);
   const t = TABS.find((x) => x.k === tab)!;
   const rows = all.filter((r) => t.match(r.stage));
-  const openMock = open && open !== ORDER.tracking ? MOCK_CASES.find((c) => c.id === open) : null;
+  const selectedCase = data.cases.find((row) => row.id === open);
+  const actualResult = [...observed.records].reverse().find((record) => record.type === "result")?.payload;
+  const actualProposal = [...observed.records].reverse().find((record) => record.type === "proposal")?.payload;
+  const selectedJson = { order: data.selected_order, result: actualResult, proposal: actualProposal };
+  const jsonDetails = useRef<HTMLDetailsElement>(null);
+  const openedGeneration = useRef<string | undefined>(undefined);
+  const hasSavedResult = !!actualResult || !!data.selected_order?.context_card;
+  useEffect(() => {
+    if (hasSavedResult && data.generation_id && openedGeneration.current !== data.generation_id && jsonDetails.current) {
+      jsonDetails.current.open = true;
+      openedGeneration.current = data.generation_id;
+    }
+  }, [hasSavedResult, data.generation_id]);
 
   return (
     <DashShell>
@@ -431,30 +428,30 @@ export function Overview() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="text-[12px] font-semibold uppercase tracking-[0.06em] d-muted">
-              {HUB.id} · Saturday 31 October
+              {HUB.id} · {HUB.date || "Waiting for backend"}
             </div>
             <h1 className="d-title mt-1 text-[28px] leading-[1.15] md:text-[32px]">{HUB.name}</h1>
             <p className="mt-1 text-[14px] d-text2">
               {HUB.shippers} shippers · {HUB.wards.join(", ")} · morning run {HUB.morningRun}, route cut-off {HUB.cutoff} · calls {HUB.callHours}
             </p>
           </div>
-          <span className="d-chip d-chip-neutral">Mock data · simulated day</span>
+          <span className="d-chip d-chip-neutral">{error ? "Backend updates unavailable" : data.data_label}</span>
         </div>
 
         <div className="mt-6">
-          <KpiStrip />
+          <KpiStrip day={DAY} />
         </div>
 
         <div className="mt-4 grid gap-4 xl:grid-cols-[1.7fr_1fr]">
-          <Card title="Rescue pipeline" sub="Every failed delivery, step by step through the agent’s flow">
-            <Pipeline />
+          <Card title="Rescue pipeline" sub="Every failed delivery, step by step through the agent’s flow" right={<details ref={jsonDetails} className="min-w-0 text-[12px] d-muted"><summary>Selected order JSON</summary><pre className="mt-2 max-h-60 max-w-[520px] overflow-auto whitespace-pre-wrap break-words font-sans">{JSON.stringify(selectedJson, null, 2)}</pre></details>}>
+            <Pipeline day={DAY} />
           </Card>
           <div className="grid gap-4">
             <Card title="Failures by hour" sub="First-attempt failures, by shipper tap">
-              <FailsByHour />
+              <FailsByHour rows={data.fails_by_hour} />
             </Card>
             <Card title="Policy guard" sub="Hard rules, checked before every action">
-              <Guard />
+              <Guard day={DAY} policy={data.policy_guard} />
             </Card>
           </div>
         </div>
@@ -472,7 +469,7 @@ export function Overview() {
               <h2 className="d-title text-[17px]">Live exception queue</h2>
               <p className="mt-0.5 text-[13px] d-muted">Open a case for its transcript, extracted fields and the decision</p>
             </div>
-            <Link href="/demo" className="d-btn d-btn-primary d-btn-sm">
+            <Link href="/live" target="_top" className="d-btn d-btn-primary d-btn-sm">
               Run the demo case
             </Link>
           </div>
@@ -549,16 +546,16 @@ export function Overview() {
         </motion.section>
 
         <div className="mt-4 grid gap-4 2xl:grid-cols-2">
-          <Card id="routes" title="Routes" sub={`${ROUTES.length} routes, 200 stops each`}>
-            <Routes />
+          <Card id="routes" title="Routes" sub={`${ROUTES.length} routes from the current backend generation`}>
+            <Routes rows={ROUTES} />
           </Card>
-          <Card id="cs" title="Customer service queue" sub={`${CS_QUEUE.length} cases from the simulated day, newest first`}>
-            <CsBacklog />
+          <Card id="cs" title="Customer service queue" sub={`${CS_QUEUE.length} cases from the current backend, newest first`}>
+            <CsBacklog rows={CS_QUEUE} />
           </Card>
         </div>
 
         <p className="mt-4 text-[12px] d-muted">
-          Fictional hub simulated with a fixed seed (prep/02-technical/mock-data). Rates are team assumptions for testing, not measurements.
+          {error || "Current-generation backend records. Synthetic demo orders; no live carrier integration. Unavailable measurements are labelled."}
         </p>
       </div>
 
@@ -577,11 +574,7 @@ export function Overview() {
               <button onClick={() => setOpen(null)} className="d-btn d-btn-secondary d-btn-sm mb-6">
                 Close
               </button>
-              {openMock ? (
-                <MockCaseDetail c={openMock} resolved={resolved[openMock.id]} onResolve={(v) => setResolved({ ...resolved, [openMock.id]: v })} />
-              ) : (
-                <LiveCaseDetail state={state} engine={engine} />
-              )}
+              <div className="d-card p-5"><h2 className="d-title text-[20px]">{selectedCase?.buyer || "Selected delivery"}</h2><p className="mt-1 text-[13px] d-muted">{open}</p><p className="mt-4 text-[14px]">{selectedCase?.state || selectedCase?.status}</p><details open className="mt-4 text-[13px]"><summary>Actual backend state and outcome</summary><pre className="mt-3 overflow-auto whitespace-pre-wrap break-words font-sans text-[12px]">{JSON.stringify(open === data.selected_order?.tracking_id ? selectedJson : selectedCase, null, 2)}</pre></details>{open === data.selected_order?.tracking_id && <div className="mt-5 space-y-3 text-[13px]">{(observed.transcripts || []).map((record) => <p key={`${record.call_id}:${record.payload.speaker}:${record.payload.utterance_id ?? record.payload.turn_id}`}><strong>{String(record.payload.speaker)}</strong> {String(record.payload.text || "")}</p>)}</div>}</div>
             </motion.aside>
           </>
         )}

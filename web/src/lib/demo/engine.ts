@@ -3,7 +3,16 @@
 import { VOICE } from "./voice";
 import { useEffect, useSyncExternalStore } from "react";
 import { DEFAULT_FOR_KEY, SCENARIOS, initialState, stepsFor } from "./scenarios";
-import type { ActionKey, ChoiceKey, DemoState, ScenarioId } from "./types";
+import type { ActionKey, ChoiceKey, DemoState, ScenarioId, Step } from "./types";
+
+/** Lets a presentation pace steps around media: the next step waits for what `begin` returns. */
+export type StepDirector = {
+  pace?: (step: Step) => number | undefined;
+  begin?: (step: Step) => Promise<void> | undefined;
+  pause?: () => void;
+  resume?: () => void;
+  stop?: () => void;
+};
 
 /**
  * Demo scenario player.
@@ -34,6 +43,19 @@ class DemoEngine {
   private autoTimer: ReturnType<typeof setTimeout> | null = null;
   private clockTimer: ReturnType<typeof setInterval> | null = null;
   private connections = 0;
+  private director: StepDirector | null = null;
+  private hold: Promise<void> | null = null;
+  private begun: string | null = null;
+
+  setDirector = (director: StepDirector | null) => {
+    this.director = director;
+  };
+
+  private endMedia() {
+    this.hold = null;
+    this.begun = null;
+    this.director?.stop?.();
+  }
 
   subscribe = (fn: () => void) => {
     this.listeners.add(fn);
@@ -102,7 +124,11 @@ class DemoEngine {
 
   play = () => {
     this.takeover();
-    if (this.state.done) this.state = { ...this.resetState(this.state.scenario), playing: true };
+    if (this.state.done && !stepsFor(this.state.scenario)[this.state.step]) {
+      this.endMedia();
+      this.state = { ...this.resetState(this.state.scenario), playing: true };
+    }
+    this.director?.resume?.();
     this.set({ ...this.state, playing: true });
     this.schedule();
   };
@@ -110,6 +136,7 @@ class DemoEngine {
   pause = () => {
     this.takeover();
     this.clearTimers();
+    this.director?.pause?.();
     this.set({ ...this.state, playing: false });
   };
 
@@ -122,7 +149,26 @@ class DemoEngine {
   reset = (scenario?: ScenarioId) => {
     this.takeover();
     this.clearTimers();
+    this.endMedia();
     this.set(this.resetState(scenario ?? this.state.scenario));
+  };
+
+  /** Jump straight to a step by replaying the pure step functions, keeping play or pause. */
+  seek = (index: number) => {
+    this.takeover();
+    this.clearTimers();
+    this.endMedia();
+    const { scenario, playing } = this.state;
+    const steps = stepsFor(scenario);
+    const key = SCENARIOS.find((x) => x.id === scenario)?.key;
+    let s = this.resetState(scenario);
+    for (const [i, step] of steps.slice(0, index).entries()) {
+      s = { ...s, clock: step.to ?? s.clock + (step.dt ?? 0) };
+      if (step.apply) s = step.apply(s, step.wait?.action === "shipper:choose" ? key : undefined);
+      s = { ...s, step: i + 1, caption: step.caption ?? s.caption };
+    }
+    this.set({ ...s, playing });
+    this.schedule();
   };
 
   setAuto = (auto: boolean) => {
@@ -140,6 +186,7 @@ class DemoEngine {
   /** Skip the wait: run the current step now (or perform the pending action). */
   next = () => {
     this.takeover();
+    this.endMedia();
     const s = this.state;
     if (s.waitingFor) return this.dispatch(s.waitingFor.action, this.autoPayload());
     const steps = stepsFor(s.scenario);
@@ -190,11 +237,26 @@ class DemoEngine {
     this.clearTimers();
     const s = this.state;
     if (!s.playing || s.waitingFor) return;
+    if (this.hold) {
+      const hold = this.hold;
+      void hold.then(() => {
+        if (this.hold !== hold) return;
+        this.hold = null;
+        this.schedule();
+      });
+      return;
+    }
     const steps = stepsFor(s.scenario);
     const step = steps[s.step];
     if (!step) {
       this.set({ ...s, playing: false });
       return;
+    }
+
+    const started = `${s.scenario}:${s.step}`;
+    if (this.begun !== started) {
+      this.begun = started;
+      this.hold = this.director?.begin?.(step) ?? null;
     }
 
     const from = s.clock;
@@ -204,7 +266,9 @@ class DemoEngine {
     const fresh = said && said.id !== this.lastSaid;
     if (said) this.lastSaid = said.id;
     const hold = fresh ? (VOICE[said.text]?.ms ?? 0) + 350 : 0;
-    const dur = Math.max(60, Math.max(step.ms ?? 1400, hold) / s.speed);
+    // A director paces around its own clips, so it replaces the recorded-line hold.
+    const paced = this.director ? (this.director.pace?.(step) ?? step.ms ?? 1400) : Math.max(step.ms ?? 1400, hold);
+    const dur = Math.max(60, paced / s.speed);
     const start = performance.now();
     this.set({ ...s, animTo: to !== from ? to : null, caption: step.caption ?? s.caption });
 

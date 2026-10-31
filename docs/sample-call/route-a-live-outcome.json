@@ -1,0 +1,47 @@
+{
+  "generation": "98d70494-fff2-41a6-9b3a-f490ea7b455a",
+  "callId": "0834fd8d-7d14-4534-bd2f-bc4dd6596894",
+  "phase": "ended",
+  "error": null,
+  "orderStatus": "moved",
+  "deliveryDate": "2026-11-01",
+  "contextCard": {
+    "tracking_id": "SPXVN0123456789",
+    "window": "2026-11-01, 17:00–20:00",
+    "drop": "Security desk",
+    "notes": "Please call when arriving",
+    "alt": null,
+    "source": "ai_call",
+    "by": "agent"
+  },
+  "result": {
+    "seq": 141,
+    "at": "2026-10-31T15:46:14.403778+07:00",
+    "tracking_id": "SPXVN0123456789",
+    "generation_id": "98d70494-fff2-41a6-9b3a-f490ea7b455a",
+    "call_id": "0834fd8d-7d14-4534-bd2f-bc4dd6596894",
+    "type": "result",
+    "payload": {
+      "status": "applied",
+      "context": {
+        "time_window": {
+          "date": "2026-11-01",
+          "from": "17:00",
+          "to": "20:00",
+          "confidence": 1.0
+        },
+        "drop_location": {
+          "type": "security_desk",
+          "note": "",
+          "confidence": 1.0
+        },
+        "alt_receiver": null,
+        "address_correction": null,
+        "cannot_receive": null,
+        "delivery_notes": "Please call when arriving",
+        "opt_out": false
+      }
+    }
+  },
+  "validation": "Two real browser sessions; synthetic microphone speech through real WebRTC and live models; physical phone not tested"
+}
