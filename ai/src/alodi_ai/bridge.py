@@ -10,7 +10,7 @@ class Snapshot:
     tracking_id: str = "SPXVN0123456789"
     rescue_case_id: int = 1
     context_version: int = 1
-    demo_epoch: int = 1
+    demo_epoch: int | str = 1
     business_now: datetime = field(
         default_factory=lambda: datetime.fromisoformat("2026-10-31T11:04:00+07:00")
     )

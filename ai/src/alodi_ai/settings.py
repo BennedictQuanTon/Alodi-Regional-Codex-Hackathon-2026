@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     voice_provider: str = "gpt_live"
     buyer_language: str = "vi"
     openai_api_key: SecretStr = SecretStr("")
-    openai_model: str = "gpt-5.6-terra"
+    openai_model: str = "gpt-6.1-terra"
     openai_reasoning_effort: str = "none"
     openai_live_model: str = "gpt-live-1"
     openai_live_voice: str = "marin"
@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     ffprobe_path: str = "ffprobe"
     recordings_dir: str = "data/recordings"
     recording_ttl_days: int = 30
+    call_max_duration_seconds: int = Field(default=180, ge=1, le=180)
 
     def __init__(self, **values):
         super().__init__(**values)

@@ -66,17 +66,16 @@ class Settings(BaseSettings):
     route_cutoff: time = time(8)
 
     openai_api_key: SecretStr = Field(default=SecretStr(""), repr=False, exclude=True)
-    assemblyai_api_key: SecretStr = Field(default=SecretStr(""), repr=False, exclude=True)
-    assembly_api_key: SecretStr = Field(default=SecretStr(""), repr=False, exclude=True)
-    openai_model: str = "gpt-5.6-terra"
+    openai_model: str = "gpt-6.1-terra"
     openai_reasoning_effort: str = "none"
-    assemblyai_memo_model: str = "universal-3-5-pro"
-    voice_provider: str = "openai_realtime"
-    openai_realtime_model: str = "gpt-realtime-2.1"
-    openai_realtime_voice: str = "marin"
+    voice_provider: Literal["gpt_live"] = "gpt_live"
+    openai_live_model: str = "gpt-live-1"
+    openai_live_voice: str = "marin"
+    openai_memo_model: str = "gpt-transcribe"
     buyer_language: str = "vi"
-    call_max_duration_seconds: int = Field(default=90, ge=1)
+    call_max_duration_seconds: int = Field(default=180, ge=1, le=180)
     ffmpeg_path: str = "ffmpeg"
+    ffprobe_path: str = "ffprobe"
     ai_request_timeout_seconds: float = Field(default=30, gt=0, allow_inf_nan=False)
 
     @field_validator("mock_pack_dir", "recordings_dir", mode="after")
@@ -148,29 +147,13 @@ class Settings(BaseSettings):
             raise ConfigurationError("Invalid configuration: CALL_WINDOW_START, CALL_WINDOW_END")
         if self.route_cutoff.tzinfo:
             raise ConfigurationError("Invalid configuration: ROUTE_CUTOFF")
-        canonical = self.assemblyai_api_key.get_secret_value()
-        alias = self.assembly_api_key.get_secret_value()
-        if canonical and alias and canonical != alias:
-            raise ConfigurationError(
-                "Conflicting configuration: ASSEMBLY_API_KEY, ASSEMBLYAI_API_KEY"
-            )
         if self.ai_mode == "live" and not self.offline_mode:
             missing = []
             if not self.openai_api_key.get_secret_value().strip():
                 missing.append("OPENAI_API_KEY")
-            if not (canonical or alias).strip():
-                missing.append("ASSEMBLYAI_API_KEY (or ASSEMBLY_API_KEY)")
             if missing:
                 raise ConfigurationError("Missing configuration: " + ", ".join(missing))
         return self
-
-    @property
-    def effective_assemblyai_api_key(self) -> SecretStr:
-        return (
-            self.assemblyai_api_key
-            if self.assemblyai_api_key.get_secret_value()
-            else self.assembly_api_key
-        )
 
     @property
     def effective_ai_mode(self) -> Literal["stub", "live", "replay"]:

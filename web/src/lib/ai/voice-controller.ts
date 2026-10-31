@@ -49,9 +49,10 @@ export class VoiceController {
   private generation = 0;
   private ready = false;
   private serverReady = false;
+  private issuedSocketPath?: string;
   private pagehide = () => { void this.end("navigation"); };
 
-  constructor(readonly config: AiConfig, private base = API_URL) {
+  constructor(readonly config: AiConfig, readonly base = API_URL) {
     window.addEventListener("pagehide", this.pagehide);
   }
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
@@ -68,6 +69,7 @@ export class VoiceController {
     const generation = ++this.generation;
     this.abort = new AbortController();
     try {
+      if (this.config.bridge_mode === "part1") throw new Error("This backend requires a call issued by the order workflow. Open the integrated workspace.");
       // Keep the reservation response on local cancellation so a late ID can be closed.
       // Backend reservation expiry covers a response lost at the network boundary.
       const call = await post<IssuedCall>("/ai/dev/calls", { tracking_id: trackingId }, undefined, this.base);
@@ -77,6 +79,22 @@ export class VoiceController {
       }
       this.patch({ status: "consent", callId: call.call_id, message: undefined });
     } catch (error) { if (this.current(generation)) this.fail(error); }
+  }
+
+  /** Attach a policy-issued Part 1 call without creating another reservation. */
+  async prepareIssued(call: IssuedCall) {
+    const closing = this.end("replaced", false);
+    const generation = this.generation;
+    await closing;
+    if (generation !== this.generation) return;
+    this.state = initialState();
+    this.abort = new AbortController();
+    try {
+      const address = new URL(socketUrl(call.ws_path, this.base));
+      if (address.searchParams.get("session") !== call.call_id || !address.pathname.endsWith("/ws/call") || call.status !== "ringing") throw new Error("This issued call is unavailable. Refresh the order.");
+      this.issuedSocketPath = call.ws_path;
+      this.patch({ status: "consent", callId: call.call_id });
+    } catch (error) { this.fail(error); }
   }
 
   /** Invoke directly from the consent button so playback can unlock in that gesture. */
@@ -167,7 +185,7 @@ export class VoiceController {
   private openSocket(callId: string, signal: AbortSignal) {
     const generation = this.generation;
     return new Promise<void>((resolve, reject) => {
-      const socket = new WebSocket(socketUrl(`/ws/call?session=${encodeURIComponent(callId)}`, this.base));
+      const socket = new WebSocket(socketUrl(this.issuedSocketPath || `/ws/call?session=${encodeURIComponent(callId)}`, this.base));
       this.socket = socket;
       socket.binaryType = "arraybuffer";
       this.diagnostic({ socket: "connecting" });
@@ -402,6 +420,7 @@ export class VoiceController {
     this.abort?.abort();
     this.ready = false;
     this.serverReady = false;
+    this.issuedSocketPath = undefined;
     clearInterval(this.tick);
     clearInterval(this.ping);
     clearTimeout(this.connectDeadline);

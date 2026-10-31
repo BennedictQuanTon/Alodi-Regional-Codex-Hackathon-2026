@@ -84,6 +84,7 @@ def create_app(
     part2_adapter: Part2Adapter | None = None,
     part2_router: APIRouter | None = None,
     start_scheduler: bool | None = None,
+    ai_runtime=None,
 ) -> FastAPI:
     settings = settings or load_settings()
     if part2_adapter is not None and part2_adapter.mode != "live":
@@ -107,6 +108,8 @@ def create_app(
                 await seed_database(database, settings, pack)
             app.state.morning = MorningService(database, settings, clock=clock)
             app.state.workflow = WorkflowService(app.state.morning)
+            if part2_adapter is not None and hasattr(part2_adapter, "bind"):
+                part2_adapter.bind(app.state.workflow)
             app.state.scheduler = Scheduler(app.state.workflow, part2_adapter)
             app.state.demo = DemoService(app.state.scheduler)
             async with database.sessions.begin() as session:
@@ -125,11 +128,14 @@ def create_app(
                 yield
             finally:
                 await app.state.scheduler.stop()
+                if ai_runtime is not None:
+                    await ai_runtime.shutdown()
         finally:
             await database.close()
 
     app = FastAPI(title="Alodi local API", version="0.1.0", lifespan=lifespan)
     app.state.settings = settings
+    app.state.ai_runtime = ai_runtime
     app.include_router(workflow_router())
     app.include_router(rescue_router(fixture_memo=part2_router is None))
     if part2_router is not None:
@@ -321,6 +327,15 @@ def create_app(
                         "recording_consent": call.recording_consent,
                         "duration_s": call.duration_s,
                         "requested_at": call.requested_at.astimezone(settings.timezone).isoformat(),
+                        "provider_session_id": call.id
+                        if ai_runtime and call.id in ai_runtime.calls
+                        else None,
+                        "ws_path": f"/ws/call?session={call.id}"
+                        if ai_runtime and call.id in ai_runtime.calls
+                        else None,
+                        "runtime_status": ai_runtime.calls[call.id].status
+                        if ai_runtime and call.id in ai_runtime.calls
+                        else None,
                     }
                     for call in calls
                 ],

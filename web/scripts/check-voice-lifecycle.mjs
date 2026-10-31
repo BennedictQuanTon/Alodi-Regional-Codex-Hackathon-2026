@@ -67,7 +67,7 @@ function fixture(overrides = {}) {
   const protocol = {
     API_URL: "http://localhost:8001",
     errorMessage: (error) => error.message,
-    socketUrl: () => "ws://localhost:8001/ws/call?session=synthetic",
+    socketUrl: (path, base = "http://localhost:8001") => new URL(path.replace(/^\//, ""), `${base}/`).toString().replace(/^http/, "ws"),
     post: async (path, body) => {
       posts.push({ path, body });
       if (path === "/ai/dev/calls") return overrides.reservation ? overrides.reservation.promise : { call_id: "synthetic", ws_path: "/ws/call" };
@@ -86,6 +86,7 @@ function fixture(overrides = {}) {
     window: { isSecureContext: true, addEventListener() {}, removeEventListener() {} },
     navigator: { mediaDevices: { getUserMedia: () => { microphoneRequests++; return overrides.permission ? overrides.permission.promise : Promise.resolve(stream); } } },
     AudioContext: Context, Audio, WebSocket: Socket, RTCPeerConnection: Peer,
+    URL,
     AbortController, DOMException, setTimeout, clearTimeout, setInterval, clearInterval,
     requestAnimationFrame: (callback) => { frames.set(++frameId, callback); return frameId; }, cancelAnimationFrame: (id) => frames.delete(id),
     Date: class extends Date { static now() { return now; } },
@@ -259,4 +260,30 @@ function fixture(overrides = {}) {
   assert.equal(controller.state.notice, undefined, "a new call clears recoverable notices");
   controller.dispose();
 }
-console.log("PASS: consent/privacy, cancellation races, speech/quiet gating, fresh unmute permissions, autoplay repeat, recoverable notices vs fatal errors, stale callbacks, media cleanup and final usage (transport doubles).");
+{
+  const env = fixture();
+  const controller = new env.Controller({ ...config, bridge_mode: "part1" }, "https://integrated.test/api");
+  await controller.prepareIssued({ call_id: "issued-session", tracking_id: "order", status: "ringing", ws_path: "/ws/call?session=issued-session", voice_provider: "gpt_live" });
+  assert.equal(controller.state.status, "consent", "an issued workflow call enters the same disclosure/consent flow");
+  assert.equal(controller.state.callId, "issued-session");
+  assert.equal(env.microphoneRequests(), 0, "attaching an issued call never requests microphone before agreement");
+  assert.equal(env.posts.length, 0, "attaching never creates a separate fixture/provider reservation");
+  await controller.connect();
+  assert.ok(env.posts.some((item) => item.path === "/ai/calls/issued-session/connect"), "consent connects the workflow-issued session");
+  assert.equal(env.track.enabled, false, "issued call uses the existing AI-speech input gate");
+  await controller.end(); controller.dispose();
+  const invalid = new env.Controller({ ...config, bridge_mode: "part1" });
+  await invalid.prepareIssued({ call_id: "mismatch", tracking_id: "order", status: "ringing", ws_path: "/ws/call?session=other", voice_provider: "gpt_live" });
+  assert.equal(invalid.state.status, "error", "mismatched session/socket binding cannot connect");
+  await invalid.prepare("order");
+  assert.equal(invalid.state.status, "error", "durable API cannot use the standalone fixture reservation endpoint");
+  assert.equal(env.posts.some((item) => item.path === "/ai/dev/calls"), false);
+  invalid.dispose();
+  const cancelled = new env.Controller({ ...config, bridge_mode: "part1" });
+  const attaching = cancelled.prepareIssued({ call_id: "late-issued", tracking_id: "order", status: "ringing", ws_path: "/ws/call?session=late-issued", voice_provider: "gpt_live" });
+  await cancelled.end("cancelled"); await attaching;
+  assert.equal(cancelled.state.status, "ended", "cancelled issued-call attachment cannot reopen consent after cleanup");
+  assert.equal(cancelled.state.callId, undefined);
+  cancelled.dispose();
+}
+console.log("PASS: consent/privacy, cancellation races, speech/quiet gating, fresh unmute permissions, autoplay repeat, notices/fatal errors, issued-call attachment, stale callbacks, cleanup and final usage (transport doubles).");

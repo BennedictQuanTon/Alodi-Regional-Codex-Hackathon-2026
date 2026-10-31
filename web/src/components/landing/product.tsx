@@ -17,7 +17,7 @@ export function Product() {
           </div>
           <Reveal delay={0.1}>
             <p className="max-w-[440px] text-[18px] leading-[1.4] text-graphite lg:ml-auto">
-              GPT-5.6 Terra runs the agent in the middle. The carrier keeps every system it already has.
+              GPT-6.1 Terra runs the agent in the middle. The carrier keeps every system it already has.
             </p>
           </Reveal>
         </div>

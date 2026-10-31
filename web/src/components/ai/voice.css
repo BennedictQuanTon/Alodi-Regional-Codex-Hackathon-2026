@@ -15,13 +15,16 @@
 .ai-card button, .ai-harness > header button { border: 1px solid #cecac8; background: #fff; border-radius: 18px; padding: 10px 16px; color: #1f2a44; font: inherit; cursor: pointer; min-height: 44px; }
 .ai-card button.ai-primary { background: #f05a00; color: white; border-color: #f05a00; }
 .ai-card button:disabled, .ai-header button:disabled { opacity: .45; cursor: not-allowed; }
-.ai-card button:focus-visible, .ai-header button:focus-visible, .ai-card textarea:focus-visible, .ai-card summary:focus-visible { outline: 3px solid #f05a00; outline-offset: 3px; }
+.ai-card button:focus-visible, .ai-header button:focus-visible, .ai-card textarea:focus-visible, .ai-card select:focus-visible, .ai-card summary:focus-visible { outline: 3px solid #f05a00; outline-offset: 3px; }
 .ai-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
 .ai-consent { border: 1px solid #cecac8; border-radius: 18px; padding: 16px; margin-top: 16px; background: #f6f3f1; }
 .ai-captions { max-height: 300px; min-height: 100px; overflow-y: auto; border-top: 1px solid #e3e6ee; margin-top: 20px; padding-top: 8px; overflow-wrap: anywhere; }
 .ai-captions strong { margin-right: 8px; }
 .ai-card meter { width: 100%; height: 15px; accent-color: #f05a00; }
 .ai-card textarea { display: block; resize: vertical; width: 100%; border: 1px solid #cecac8; border-radius: 12px; padding: 12px; margin: 8px 0 12px; background: #fbf9f7; font: inherit; }
+.ai-card select { display: block; width: 100%; min-height: 44px; border: 1px solid #cecac8; border-radius: 12px; padding: 10px; margin: 8px 0; background: #fbf9f7; font: inherit; }
+.ai-card input { display: block; width: 100%; min-height: 44px; border: 1px solid #cecac8; border-radius: 12px; padding: 10px 12px; margin: 8px 0 12px; background: #fbf9f7; font: inherit; }
+.ai-card input:focus-visible { outline: 3px solid #f05a00; outline-offset: 3px; }
 .ai-card pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--font-sans-face), sans-serif; background: #f6f3f1; border-radius: 12px; padding: 12px; margin: 8px 0 16px; font-size: 12px; max-height: 340px; overflow: auto; }
 .ai-card details { margin-top: 16px; }
 .ai-card summary { cursor: pointer; font-size: 13px; }

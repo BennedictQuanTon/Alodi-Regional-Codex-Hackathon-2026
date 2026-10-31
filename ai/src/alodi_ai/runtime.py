@@ -10,6 +10,7 @@ from fastapi import (
     APIRouter,
     FastAPI,
     File,
+    Form,
     HTTPException,
     UploadFile,
     WebSocket,
@@ -76,14 +77,19 @@ class Runtime:
         self.calls, self.jobs, self.job_tasks = {}, {}, {}
         self.reservation_lock = asyncio.Lock()
 
-    async def reserve_call(self, tracking_id):
+    async def reserve_call(self, tracking_id, call_id=None):
         async with self.reservation_lock:
-            if any(c.status != "ended" for c in self.calls.values()):
+            if call_id and call_id in self.calls:
+                call = self.calls[call_id]
+                if call.snapshot.tracking_id != tracking_id or call.status == "ended":
+                    raise ValueError("Call reservation is no longer current")
+                return call
+            if call_id is None and any(c.status != "ended" for c in self.calls.values()):
                 raise ValueError("A call is already active")
             snapshot = await self.bridge.snapshot(tracking_id)
             if not snapshot.eligible:
                 raise ValueError("Contact blocked")
-            call = Call(str(uuid.uuid4()), snapshot)
+            call = Call(call_id or str(uuid.uuid4()), snapshot)
             self.calls[call.id] = call
 
             async def expire_reservation():
@@ -128,6 +134,14 @@ class Runtime:
                 task.cancel()
         await self.emit(call, {"type": "audio_clear"})
         await self.emit(call, {"type": "media_stop", "reason": reason})
+        try:
+            ended = getattr(self.bridge, "call_ended", None)
+            if ended:
+                await ended(call, reason)
+        finally:
+            await self._close_media(call, reason)
+
+    async def _close_media(self, call, reason):
         try:
             if call.upstream is not None:
                 upstream, call.upstream = call.upstream, None
@@ -374,16 +388,22 @@ def create_app(settings=None, bridge=None, fixture=False):
 
     @router.get("/ai/config")
     async def config():
-        missing = settings.missing()
+        current_mode = getattr(bridge, "current_mode", None)
+        mode = await current_mode() if current_mode else settings.mode
+        missing = settings.missing() if mode != "offline" else []
         return {
-            "mode": settings.mode,
+            "mode": mode,
             "voice_provider": settings.voice_provider,
             "language": "vi",
             "transport": "webrtc",
-            "ready": settings.mode != "offline" and not missing,
+            "ready": mode != "offline" and not missing,
+            "models": {"voice": settings.openai_live_model,
+                       "extraction": settings.openai_model,
+                       "memo": settings.openai_memo_model},
             "bridge_mode": "fixture" if fixture else "part1",
             "missing_variables": missing,
-            "limits": {"call_seconds": 180, "memo_seconds": 10, "memo_bytes": 5242880},
+            "limits": {"call_seconds": settings.call_max_duration_seconds,
+                       "memo_seconds": 10, "memo_bytes": 5242880},
             "disclosure": {"text": DISCLOSURE, "audio_url": "/ai/disclosure.mp3"},
         }
 
@@ -466,6 +486,16 @@ def create_app(settings=None, bridge=None, fixture=False):
                     raise HTTPException(409, "Attach call websocket first")
                 if not body.sdp:
                     raise HTTPException(400, "SDP offer required")
+            # The host rechecks policy and records consent before any cloud audio.
+            started = getattr(bridge, "call_started", None)
+            if started:
+                try:
+                    call.snapshot = await started(call)
+                except (KeyError, ValueError):
+                    raise HTTPException(409, "Call is no longer eligible") from None
+            if call.status != "ringing":
+                raise HTTPException(409, "Call ended during authorization")
+            if settings.mode == "live":
                 call.status = "connecting"
                 upstream = LiveSession(runtime, call)
                 call.upstream = upstream
@@ -483,14 +513,14 @@ def create_app(settings=None, bridge=None, fixture=False):
                     if call.upstream is upstream:
                         call.upstream = None
                         await upstream.close()
-                    call.status = "ended"
+                    await runtime.end(call, "connection_failed")
                     raise HTTPException(503, "Voice service unavailable") from None
             call.status = "connected"
             if call.timeout:
                 call.timeout.cancel()
 
             async def expire():
-                await asyncio.sleep(180)
+                await asyncio.sleep(settings.call_max_duration_seconds)
                 await runtime.end(call, "timeout")
 
             call.timeout = asyncio.create_task(expire())
@@ -543,7 +573,13 @@ def create_app(settings=None, bridge=None, fixture=False):
         return {"call_id": call_id, "status": "ended"}
 
     @router.post("/orders/{tracking_id}/memo", status_code=202)
-    async def memo(tracking_id: str, audio: UploadFile = File(...)):
+    async def memo(
+        tracking_id: str,
+        audio: UploadFile = File(...),
+        generation_id: str | None = Form(None),
+        context_version: int | None = Form(None),
+        shipper_event_id: int | None = Form(None),
+    ):
         try:
             snapshot = await bridge.snapshot(tracking_id)
         except KeyError:
@@ -559,6 +595,11 @@ def create_app(settings=None, bridge=None, fixture=False):
         if not data:
             raise HTTPException(400, "Empty memo")
         job_id = str(uuid.uuid4())
+        prepare = getattr(bridge, "prepare_memo", None)
+        if prepare:
+            snapshot = await prepare(
+                tracking_id, generation_id, context_version, shipper_event_id, job_id
+            )
         runtime.jobs[job_id] = {"job_id": job_id, "status": "processing"}
         runtime.job_tasks[job_id] = asyncio.create_task(
             runtime.memo_job(job_id, snapshot, data)

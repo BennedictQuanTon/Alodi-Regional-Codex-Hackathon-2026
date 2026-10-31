@@ -33,7 +33,7 @@ const OUTPUTS: Node[] = [
 ];
 
 const CORE = [
-  { icon: "siOpenai", title: "Alodi Agent", sub: "GPT-5.6 Terra · Agents SDK, one run per order" },
+  { icon: "siOpenai", title: "Alodi Agent", sub: "GPT-6.1 Terra · Agents SDK, one run per order" },
   { icon: "siOpenai", title: "Triage", sub: "Decisions API on GPT-6 Luna" },
   { mark: "square" as const, title: "Policy guard", sub: "quiet hours · caps · 0.85 · masks PII" },
   { icon: "siTemporal", title: "Scheduler", sub: "60′ and +2 h timers, retries" },
@@ -48,7 +48,7 @@ const STORES = [
 const MODELS = [
   { icon: "siOpenai", name: "GPT-Live-1", sub: "real-time voice calls with the buyer" },
   { icon: "siOpenai", name: "Decisions API", sub: "GPT-6 Luna triages every message" },
-  { icon: "siOpenai", name: "GPT-5.6 Terra", sub: "orchestrates buyer, courier and policy" },
+  { icon: "siOpenai", name: "GPT-6.1 Terra", sub: "orchestrates buyer, courier and policy" },
   { icon: "siOpenai", name: "gpt-oss-20b", sub: "local fallback · PhoWhisper for memos" },
 ];
 

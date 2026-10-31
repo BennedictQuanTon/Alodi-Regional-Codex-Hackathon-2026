@@ -1,6 +1,6 @@
 # Alodi AI service
 
-This package provides the AI integration and a standalone fixture app. The fixture is in-memory and does not implement the carrier, database, workflow, scheduler, or authoritative policy. Part 1 must provide a bridge that rechecks eligibility and atomically applies a proposal against the context version, demo epoch, revision and idempotency key.
+This package provides GPT voice, memo and extraction services. The integrated host in `api/app/integrated.py` connects them to the real local database, workflow, scheduler and authoritative policy through `api/app/ai_bridge.py`. The separate standalone fixture is in-memory; it does not implement those backend responsibilities or a carrier integration. The bridge rechecks eligibility and applies proposals against the context version, generation, revision and idempotency key.
 
 ## Windows setup
 
@@ -54,23 +54,71 @@ uv run --project ai --with aiortc --with numpy python ai/smoke.py --notes no
 
 The local disclosure clip is fixed synthetic speech. No buyer audio is stored. Live provider requests receive raw audio; masking reduces known identifiable transcript text before extraction but cannot guarantee complete anonymization.
 
-## Part 1 host recipe
+## Integrated host
 
-In Part 1's Python environment, install this package with `uv pip install -e .\ai`. Construct a bridge implementation backed by Part 1's transactional store and policy. After registering the host's own routes, mount the AI app at the root (and avoid registering a conflicting `/orders/{tracking_id}/memo` route):
+For live calls, use real-time business-clock speed so a conversation does not advance hours while the buyer speaks. From PowerShell at the repository root:
 
-```python
-from fastapi import FastAPI
-from alodi_ai.runtime import create_app
-from alodi_ai.settings import Settings
-
-app = FastAPI()
-# Register Part 1 order, policy, scheduler, and other routes here first.
-# part1_bridge is your implementation of alodi_ai.bridge.Bridge.
-ai_app = create_app(settings=Settings(), bridge=part1_bridge, fixture=False)
-app.mount("/", ai_app)
-# Part 1's scheduler reserves a call in-process when policy permits:
-# call = await ai_app.state.runtime.reserve_call(tracking_id)
-# Publish call.id and /ws/call?session=<id> through Part 1's existing workflow.
+```powershell
+$env:DEMO_CLOCK_SPEED = "1"
+.\scripts\start-api.ps1
 ```
 
-Start the host using Part 1's own documented startup command on port 8000. Stop it using its normal shutdown procedure. The fixture app is separate: from the repository root run `.\scripts\start-ai.ps1`, stop with Ctrl+C, and check with `.\scripts\check-ai.ps1`. The fixture lifespan calls `await ai_app.state.runtime.shutdown()` on exit. Because mounted app lifespans may not run under a parent, register that same shutdown call in the Part 1 host lifecycle. `GET /ai/calls/{id}` and job responses expose elapsed monotonic seconds, selected model names, and available provider/token usage; usage varies by provider and no cost estimate is inferred from it.
+Use the workspace's explicit Next timer control to advance scheduled waits, or pause the business clock before a conversation. Changing speed preserves an existing database's saved clock; use the workspace speed control or an explicit scenario reset when needed. The script uses
+`api/uv.lock` and the editable local AI package together. The `alodi-api` entrypoint
+constructs `app.integrated.create_integrated_app`: the existing Part 1 order,
+workflow, policy, scheduler and SQLite store share one FastAPI application with
+this package's AI router. Mounted-app lifespan behavior is not involved. Host
+shutdown stops scheduler tasks, memo jobs and voice sessions before closing SQLite.
+
+The root `.env.example` defaults to synthetic stub behavior. For cloud requests,
+set `AI_MODE=live`, `OPENAI_API_KEY`, `VOICE_PROVIDER=gpt_live`,
+`OPENAI_MODEL=gpt-6.1-terra`, `OPENAI_REASONING_EFFORT=none`,
+`OPENAI_LIVE_MODEL=gpt-live-1`, and `OPENAI_MEMO_MODEL=gpt-transcribe` in the ignored
+root `.env`. Existing credentials are never overwritten by the startup script.
+AssemblyAI and the old realtime settings are no longer active configuration.
+`CALL_MAX_DURATION_SECONDS` sets the connected-call cap on both layers (default
+180 seconds, maximum 180). The host's unanswered-call timer is 30 seconds.
+
+Open `/dev/integrated` and connect to the host URL shown by its startup command
+(default `http://127.0.0.1:8000`). This workspace reads authoritative orders and
+shows the business clock, explicit courier outcomes, undo, issued calls, memo
+status, saved context and audit events. Its API selector does not change the
+standalone fixture lab. Both surfaces use synthetic seeded orders; cloud audio
+is real only after disclosure and explicit consent. The integration is a local,
+unauthenticated demo, not a deployed production service.
+
+Part 1 schedules call reservations; runtime call IDs equal the durable
+`CallAttempt.id`. `GET /orders/{tracking_id}` publishes `calls[].provider_session_id`,
+`ws_path` and `runtime_status`. The browser attaches the issued session through
+`/ws/call?session=<id>`; it cannot use fixture creation routes on the host. Each
+connection rechecks generation, context version, eligibility, call hours and
+consent before opening the cloud transport. Distinct host orders may have
+independent reservations. Opt-out, new buyer input, delivery, offline switching,
+reset and timeout invalidate pending proposals and terminate cancelled media.
+Cancellation acknowledgments are retained until successful, including retries
+after a failed reset. Provider waits do not hold the scheduler's timer lock.
+
+Multipart `POST /orders/{tracking_id}/memo` has one route owner and requires
+`audio`, `generation_id`, `context_version` and `shipper_event_id`. An unused,
+committed B outcome is required; pending or undone outcomes cannot upload.
+The response is `{job_id, status}`; poll `GET /ai/jobs/{job_id}`. Audio remains
+ephemeral. A stale result cannot apply after another workflow change. Confirmed
+voice and memo proposals pass through the same transactional Part 1 policy as
+chat; `delivery_notes` is saved in extracted context and `context_card.notes`.
+An address correction without an established allowed ward requires review; a
+model's `same_district` flag does not establish that ward.
+
+```powershell
+uv sync --project api --frozen --python 3.12
+uv run --project api --frozen pytest -q api/tests ai/tests
+uv run --project api --frozen ruff check api
+uv run --project api --frozen ruff check --isolated --select E4,E7,E9,F ai
+```
+
+The integration tests use real SQLite migrations, scheduler and workflow with
+simulated provider boundaries. They verify saved proposals, notes/corrections,
+idempotence, stale and cancelled work, reset retries, offline transitions,
+timeouts, route ownership, and restart persistence. They do not establish live
+speech accuracy, carrier integration, deployed authentication or production
+readiness. A separate minimal synthetic text request verified `gpt-6.1-terra`
+with reasoning effort `none`; it is not a quality benchmark.

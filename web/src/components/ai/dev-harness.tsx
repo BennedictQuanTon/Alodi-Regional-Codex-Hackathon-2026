@@ -5,6 +5,7 @@ import { API_URL, errorMessage, post, request, type AiConfig, type Fixture } fro
 import { VoiceController } from "@/lib/ai/voice-controller";
 import { MemoRecorder } from "./memo-recorder";
 import { VoiceControls } from "./voice-controls";
+import Link from "next/link";
 import "./voice.css";
 
 function CallEvidence({ controller, refresh }: { controller: VoiceController; refresh: () => void }) {
@@ -49,8 +50,12 @@ export function DevAiHarness() {
 
   useEffect(() => {
     const abort = new AbortController(); load.current = abort;
-    Promise.all([request<AiConfig>("/ai/config", { signal: abort.signal }), request<Fixture>("/ai/dev/fixture", { signal: abort.signal })])
-      .then(([config, fixture]) => {
+    request<AiConfig>("/ai/config", { signal: abort.signal })
+      .then(async (config) => {
+        if (abort.signal.aborted) return;
+        setConfig(config);
+        if (config.bridge_mode !== "fixture") { setLoading(false); return; }
+        const fixture = await request<Fixture>("/ai/dev/fixture", { signal: abort.signal });
         if (abort.signal.aborted) return;
         const next = new VoiceController(config); owner.current = next;
         setConfig(config); setFixture(fixture); setController(next); setError(""); setLoading(false);
@@ -69,13 +74,14 @@ export function DevAiHarness() {
   }
 
   return <main className="ai-harness">
-    <header className="ai-header"><div><p className="ai-eyebrow">Alodi · development only</p><h1>Voice & memo lab</h1><p className="ai-muted">Independent Part 2 harness. The main demo remains scripted; business workflow integration awaits Part 1.</p></div><button onClick={() => void reset()} disabled={loading}>Reset fixture & sessions</button></header>
+    <header className="ai-header"><div><p className="ai-eyebrow">Alodi · development only</p><h1>Voice & memo lab</h1><p className="ai-muted">Standalone Part 2 fixture harness. Use the <Link href="/dev/integrated">integrated order workspace</Link> for durable backend orders. The main demo remains scripted.</p></div><button onClick={() => void reset()} disabled={loading || config?.bridge_mode !== "fixture"}>Reset fixture & sessions</button></header>
     <section className="ai-card">
       <div className="ai-row"><h2>Service readiness</h2><span className="ai-pill">{config ? `${config.mode === "live" ? "Live AI" : config.mode === "stub" ? "Stub simulation" : "Offline"} · ${config.bridge_mode === "fixture" ? "fixture order state" : "Part 1 bridge"}` : "Service unavailable"}</span></div>
       {loading && <p role="status">Loading backend readiness…</p>}
       {error && <p role="alert">{error} Verify that the independent backend is running at {API_URL}.</p>}
+      {config?.bridge_mode === "part1" && <p role="status">This API serves durable Part 1 orders. Open the <Link href="/dev/integrated">integrated workspace</Link>; fixture creation and reset are unavailable here.</p>}
       {config && <><p>{config.ready ? "Ready" : "Not ready"} · GPT Live · gpt-live-1 · {config.transport} · default language: {config.language}</p><p className="ai-muted">Voice calls use GPT Live over WebRTC. No provider credentials are sent to this page.</p><details><summary>Development configuration</summary><pre>{JSON.stringify(config, null, 2)}</pre></details></>}
-      {!loading && !controller && <button onClick={() => { setLoading(true); setEpoch((value) => value + 1); }}>Retry service</button>}
+      {!loading && !controller && config?.bridge_mode !== "part1" && <button onClick={() => { setLoading(true); setEpoch((value) => value + 1); }}>Retry service</button>}
     </section>
     {fixture && <section className="ai-card"><div className="ai-row"><h2>Fixture order · {fixture.tracking_id}</h2><span className="ai-pill">Server version {fixture.context_version}</span></div><p className="ai-muted">Fictional server-held fixture. State is kept in memory and resets when the backend restarts.</p><pre>{JSON.stringify(fixture.context, null, 2)}</pre><button onClick={refresh} disabled={loading}>Refresh fixture state</button><details><summary>Fixture epoch & events</summary><pre>{JSON.stringify({ demo_epoch: fixture.demo_epoch, events: fixture.events }, null, 2)}</pre></details></section>}
     {!loading && controller && fixture && config && <CallWorkspace key={epoch} controller={controller} fixture={fixture} config={config} refresh={refresh} />}

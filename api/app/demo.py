@@ -4,7 +4,15 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import func, select
 
-from app.db.models import CallAttempt, DemoState, Hub, Order, RescueCase, ShipperEvent
+from app.db.models import (
+    CallAttempt,
+    DemoState,
+    Hub,
+    Order,
+    ProviderRequest,
+    RescueCase,
+    ShipperEvent,
+)
 from app.db.seed import load_seed_pack, seed_database
 from app.morning import WorkflowError
 
@@ -131,25 +139,80 @@ class DemoService:
                 state.auto_buyer = body.auto_buyer
             if body.offline is not None:
                 state.offline_mode = body.offline
+            if body.offline is True:
+                orders = (
+                    (
+                        await session.scalars(
+                            select(Order)
+                            .join(RescueCase)
+                            .where(
+                                RescueCase.generation_id == body.generation_id,
+                                RescueCase.closed_at.is_(None),
+                            )
+                        )
+                    )
+                    .unique()
+                    .all()
+                )
+                for order in orders:
+                    active = await session.scalar(
+                        select(CallAttempt.id)
+                        .join(RescueCase)
+                        .where(
+                            RescueCase.tracking_id == order.tracking_id,
+                            CallAttempt.mode == "live",
+                            CallAttempt.status.in_(["requested", "connected"]),
+                        )
+                    )
+                    if active:
+                        await self.flow.cancel_work(session, order, now, "offline_mode")
+                        case = await session.scalar(
+                            select(RescueCase)
+                            .where(
+                                RescueCase.tracking_id == order.tracking_id,
+                                RescueCase.closed_at.is_(None),
+                            )
+                            .order_by(RescueCase.cycle.desc())
+                            .limit(1)
+                        )
+                        case.state, case.reason = "confirm_in_chat", "clarification_sent"
+                        log.change(
+                            order,
+                            self.flow.context(order, "confirm_in_chat"),
+                            "confirm_asked",
+                            {"case_id": case.id, "reason": "offline_mode"},
+                        )
+                        self.flow.message(
+                            session,
+                            order,
+                            case,
+                            now,
+                            "clarification",
+                            "Voice is offline. Please confirm delivery details in chat.",
+                            f"offline:{active}",
+                        )
+                for task in await session.scalars(
+                    select(ProviderRequest).where(
+                        ProviderRequest.generation_id == body.generation_id,
+                        ProviderRequest.kind == "extract",
+                        ProviderRequest.mode == "live",
+                        ProviderRequest.status == "processing",
+                    )
+                ):
+                    task.mode, task.status, task.lease_until = "replay", "requested", None
             log.audit(
                 None, "demo_mode", {"auto_buyer": state.auto_buyer, "offline": state.offline_mode}
             )
             await log.flush(session)
-            return self.view(state)
+            result = self.view(state)
+        if body.offline is True:
+            await self.scheduler.cancel_generation(body.generation_id, live_only=True)
+            await self.scheduler.acknowledge_cancellations(body.generation_id)
+        return result
 
     async def reset(self, generation, scenario):
         async with self.scheduler.lock:
-            calls = []
             async with self.flow.morning.transaction(generation) as (session, now, log):
-                calls = [
-                    (call.id, call.mode)
-                    for call in await session.scalars(
-                        select(CallAttempt).where(
-                            CallAttempt.generation_id == generation,
-                            CallAttempt.status.in_(["requested", "connected"]),
-                        )
-                    )
-                ]
                 active_orders = (
                     (
                         await session.scalars(
@@ -167,27 +230,9 @@ class DemoService:
                 )
                 for order in active_orders:
                     await self.flow.cancel_work(session, order, now, "reset")
-            # Part 2 must implement idempotent cancellation by call ID, including a
-            # tombstone if cancellation arrives before provider session creation.
-            for call_id, mode in calls:
-                adapter = self.scheduler.adapters.get(mode)
-                if adapter is None:
-                    raise WorkflowError(
-                        "part2_unavailable", "Active provider session cannot be cancelled", 503
-                    )
-                import asyncio
-
-                try:
-                    await asyncio.wait_for(
-                        adapter.cancel_call(call_id, generation),
-                        self.settings.ai_request_timeout_seconds,
-                    )
-                except Exception:
-                    raise WorkflowError(
-                        "provider_failure",
-                        "Provider cancellation failed; reset was not applied",
-                        503,
-                    ) from None
+            # Includes unacknowledged cancellation from a failed earlier reset.
+            await self.scheduler.cancel_generation(generation)
+            await self.scheduler.acknowledge_cancellations(generation)
             settings = self.settings.model_copy(update={"demo_scenario": scenario})
             pack = load_seed_pack(settings.mock_pack_dir)
             summary = await seed_database(self.database, settings, pack, reset=True)

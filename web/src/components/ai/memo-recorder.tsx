@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { errorMessage, request, type Job } from "@/lib/ai/protocol";
+import { errorMessage, memoForm, request, type Job, type MemoBinding } from "@/lib/ai/protocol";
 import "./voice.css";
 
 type Recording = { recorder: MediaRecorder; stream: MediaStream; timer: ReturnType<typeof setTimeout>; ticker: ReturnType<typeof setInterval>; discard: boolean };
@@ -12,7 +12,7 @@ function preferredMime() {
 }
 
 /** Real short recording, preview, upload and server-job polling; no local decision logic. */
-export function MemoRecorder({ trackingId, maxSeconds = 10, maxBytes = 5242880, disabled = false, onCompleted }: { trackingId: string; maxSeconds?: number; maxBytes?: number; disabled?: boolean; onCompleted?: (job: Job) => void }) {
+export function MemoRecorder({ trackingId, maxSeconds = 10, maxBytes = 5242880, disabled = false, onCompleted, binding, requireBinding = false, onSettled, apiBase }: { trackingId: string; maxSeconds?: number; maxBytes?: number; disabled?: boolean; onCompleted?: (job: Job) => void; binding?: MemoBinding; requireBinding?: boolean; onSettled?: () => void; apiBase?: string }) {
   const [status, setStatus] = useState<"idle" | "permission" | "recording" | "preview" | "uploading" | "processing" | "completed" | "failed">("idle");
   const [seconds, setSeconds] = useState(0);
   const [clip, setClip] = useState<Clip>();
@@ -24,10 +24,12 @@ export function MemoRecorder({ trackingId, maxSeconds = 10, maxBytes = 5242880, 
   const alive = useRef(true);
   const uploading = useRef<AbortController | undefined>(undefined);
   const callback = useRef(onCompleted);
+  const settled = useRef(onSettled);
   const duration = Math.min(10, maxSeconds);
   const byteLimit = Math.min(5242880, maxBytes);
 
   useEffect(() => { callback.current = onCompleted; }, [onCompleted]);
+  useEffect(() => { settled.current = onSettled; }, [onSettled]);
   useEffect(() => {
     alive.current = true;
     const cancel = () => {
@@ -72,7 +74,7 @@ export function MemoRecorder({ trackingId, maxSeconds = 10, maxBytes = 5242880, 
   }
 
   async function start() {
-    if (disabled || active.current || holding.current || ["uploading", "processing"].includes(status)) return;
+    if (disabled || (requireBinding && !binding) || active.current || holding.current || ["uploading", "processing"].includes(status)) return;
     holding.current = true;
     setMessage(""); setJob(undefined); setStatus("permission"); setClip(undefined); setSeconds(0);
     try {
@@ -129,15 +131,14 @@ export function MemoRecorder({ trackingId, maxSeconds = 10, maxBytes = 5242880, 
     uploading.current?.abort(); uploading.current = abort;
     setStatus("uploading"); setMessage("");
     try {
-      const data = new FormData();
       const extension = clip.blob.type.includes("mp4") ? "m4a" : clip.blob.type.includes("ogg") ? "ogg" : "webm";
-      data.append("audio", clip.blob, `memo.${extension}`);
-      const accepted = await request<Job>(`/orders/${encodeURIComponent(trackingId)}/memo`, { method: "POST", body: data, signal: abort.signal });
+      const data = memoForm(clip.blob, `memo.${extension}`, binding, requireBinding);
+      const accepted = await request<Job>(`/orders/${encodeURIComponent(trackingId)}/memo`, { method: "POST", body: data, signal: abort.signal }, apiBase);
       if (!accepted.job_id) throw new Error("The service did not return a memo job.");
       setStatus("processing"); setJob(accepted);
       const deadline = Date.now() + 120000;
       while (!abort.signal.aborted) {
-        const result = await request<Job>(`/ai/jobs/${encodeURIComponent(accepted.job_id)}`, { signal: abort.signal });
+        const result = await request<Job>(`/ai/jobs/${encodeURIComponent(accepted.job_id)}`, { signal: abort.signal }, apiBase);
         if (!alive.current || abort.signal.aborted) return;
         setJob(result);
         if (result.status === "completed") { setStatus("completed"); callback.current?.(result); return; }
@@ -151,6 +152,8 @@ export function MemoRecorder({ trackingId, maxSeconds = 10, maxBytes = 5242880, 
       }
     } catch (error) {
       if (!abort.signal.aborted && alive.current) { setStatus("failed"); setMessage(errorMessage(error)); }
+    } finally {
+      if (!abort.signal.aborted && alive.current) settled.current?.();
     }
   }
 
@@ -158,7 +161,7 @@ export function MemoRecorder({ trackingId, maxSeconds = 10, maxBytes = 5242880, 
     <section className="ai-card" aria-label="Shipper voice memo">
       <div className="ai-row"><h2>Shipper memo</h2><span className="ai-pill">{status}</span></div>
       <p className="ai-muted">Hold to record what the buyer said. Release to stop. Up to {duration} seconds · 5 MB.</p>
-      <button className="ai-record" disabled={disabled || ["uploading", "processing"].includes(status)}
+      <button className="ai-record" disabled={disabled || (requireBinding && !binding) || ["uploading", "processing"].includes(status)}
         onPointerDown={(event) => { if (event.button !== 0) return; event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); void start(); }}
         onPointerUp={() => stop()} onPointerCancel={() => stop(true)} onLostPointerCapture={() => { if (holding.current) stop(true); }}
         onKeyDown={(event) => { if ([" ", "Enter"].includes(event.key)) { event.preventDefault(); if (!event.repeat) void start(); } if (event.key === "Escape") stop(true); }}
@@ -172,7 +175,7 @@ export function MemoRecorder({ trackingId, maxSeconds = 10, maxBytes = 5242880, 
       {["uploading", "processing"].includes(status) && <p role="status">{status === "uploading" ? "Uploading recording…" : "Processing on the server…"}</p>}
       {message && <p role="alert">{message}</p>}
       {job?.transcript && <p><strong>Transcript</strong> {job.transcript}</p>}
-      {status === "completed" && <p role="status">Server job completed. Review the current fixture context above.</p>}
+      {status === "completed" && <p role="status">{requireBinding ? "Memo job completed. Review the durable order context and events." : "Server job completed. Review the current fixture context above."}</p>}
       {job && <details><summary>Memo job response</summary><pre>{JSON.stringify(job, null, 2)}</pre></details>}
     </section>
   );

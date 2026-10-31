@@ -8,6 +8,7 @@ from app.morning import WorkflowError
 
 def case_view(case, settings):
     return {
+        "shipper_event_id": case.shipper_event_id,
         "id": case.id,
         "tracking_id": case.tracking_id,
         "generation_id": case.generation_id,

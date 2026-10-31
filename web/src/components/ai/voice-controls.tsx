@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { apiUrl, type AiConfig } from "@/lib/ai/protocol";
+import { apiUrl, type AiConfig, type IssuedCall } from "@/lib/ai/protocol";
 import { VoiceController } from "@/lib/ai/voice-controller";
 import "./voice.css";
 
 /** Can be injected into BuyerPhone without coupling transport to the scripted engine. */
-export function VoiceControls({ controller, trackingId }: { controller: VoiceController; trackingId: string }) {
+export function VoiceControls({ controller, trackingId, issuedCall }: { controller: VoiceController; trackingId: string; issuedCall?: IssuedCall }) {
   const state = useSyncExternalStore(controller.subscribe, controller.snapshot, controller.snapshot);
   const busy = ["connecting", "connected", "consent", "ending"].includes(state.status);
   return (
     <section className="ai-card" aria-label="Buyer voice call">
       <div className="ai-row"><h2>Buyer call</h2><span className="ai-pill">{state.status}</span></div>
       <p className="ai-muted">{controller.config.mode === "stub" ? "Stub captions · no microphone or generated speech" : "Vietnamese speech · cloud voice service"}</p>
-      {!busy && <button className="ai-primary" onClick={() => void controller.prepare(trackingId)} disabled={!controller.config.ready}>Start fixture call</button>}
+      {!busy && <button className="ai-primary" onClick={() => void (issuedCall ? controller.prepareIssued(issuedCall) : controller.prepare(trackingId))} disabled={!controller.config.ready || (controller.config.bridge_mode === "part1" && !issuedCall)}>{issuedCall ? "Answer issued call" : controller.config.bridge_mode === "part1" ? "Waiting for a workflow-issued call" : "Start fixture call"}</button>}
       {state.status === "consent" && (
         <ConsentPrompt key={state.callId} controller={controller} />
       )}
@@ -41,7 +41,7 @@ function ConsentPrompt({ controller }: { controller: VoiceController }) {
   return <div className="ai-consent">
     <h3>Before you answer</h3>
     <p>{controller.config.disclosure.text}</p>
-    <DisclosureNotice disclosure={controller.config.disclosure} onComplete={() => setComplete(true)} />
+    <DisclosureNotice disclosure={controller.config.disclosure} apiBase={controller.base} onComplete={() => setComplete(true)} />
     <div className="ai-actions">
       <button className="ai-primary" disabled={!complete} onClick={() => { if (complete) void controller.connect(); }}>Agree and continue</button>
       <button onClick={() => void controller.end("decline")}>Use chat</button>
@@ -50,7 +50,7 @@ function ConsentPrompt({ controller }: { controller: VoiceController }) {
   </div>;
 }
 
-export function DisclosureNotice({ disclosure, onComplete }: { disclosure: AiConfig["disclosure"]; onComplete: () => void }) {
+export function DisclosureNotice({ disclosure, onComplete, apiBase }: { disclosure: AiConfig["disclosure"]; onComplete: () => void; apiBase?: string }) {
   const audio = useRef<HTMLAudioElement>(null);
   const [notice, setNotice] = useState("Playing the fixed disclosure. Please wait before agreeing.");
   const [fallback, setFallback] = useState(!disclosure.audio_url);
@@ -61,13 +61,13 @@ export function DisclosureNotice({ disclosure, onComplete }: { disclosure: AiCon
     let active = true;
     if (element) void element.play().catch(() => { if (active) { setPlaying(false); setNotice("Autoplay is blocked. Choose Play notice to hear the full disclosure."); } });
     return () => { active = false; if (element) { element.pause(); element.currentTime = 0; } };
-  }, [disclosure.audio_url]);
+  }, [disclosure.audio_url, apiBase]);
   async function play() {
     try { await audio.current?.play(); }
     catch { setNotice("Playback is blocked. Allow audio in your browser, then choose Play notice again."); }
   }
   return <>
-    {disclosure.audio_url && <audio ref={audio} preload="auto" src={apiUrl(disclosure.audio_url)}
+    {disclosure.audio_url && <audio ref={audio} preload="auto" src={apiUrl(disclosure.audio_url, apiBase)}
       onPlay={() => { setPlaying(true); setNotice("Playing the fixed disclosure. Please wait before agreeing."); }}
       onEnded={() => { setPlaying(false); setFinished(true); setNotice("Disclosure finished. You can agree and continue."); onComplete(); }}
       onError={() => { audio.current?.pause(); setPlaying(false); setFallback(true); setNotice("Disclosure audio is unavailable. Read the complete notice above, then confirm below."); }} />}

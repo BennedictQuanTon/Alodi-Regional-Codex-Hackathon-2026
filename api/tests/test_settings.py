@@ -23,46 +23,33 @@ def test_dotenv_is_explicit_and_process_environment_wins(tmp_path, monkeypatch):
     monkeypatch.setenv("API_PORT", "8012")
     settings = load_settings(_env_file=env)
     assert settings.api_port == 8012
-    assert settings.effective_assemblyai_api_key.get_secret_value() == "test-alias"
+    assert "assembly_api_key" not in Settings.model_fields
 
 
-def test_assembly_alias_accepts_either_or_equal_keys():
-    alias = load_settings(_env_file=None, assembly_api_key="test-key")
-    canonical = load_settings(_env_file=None, assemblyai_api_key="test-key")
-    both = load_settings(_env_file=None, assembly_api_key="test-key", assemblyai_api_key="test-key")
-    assert alias.effective_assemblyai_api_key == canonical.effective_assemblyai_api_key
-    assert both.effective_assemblyai_api_key == alias.effective_assemblyai_api_key
-
-
-def test_conflicting_alias_error_contains_names_only():
-    with pytest.raises(ConfigurationError) as error:
-        load_settings(
-            _env_file=None, assembly_api_key="alias-secret", assemblyai_api_key="canonical-secret"
-        )
-    assert "ASSEMBLY_API_KEY" in str(error.value)
-    assert "ASSEMBLYAI_API_KEY" in str(error.value)
-    assert "alias-secret" not in str(error.value)
-    assert "canonical-secret" not in str(error.value)
+def test_obsolete_provider_values_cannot_block_gpt_only_startup():
+    settings = load_settings(_env_file=None, assembly_api_key="old-a", assemblyai_api_key="old-b")
+    assert settings.voice_provider == "gpt_live"
 
 
 def test_live_requires_credentials_but_offline_overrides_live():
     with pytest.raises(ConfigurationError) as error:
         load_settings(_env_file=None, ai_mode="live")
     assert "OPENAI_API_KEY" in str(error.value)
-    assert "ASSEMBLYAI_API_KEY" in str(error.value)
+    assert "ASSEMBLYAI_API_KEY" not in str(error.value)
+    assert (
+        load_settings(_env_file=None, ai_mode="live", openai_api_key="test").voice_provider
+        == "gpt_live"
+    )
     settings = load_settings(_env_file=None, ai_mode="live", offline_mode=True, auto_buyer=False)
     assert settings.effective_ai_mode == "replay"
     assert settings.auto_buyer is False
 
 
 def test_live_is_not_silently_reported_as_available_before_part_two():
-    settings = load_settings(
-        _env_file=None, ai_mode="live", openai_api_key="openai-test", assembly_api_key="asr-test"
-    )
+    settings = load_settings(_env_file=None, ai_mode="live", openai_api_key="openai-test")
     with pytest.raises(ConfigurationError, match="Part 2"):
         create_app(settings)
     assert "openai-test" not in repr(settings)
-    assert "asr-test" not in repr(settings)
     assert "openai_api_key" not in settings.model_dump()
     assert "assembly_api_key" not in settings.model_dump()
 

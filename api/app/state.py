@@ -524,6 +524,7 @@ class WorkflowService(RescueBoundary):
             "tracking_id": order.tracking_id,
             "window": f"{window.date.isoformat()}, {window.starts_at:%H:%M}–{window.ends_at:%H:%M}",
             "drop": fields.drop_location.note,
+            "notes": fields.delivery_notes,
             "alt": f"{fields.alt_receiver.relation} · {fields.alt_receiver.phone_masked}"
             if fields.alt_receiver
             else None,

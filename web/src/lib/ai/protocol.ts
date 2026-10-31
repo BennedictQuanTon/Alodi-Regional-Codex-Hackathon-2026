@@ -41,6 +41,20 @@ export type Job = {
   result?: unknown;
   error?: string | { message?: string };
 };
+export type MemoBinding = { generation_id: string; context_version: number; shipper_event_id: number };
+
+export function memoForm(audio: Blob, filename: string, binding?: MemoBinding, requireBinding = false) {
+  if (requireBinding && !binding) throw new Error("A committed reschedule event is required before uploading this memo.");
+  const data = new FormData();
+  data.append("audio", audio, filename);
+  if (binding) {
+    if (!binding.generation_id || !Number.isInteger(binding.context_version) || binding.context_version < 0 || !Number.isInteger(binding.shipper_event_id) || binding.shipper_event_id < 1) throw new Error("The memo order binding is incomplete. Refresh the order.");
+    data.append("generation_id", binding.generation_id);
+    data.append("context_version", String(binding.context_version));
+    data.append("shipper_event_id", String(binding.shipper_event_id));
+  }
+  return data;
+}
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001").replace(/\/$/, "");
 
 export function apiUrl(path: string, base = API_URL) {

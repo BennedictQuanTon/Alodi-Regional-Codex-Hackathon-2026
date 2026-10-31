@@ -40,6 +40,8 @@ class Scheduler:
         self.lock = asyncio.Lock()
         self.task = None
         self.last_error = None
+        self.provider_tasks = {}
+        self.provider_inputs = {}
 
     def start(self):
         self.task = asyncio.create_task(self.run())
@@ -52,11 +54,17 @@ class Scheduler:
             except asyncio.CancelledError:
                 pass
             self.task = None
+        tasks = list(self.provider_tasks.values())
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+        self.provider_tasks.clear()
+        self.provider_inputs.clear()
 
     async def run(self):
         while True:
             try:
-                await self.tick()
+                await self.tick(wait_for_providers=False)
                 self.last_error = None
             except asyncio.CancelledError:
                 raise
@@ -66,7 +74,60 @@ class Scheduler:
                 )
             await asyncio.sleep(0.1)
 
-    async def tick(self, expected_generation=None):
+    async def cancel_generation(self, generation, *, live_only=False):
+        """Stop in-flight transport/extraction without deleting durable cancellation work."""
+        tasks = [
+            task
+            for key, task in self.provider_tasks.items()
+            if self.provider_inputs[key].generation_id == generation
+            and (not live_only or self.provider_inputs[key].mode == "live")
+        ]
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+        for mode, adapter in self.adapters.items():
+            if live_only and mode != "live":
+                continue
+            cancel = getattr(adapter, "cancel_generation", None)
+            if cancel:
+                try:
+                    await cancel(generation)
+                except Exception:
+                    raise WorkflowError(
+                        "provider_failure", "Provider cancellation failed", 503
+                    ) from None
+
+    async def acknowledge_cancellations(self, generation):
+        async with self.database.sessions() as session:
+            pending = (
+                await session.scalars(
+                    select(ProviderRequest).where(
+                        ProviderRequest.generation_id == generation,
+                        ProviderRequest.kind == "cancel_call",
+                        ProviderRequest.status != "completed",
+                    )
+                )
+            ).all()
+        for request in pending:
+            adapter = self.adapters.get(request.mode)
+            if adapter is None:
+                raise WorkflowError("part2_unavailable", "Provider cancellation unavailable", 503)
+            try:
+                await asyncio.wait_for(
+                    adapter.cancel_call(request.call_id, generation),
+                    self.settings.ai_request_timeout_seconds,
+                )
+            except Exception:
+                raise WorkflowError(
+                    "provider_failure", "Provider cancellation failed", 503
+                ) from None
+            async with self.flow.morning.transaction(generation) as (session, now, log):
+                task = await session.get(ProviderRequest, request.id)
+                if task:
+                    task.status, task.result = "completed", {"status": "cancelled"}
+
+    async def tick(self, expected_generation=None, *, wait_for_providers=True, _round=0):
+        pending = []
         async with self.lock:
             async with self.database.sessions() as session:
                 state = await session.get(DemoState, 1)
@@ -82,12 +143,34 @@ class Scheduler:
             await self.timers(generation)
             await self.real_timeouts(generation)
             for _ in range(20):
-                claimed = await self.claim(generation)
+                # Provider work cannot hold the scheduling lock or occupy every slot
+                # needed for urgent cancellation. Interactive calls return a reservation.
+                if len(self.provider_tasks) >= 4:
+                    claimed = await self.claim(generation, cancellations_only=True)
+                else:
+                    claimed = await self.claim(generation)
                 if claimed is None:
                     break
-                await self.process(*claimed)
+                envelope, kind = claimed
+                if envelope.request_id in self.provider_tasks:
+                    continue
+                task = asyncio.create_task(self.process(envelope, kind))
+                self.provider_tasks[envelope.request_id] = task
+                self.provider_inputs[envelope.request_id] = envelope
+
+                def finished(done, key=envelope.request_id):
+                    self.provider_tasks.pop(key, None)
+                    self.provider_inputs.pop(key, None)
+
+                task.add_done_callback(finished)
+                pending.append(task)
+        if wait_for_providers:
+            await asyncio.gather(*pending)
+            # Preserve deterministic run-due behavior without blocking background timers.
             await self.dispatch(generation)
-            return {"status": "ok", "generation_id": generation}
+            if pending and _round < 20:
+                return await self.tick(generation, _round=_round + 1)
+        return {"status": "ok", "generation_id": generation}
 
     async def morning(self, generation):
         async with self.database.sessions() as session:
@@ -288,8 +371,26 @@ class Scheduler:
                     )
         for report in reports:
             await self.flow.call_event(report)
+            async with self.flow.morning.transaction(generation) as (session, now, log):
+                call = await session.get(CallAttempt, report.call_id)
+                pending = await session.scalar(
+                    select(ProviderRequest).where(
+                        ProviderRequest.generation_id == generation,
+                        ProviderRequest.correlation_key == f"cancel:{call.id}",
+                    )
+                )
+                if pending is None:
+                    case = await session.get(RescueCase, call.rescue_case_id)
+                    order = await session.get(Order, case.tracking_id)
+                    pending = await self.flow.provider_request(
+                        session, order, case, now, source="ai_call", kind="cancel_call", call=call
+                    )
+                    pending.correlation_key = f"cancel:{call.id}"
+                    pending.mode = call.mode
+        if reports:
+            await self.acknowledge_cancellations(generation)
 
-    async def claim(self, generation):
+    async def claim(self, generation, *, cancellations_only=False):
         async with self.flow.morning.transaction(generation) as (session, now, log):
             state = await session.get(DemoState, 1)
             tasks = (
@@ -305,11 +406,19 @@ class Scheduler:
                             ),
                         ),
                     )
-                    .order_by(ProviderRequest.created_at, ProviderRequest.id)
+                    .order_by(
+                        (ProviderRequest.kind != "cancel_call"),
+                        ProviderRequest.created_at,
+                        ProviderRequest.id,
+                    )
                     .limit(100)
                 )
             ).all()
             for task in tasks:
+                if cancellations_only and task.kind != "cancel_call":
+                    continue
+                if task.id in self.provider_tasks:
+                    continue
                 order = await self.flow.order(session, task.tracking_id)
                 case = await session.get(RescueCase, task.rescue_case_id)
                 if task.kind != "cancel_call" and (
@@ -415,7 +524,18 @@ class Scheduler:
                 if task and task.status == "processing":
                     task.status, task.result = (
                         "completed",
-                        {"status": "accepted", "mode": envelope.mode},
+                        {
+                            "status": "accepted",
+                            "mode": envelope.mode,
+                            **(
+                                {
+                                    "provider_session_id": envelope.call_id,
+                                    "ws_path": f"/ws/call?session={envelope.call_id}",
+                                }
+                                if kind == "call" and envelope.mode == "live"
+                                else {}
+                            ),
+                        },
                     )
         except asyncio.CancelledError:
             raise
@@ -428,7 +548,7 @@ class Scheduler:
                 task = await session.get(ProviderRequest, envelope.request_id)
                 if not task or task.status != "processing":
                     return
-                task.status = "failed"
+                task.status = "requested" if kind == "cancel_call" else "failed"
                 task.result = {
                     "status": "provider_failed",
                     "mode": envelope.mode,

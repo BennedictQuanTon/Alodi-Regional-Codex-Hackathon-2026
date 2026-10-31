@@ -63,6 +63,7 @@ class Extraction(StrictModel):
     alt_receiver: AltReceiver | None
     address_correction: AddressCorrection | None
     cannot_receive: CannotReceive | None
+    delivery_notes: str | None = Field(default=None, max_length=2000)
     opt_out: bool
 
 
