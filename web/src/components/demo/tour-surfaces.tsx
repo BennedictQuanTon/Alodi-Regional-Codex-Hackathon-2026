@@ -5,7 +5,7 @@ import { Mark } from "@/components/site/brand";
 import { DAY, HUB } from "@/lib/dash/hub-day";
 import { ORDER, fmtClock } from "@/lib/demo/scenarios";
 import type { CaseStage, DemoState } from "@/lib/demo/types";
-import { FlowRail, STAGE_LABEL } from "./console-parts";
+import { FlowRail, STAGE_LABEL, ttcText } from "./console-parts";
 
 // The two desktop surfaces of the narrated demo: the carrier's dashboard and the agent's run.
 
@@ -21,6 +21,7 @@ export function TourDashboard({ state: s }: { state: DemoState }) {
     { k: "Failed first time", v: fmt(DAY.failed_first_attempt.total) },
     { k: "Rescued, card sent", v: fmt(DAY.rescheduled_with_card), hot: true },
   ];
+  const ttc = ttcText(s);
   return (
     <div className="ui-card flex h-full flex-col overflow-hidden">
       <div className="flex items-baseline justify-between px-5 pt-5">
@@ -39,11 +40,15 @@ export function TourDashboard({ state: s }: { state: DemoState }) {
         <div className="min-w-0">
           <div className="ui-label">Exception queue</div>
           <div className="mt-1 truncate text-[15px] font-medium">{ORDER.buyer} · {ORDER.item}</div>
+          <div className="mt-0.5 truncate text-[12.5px] tabular-nums ui-muted">{ORDER.tracking} · COD {ORDER.cod} · {ORDER.route} · Attempt {s.oco.delivery_attempt}</div>
         </div>
         <span className="ui-badge ui-badge-accent shrink-0">{STAGE_LABEL[s.stage]}</span>
       </div>
-      <FlowRail state={s} />
-      <div className="min-h-0 flex-1 border-t border-[var(--ui-line)] p-5">
+      <div className="mt-4 px-3">
+        <FlowRail state={s} />
+      </div>
+      {ttc && <div className="mt-3 text-center text-[13px] ui-muted">Context card ready {ttc.signalText} after the call</div>}
+      <div className="mt-3 min-h-0 flex-1 overflow-hidden border-t border-[var(--ui-line)] p-5">
         <div className="ui-label">Activity</div>
         <ul className="mt-3 space-y-2.5">
           <AnimatePresence initial={false}>
@@ -87,11 +92,13 @@ const DOT: Record<Status, string> = {
 export function TourAgent({ state: s }: { state: DemoState }) {
   const steps = agentSteps(s);
   const now = steps.find((x) => x.status === "running");
+  const found = s.extraction?.fields.slice(0, s.extraction.revealed) ?? [];
   const fields = [
-    { k: "When", v: s.card?.window, c: s.oco.confidence.time_window },
-    { k: "Where", v: s.card?.drop, c: s.oco.confidence.drop_location },
-    { k: "Who", v: s.card?.alt, c: s.oco.confidence.alt_receiver },
+    { k: "When", f: found.find((x) => x.key === "time_window") },
+    { k: "Where", f: found.find((x) => x.key === "drop_location") },
+    { k: "Who", f: found.find((x) => x.key === "alt_receiver") },
   ];
+  const heard = s.call.lines.slice(-2);
   return (
     <div className="ui-card flex h-full flex-col p-5">
       <div className="flex items-center gap-2 text-[17px] font-medium">
@@ -111,13 +118,22 @@ export function TourAgent({ state: s }: { state: DemoState }) {
           </li>
         ))}
       </ol>
+      <div className="min-h-[132px] border-t border-[var(--ui-line)] py-3">
+        <div className="ui-label">Call transcript</div>
+        {heard.length === 0 && <div className="mt-2 text-[13px] ui-muted">No call yet.</div>}
+        {heard.map((l) => (
+          <p key={l.id} className="mt-2 line-clamp-2 text-[13px] leading-snug">
+            <span className="font-medium">{l.who === "buyer" ? "Buyer" : "Alodi"}:</span> {l.text}
+          </p>
+        ))}
+      </div>
       <div className="space-y-2.5 border-t border-[var(--ui-line)] pt-3">
         {fields.map((f) => (
           <div key={f.k} className="flex items-baseline justify-between gap-3 text-[13px]">
             <span className="ui-muted">{f.k}</span>
             <span className="min-w-0 truncate text-right font-medium">
-              {f.v ?? "–"}
-              {f.v && f.c != null && <span className="ml-2 font-normal tabular-nums ui-muted">{f.c.toFixed(2)}</span>}
+              {f.f?.value ?? "–"}
+              {f.f?.conf != null && <span className="ml-2 font-normal tabular-nums ui-muted">{f.f.conf.toFixed(2)}</span>}
             </span>
           </div>
         ))}
