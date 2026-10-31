@@ -63,7 +63,20 @@ $env:DEMO_CLOCK_SPEED = "1"
 .\scripts\start-api.ps1
 ```
 
-Use the workspace's explicit Next timer control to advance scheduled waits, or pause the business clock before a conversation. Changing speed preserves an existing database's saved clock; use the workspace speed control or an explicit scenario reset when needed. The script uses
+`DEMO_CLOCK_SPEED` initializes a new database's clock. An existing database retains
+its saved speed. After starting the backend, set an existing clock to real time
+through the backend API from another PowerShell window:
+
+```powershell
+$apiBase = "http://127.0.0.1:8000"
+$demoClock = Invoke-RestMethod -Uri "$apiBase/demo/clock"
+$clockUpdate = @{ generation_id = $demoClock.generation_id; speed = 1 } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri "$apiBase/demo/clock" -ContentType "application/json" -Body $clockUpdate
+```
+
+This changes speed while preserving the current business time and order state.
+Use the workspace's explicit Next timer control to advance scheduled waits; the
+workspace does not offer speed or pause controls. The script uses
 `api/uv.lock` and the editable local AI package together. The `alodi-api` entrypoint
 constructs `app.integrated.create_integrated_app`: the existing Part 1 order,
 workflow, policy, scheduler and SQLite store share one FastAPI application with
