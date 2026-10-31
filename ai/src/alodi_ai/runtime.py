@@ -25,6 +25,7 @@ from .conversation import is_confirmation
 from .extract import extract
 from .live import LiveSession
 from .memo import transcribe
+from .observe import ObservationLog
 from .privacy import mask
 from .settings import Settings
 
@@ -69,6 +70,8 @@ class Call:
     timeout: asyncio.Task | None = None
     upstream: object = None
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    local_input_gate: object = None
+    explicit_finish: bool = False
 
 
 class Runtime:
@@ -76,6 +79,7 @@ class Runtime:
         self.settings, self.bridge = settings, bridge
         self.calls, self.jobs, self.job_tasks = {}, {}, {}
         self.reservation_lock = asyncio.Lock()
+        self.observations = ObservationLog()
 
     async def reserve_call(self, tracking_id, call_id=None):
         async with self.reservation_lock:
@@ -84,13 +88,24 @@ class Runtime:
                 if call.snapshot.tracking_id != tracking_id or call.status == "ended":
                     raise ValueError("Call reservation is no longer current")
                 return call
-            if call_id is None and any(c.status != "ended" for c in self.calls.values()):
+            if call_id is None and any(
+                c.status != "ended" for c in self.calls.values()
+            ):
                 raise ValueError("A call is already active")
             snapshot = await self.bridge.snapshot(tracking_id)
             if not snapshot.eligible:
                 raise ValueError("Contact blocked")
             call = Call(call_id or str(uuid.uuid4()), snapshot)
             self.calls[call.id] = call
+            await self.emit(
+                call,
+                {
+                    "type": "models",
+                    "voice": self.settings.openai_live_model,
+                    "extraction": self.settings.openai_model,
+                },
+            )
+            await self.emit(call, {"type": "status", "status": "ringing"})
 
             async def expire_reservation():
                 await asyncio.sleep(120)
@@ -111,7 +126,18 @@ class Runtime:
         )
         await asyncio.gather(*self.job_tasks.values(), return_exceptions=True)
 
+    def retire_generation(self, generation):
+        self.observations.retire(generation)
+        for call_id, call in list(self.calls.items()):
+            if call.snapshot.demo_epoch == generation and call.status == "ended":
+                self.calls.pop(call_id)
+        for job_id, job in list(self.jobs.items()):
+            if job.get("generation_id") == generation:
+                self.jobs.pop(job_id)
+                self.job_tasks.pop(job_id, None)
+
     async def emit(self, call, message):
+        self.observations.append(call.snapshot, message, call.id)
         if message.get("type") == "usage":
             call.usage.append(message)
         if call.socket:
@@ -121,6 +147,12 @@ class Runtime:
                 call.socket = None
                 if call.status != "ended":
                     asyncio.create_task(self.end(call, "socket_disconnected"))
+
+    async def request_end(self, call, reason="hangup"):
+        if call.explicit_finish and call.upstream and call.status == "connected":
+            await call.upstream.finish_requested(reason)
+        else:
+            await self.end(call, reason)
 
     async def end(self, call, reason="hangup"):
         if call.status == "ended":
@@ -325,12 +357,22 @@ class Runtime:
 
     async def memo_job(self, job_id, snapshot, data):
         job = self.jobs[job_id]
+        job.update(generation_id=snapshot.demo_epoch, tracking_id=snapshot.tracking_id)
         start = time.monotonic()
         job["usage"] = []
         job["models"] = {
             "transcription": self.settings.openai_memo_model,
             "extraction": self.settings.openai_model,
         }
+        self.observations.append(snapshot, {"type": "models", **job["models"]})
+        self.observations.append(
+            snapshot,
+            {
+                "type": "status",
+                "status": "memo_processing",
+                "job_id": job_id,
+            },
+        )
         try:
 
             async def process():
@@ -353,11 +395,46 @@ class Runtime:
                 context=proposal.model_dump(by_alias=True, mode="json"),
                 result=result,
             )
+            self.observations.append(
+                snapshot,
+                {
+                    "type": "transcript",
+                    "speaker": "courier",
+                    "text": job["transcript"],
+                    "final": True,
+                    "turn_id": job_id,
+                },
+            )
+            self.observations.append(
+                snapshot,
+                {
+                    "type": "result",
+                    "status": result,
+                    "context": job["context"],
+                    "job_id": job_id,
+                },
+            )
         except asyncio.CancelledError:
             job.update(status="cancelled")
+            self.observations.append(
+                snapshot,
+                {
+                    "type": "status",
+                    "status": "memo_cancelled",
+                    "job_id": job_id,
+                },
+            )
             raise
         except Exception:
             job.update(status="failed", error="Memo could not be processed.")
+            self.observations.append(
+                snapshot,
+                {
+                    "type": "error",
+                    "code": "memo_failed",
+                    "message": job["error"],
+                },
+            )
         finally:
             job["elapsed_seconds"] = round(time.monotonic() - start, 3)
 
@@ -397,13 +474,18 @@ def create_app(settings=None, bridge=None, fixture=False):
             "language": "vi",
             "transport": "webrtc",
             "ready": mode != "offline" and not missing,
-            "models": {"voice": settings.openai_live_model,
-                       "extraction": settings.openai_model,
-                       "memo": settings.openai_memo_model},
+            "models": {
+                "voice": settings.openai_live_model,
+                "extraction": settings.openai_model,
+                "memo": settings.openai_memo_model,
+            },
             "bridge_mode": "fixture" if fixture else "part1",
             "missing_variables": missing,
-            "limits": {"call_seconds": settings.call_max_duration_seconds,
-                       "memo_seconds": 10, "memo_bytes": 5242880},
+            "limits": {
+                "call_seconds": settings.call_max_duration_seconds,
+                "memo_seconds": 10,
+                "memo_bytes": 5242880,
+            },
             "disclosure": {"text": DISCLOSURE, "audio_url": "/ai/disclosure.mp3"},
         }
 
@@ -569,7 +651,7 @@ def create_app(settings=None, bridge=None, fixture=False):
         call = runtime.calls.get(call_id)
         if not call:
             raise HTTPException(404, "Call not found")
-        await runtime.end(call, body.reason)
+        await runtime.request_end(call, body.reason)
         return {"call_id": call_id, "status": "ended"}
 
     @router.post("/orders/{tracking_id}/memo", status_code=202)
@@ -600,7 +682,12 @@ def create_app(settings=None, bridge=None, fixture=False):
             snapshot = await prepare(
                 tracking_id, generation_id, context_version, shipper_event_id, job_id
             )
-        runtime.jobs[job_id] = {"job_id": job_id, "status": "processing"}
+        runtime.jobs[job_id] = {
+            "job_id": job_id,
+            "status": "processing",
+            "generation_id": snapshot.demo_epoch,
+            "tracking_id": snapshot.tracking_id,
+        }
         runtime.job_tasks[job_id] = asyncio.create_task(
             runtime.memo_job(job_id, snapshot, data)
         )
@@ -634,7 +721,7 @@ def create_app(settings=None, bridge=None, fixture=False):
                     except ValueError:
                         continue
                     if payload.get("type") in ("hangup", "decline"):
-                        await runtime.end(call, payload["type"])
+                        await runtime.request_end(call, payload["type"])
                     elif call.upstream and payload.get("type") in (
                         "playback_state",
                         "user_activity",

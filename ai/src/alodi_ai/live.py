@@ -24,13 +24,16 @@ class InputGateTimeout(TimeoutError):
     """Provider input control was not acknowledged; never open local input."""
 
 
+AUDIO_CONTROL_ACK_TIMEOUT = 8
+
+
 def no_more_notes(text):
     # Preserve every word so punctuation cannot turn a correction into consent.
     text = re.sub(r"[,.;:!?…]", " ", text)
     text = " ".join(text.split())
     return bool(
         re.fullmatch(
-            r"\s*(?:dạ\s+|vâng\s+)?(?:không(?:\s+(?:có|cần))?(?:\s+(?:ghi\s+chú|gì))?(?:\s+(?:thêm|nữa))?|hết(?:\s+rồi)?|vậy\s+thôi|no(?:\s+more)?|nothing(?:\s+else)?)(?:\s+(?:ạ|nhé))?\s*[.!?]?\s*",
+            r"\s*(?:dạ\s+|vâng\s+)?(?:không(?:\s+(?:có|cần))?(?:\s+(?:ghi\s+chú|gì))?(?:\s+(?:thêm|nữa))?|hết(?:\s+rồi)?|vậy\s+thôi|no(?:\s+more(?:\s+notes)?)?|nothing(?:\s+else)?)(?:\s+(?:thank\s+you|thanks))?(?:\s+(?:ạ|nhé))?\s*[.!?]?\s*",
             text,
             re.IGNORECASE,
         )
@@ -95,6 +98,8 @@ class LiveSession:
         self.input_evidence = []
         self.verified_readback = None
         self.verification_task = None
+        self.tail_task = None
+        self.readback_attempts = 0
         self.user_active = False
         self.last_input_activity = 0.0
         self.inputs, self.outputs = [], []
@@ -187,7 +192,9 @@ class LiveSession:
                 "phase": self.phase,
                 "input_allowed": self.input_allowed,
                 "playback_revision": self.playback_revision,
-                "notes_timeout_seconds": 8 if self.phase == "notes" else None,
+                "notes_timeout_seconds": 8
+                if self.phase == "notes" and not self.call.explicit_finish
+                else None,
             },
         )
 
@@ -202,30 +209,64 @@ class LiveSession:
         async with self.audio_lock:
             if self.input_muted is muted:
                 return
-            event_id = str(uuid.uuid4())
-            future = asyncio.get_running_loop().create_future()
-            expected = (
-                "session.input_audio.muted" if muted else "session.input_audio.unmuted"
-            )
-            self.acks[event_id] = (expected, future)
-            try:
-                await self.ws.send(
-                    json.dumps(
-                        {
-                            "type": "session.input_audio.mute"
-                            if muted
-                            else "session.input_audio.unmute",
-                            "event_id": event_id,
-                        }
-                    )
-                )
+            if self.call.local_input_gate is not None:
                 try:
-                    await asyncio.wait_for(future, 8)
-                except TimeoutError as exc:
-                    raise InputGateTimeout("mute" if muted else "unmute") from exc
+                    await self.call.local_input_gate(muted)
+                except asyncio.CancelledError:
+                    raise
+                except Exception as exc:  # noqa: BLE001 - fail closed at the device boundary
+                    raise InputGateTimeout("browser_local_gate") from exc
                 self.input_muted = muted
-            finally:
-                self.acks.pop(event_id, None)
+                return
+            identity = (self.generation_id, self.turn_id, self.playback_revision)
+            for attempt in range(2 if muted else 1):
+                event_id = str(uuid.uuid4())
+                future = asyncio.get_running_loop().create_future()
+                expected = (
+                    "session.input_audio.muted"
+                    if muted
+                    else "session.input_audio.unmuted"
+                )
+                self.acks[event_id] = (expected, future)
+                try:
+                    await self.ws.send(
+                        json.dumps(
+                            {
+                                "type": "session.input_audio.mute"
+                                if muted
+                                else "session.input_audio.unmute",
+                                "event_id": event_id,
+                            }
+                        )
+                    )
+                    try:
+                        await asyncio.wait_for(future, AUDIO_CONTROL_ACK_TIMEOUT)
+                    except TimeoutError as exc:
+                        if (
+                            muted
+                            and attempt == 0
+                            and self.call.status == "connected"
+                            and identity
+                            == (
+                                self.generation_id,
+                                self.turn_id,
+                                self.playback_revision,
+                            )
+                        ):
+                            await self.runtime.emit(
+                                self.call,
+                                {
+                                    "type": "notice",
+                                    "code": "input_gate_retry",
+                                    "message": "Audio remains paused while its connection recovers.",
+                                },
+                            )
+                            continue
+                        raise InputGateTimeout("mute" if muted else "unmute") from exc
+                    self.input_muted = muted
+                    return
+                finally:
+                    self.acks.pop(event_id, None)
 
     async def say(self, delegation_id, content, phase):
         async with self.control_lock:
@@ -263,6 +304,22 @@ class LiveSession:
             )
 
     async def browser_event(self, payload):
+        try:
+            await self._browser_event(payload)
+        except InputGateTimeout:
+            self.input_allowed = False
+            self.cancel_notes_timer()
+            await self.runtime.emit(
+                self.call,
+                {
+                    "type": "error",
+                    "code": "input_gate_failed",
+                    "message": "Audio control could not be verified. Please reconnect or use chat.",
+                },
+            )
+            await self.runtime.end(self.call, "input_gate_failed")
+
+    async def _browser_event(self, payload):
         if (
             payload.get("generation_id") != self.generation_id
             or payload.get("turn_id") != self.turn_id
@@ -365,7 +422,13 @@ class LiveSession:
         if self.phase == "greeting":
             self.phase = "collecting"
         self.listening_windows.append(
-            [self.listen_after_ms, None, self.phase, self.verified_readback]
+            [
+                self.listen_after_ms,
+                None,
+                self.phase,
+                self.verified_readback,
+                self.turn_id,
+            ]
         )
         await self.state()
         if self.phase == "notes" and not self.notes_pending:
@@ -413,7 +476,7 @@ class LiveSession:
                         "fields": readback_mismatches(self.candidate, heard),
                     },
                 )
-                await self.read_back(None)
+                await self.repeat_readback()
                 return
             async with self.control_lock:
                 if self.current_readback(identity):
@@ -433,10 +496,26 @@ class LiveSession:
                         "http_status": getattr(exc, "status_code", None),
                     },
                 )
-                await self.read_back(None)
+                await self.repeat_readback()
+
+    async def repeat_readback(self):
+        if self.readback_attempts >= 3:
+            await self.runtime.emit(
+                self.call,
+                {
+                    "type": "error",
+                    "code": "readback_verification_failed",
+                    "message": "Could not verify the spoken delivery details. Please use chat.",
+                },
+            )
+            await self.runtime.end(self.call, "readback_verification_failed")
+            return
+        await self.read_back(None)
 
     def arm_notes_timer(self):
         self.cancel_notes_timer()
+        if self.call.explicit_finish:
+            return
         revision, turn = self.input_revision, self.turn_id
 
         async def expire():
@@ -505,6 +584,25 @@ class LiveSession:
                             "turn_id": self.turn_id,
                         },
                     )
+                    if (
+                        window[4] != self.turn_id
+                        and self.input_revision > self.processed_revision
+                    ):
+                        # STT from an earlier listening interval can arrive after
+                        # its proposal/readback. It invalidates that proposal;
+                        # a second provider delegation is not guaranteed.
+                        self.confirmed = False
+                        self.readback_played = False
+                        self.verified_readback = None
+                        self.input_allowed = False
+                        self.processing = True
+                        if self.verification_task and not self.verification_task.done():
+                            self.verification_task.cancel()
+                        await self.state()
+                        if self.tail_task is None or self.tail_task.done():
+                            self.tail_task = asyncio.create_task(
+                                self.delegate(None, end, self.input_revision)
+                            )
                 elif typ == "session.output_transcript.delta":
                     self.outputs.append(
                         (
@@ -558,11 +656,9 @@ class LiveSession:
                             )
                         )
                         self.input_cutoff = e.get("offset_ms", 0)
-                        if (
-                            self.listening_windows
-                            and self.listening_windows[-1][1] is None
-                        ):
-                            self.listening_windows[-1][1] = self.input_cutoff
+                        # A provider delegation is speculative, not evidence that
+                        # buyer audio ended. Keep its STT interval open through
+                        # the tail; actual assistant output closes the interval.
                         self.task = asyncio.create_task(
                             self.delegate(
                                 delegation_id, self.input_cutoff, self.input_revision
@@ -663,12 +759,17 @@ class LiveSession:
                     else:
                         await self.say(
                             delegation_id,
-                            "Bạn có muốn ghi chú thêm điều gì cho người giao hàng không? Nếu không có, bạn có thể nói không hoặc giữ im lặng trong tám giây.",
+                            "Bạn có muốn ghi chú thêm điều gì cho người giao hàng không? Nếu không có, bạn có thể nói không hoặc kết thúc cuộc gọi.",
                             "notes",
                         )
                     return
                 was_notes = self.phase == "notes"
-                conversation = "".join(x[2] for x in self.inputs[:revision])
+                conversation = "".join(
+                    x[2]
+                    for x in sorted(
+                        self.inputs[:revision], key=lambda item: (item[0], item[1])
+                    )
+                )
                 proposal = await asyncio.wait_for(
                     extract(
                         self.runtime.settings,
@@ -687,6 +788,7 @@ class LiveSession:
                     return
                 self.processed_revision = revision
                 self.candidate, self.candidate_revision = proposal, revision
+                self.readback_attempts = 0
                 self.confirmed = self.notes_pending = False
                 self.final_after_confirmation = (
                     was_notes or self.final_after_confirmation
@@ -731,9 +833,29 @@ class LiveSession:
 
     async def read_back(self, delegation_id):
         self.confirmed = False
+        self.readback_attempts += 1
+        location_labels = {
+            "hand_to_buyer": "giao tận tay người nhận",
+            "security_desk": "bàn bảo vệ",
+            "reception": "lễ tân",
+            "neighbour": "hàng xóm",
+            "locker": "tủ nhận hàng",
+            "other": "địa điểm khác theo mô tả của khách",
+        }
+        category = (
+            self.candidate.drop_location.type if self.candidate.drop_location else None
+        )
+        location_instruction = (
+            f"Tên địa điểm phải đọc chính xác là '{location_labels[category]}'. "
+            "Bàn bảo vệ (security_desk) và lễ tân (reception) là hai địa điểm khác nhau; "
+            "không thay thế địa điểm hoặc thêm thông tin không có trong JSON. "
+            if category
+            else ""
+        )
         await self.say(
             delegation_id,
-            "Đọc lại chính xác toàn bộ thông tin sau, bao gồm ghi chú nếu có, rồi hỏi khách xác nhận. Không đọc confidence hoặc tên trường JSON: "
+            location_instruction
+            + "Đọc lại chính xác toàn bộ thông tin sau, bao gồm ghi chú nếu có, rồi hỏi khách xác nhận. Không đọc confidence hoặc tên trường JSON: "
             + json.dumps(
                 self.candidate.model_dump(by_alias=True, mode="json"),
                 ensure_ascii=False,
@@ -741,7 +863,48 @@ class LiveSession:
             "confirming",
         )
 
-    async def finalize(self, delegation_id, opt_out=False):
+    async def finish_requested(self, reason="hangup"):
+        if (
+            not self.candidate
+            or not self.confirmed
+            or not self.candidate.time_window
+            or not self.candidate.drop_location
+            or self.processed_revision != self.input_revision
+        ):
+            await self.runtime.emit(
+                self.call,
+                {
+                    "type": "result",
+                    "status": "needs_clarification",
+                    "message": "Delivery details were incomplete or unconfirmed. No card was saved.",
+                },
+            )
+            await self.runtime.end(self.call, "hangup_incomplete")
+            return
+        await self.finalize(None, hangup=True)
+
+    async def finalize(self, delegation_id, opt_out=False, hangup=False):
+        try:
+            await self._finalize(delegation_id, opt_out, hangup)
+        except asyncio.CancelledError:
+            raise
+        except Exception:  # noqa: BLE001 - close media for any unexpected finalization failure
+            self.finalizing = False
+            self.input_allowed = False
+            self.cancel_notes_timer()
+            try:
+                await self.runtime.emit(
+                    self.call,
+                    {
+                        "type": "error",
+                        "code": "finalization_failed",
+                        "message": "Could not complete the delivery update. Please check the saved status or use chat.",
+                    },
+                )
+            finally:
+                await self.runtime.end(self.call, "finalization_failed")
+
+    async def _finalize(self, delegation_id, opt_out=False, hangup=False):
         if self.finalizing or self.call.status != "connected" or not self.candidate:
             return
         if not opt_out and (
@@ -756,8 +919,19 @@ class LiveSession:
         self.cancel_notes_timer()
         await self.state()
         await self.audio_control(True)
-        if revision != self.input_revision or self.user_active:
+        if revision != self.input_revision or (self.user_active and not hangup):
             self.finalizing = False
+            if hangup:
+                await self.runtime.emit(
+                    self.call,
+                    {
+                        "type": "result",
+                        "status": "needs_clarification",
+                        "message": "A late correction was not confirmed. No card was saved.",
+                    },
+                )
+                await self.runtime.end(self.call, "hangup_incomplete")
+                return
             if self.input_revision > self.processed_revision:
                 self.task = asyncio.create_task(
                     self.delegate(
@@ -786,6 +960,9 @@ class LiveSession:
             },
         )
         self.closing_reason = "opt_out" if opt_out else status
+        if hangup:
+            await self.runtime.end(self.call, self.closing_reason)
+            return
         if opt_out and status == "applied":
             line = "Đã ghi nhận yêu cầu ngừng liên hệ. Cảm ơn bạn, xin chào."
         elif status == "applied":
@@ -797,7 +974,7 @@ class LiveSession:
     async def close(self):
         self.cancel_notes_timer()
         current = asyncio.current_task()
-        for task in (self.task, self.boot, self.verification_task):
+        for task in (self.task, self.boot, self.verification_task, self.tail_task):
             if task and task is not current:
                 task.cancel()
         for _, future in self.acks.values():

@@ -55,3 +55,6 @@ dist/
 !/ai/README.md
 !/prep/01-pitch/video/story/CREDITS.md
 !/prep/01-pitch/video/skit/CREDITS.md
+# Local browser test output
+/output/
+/.playwright-cli/

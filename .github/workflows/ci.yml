@@ -34,6 +34,11 @@ jobs:
       - run: node scripts/check-voice-audio.mjs
       - run: node scripts/check-voice-lifecycle.mjs
       - run: node scripts/check-integrated-contract.mjs
+      - run: node scripts/check-live-state.mjs
+      - run: node scripts/check-live-transcripts.mjs
+      - run: node scripts/check-live-ui.mjs
+      - run: node scripts/check-route-a-transport.mjs
+      - run: node ../scripts/check-demo-gateway.cjs
 
   api:
     runs-on: ubuntu-latest

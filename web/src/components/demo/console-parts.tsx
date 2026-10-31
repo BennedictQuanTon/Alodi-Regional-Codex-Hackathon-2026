@@ -132,7 +132,7 @@ function Approval({ state: s, engine }: { state: DemoState; engine: DemoEngine }
 }
 
 /** Compact operations view used on the three-screen demo stage. */
-export function ConsolePanel({ state: s, engine }: { state: DemoState; engine: DemoEngine }) {
+export function ConsolePanel({ state: s, engine, minimal = false }: { state: DemoState; engine: DemoEngine; minimal?: boolean }) {
   const [json, setJson] = useState(false);
   const now = nowLine(s);
   const ex = s.extraction;
@@ -207,6 +207,7 @@ export function ConsolePanel({ state: s, engine }: { state: DemoState; engine: D
           </div>
         </div>
 
+        {!minimal && <>
         <div className="ui-card p-5">
           <div className="ui-label">Activity</div>
           <ul className="mt-3 space-y-2.5">
@@ -256,6 +257,7 @@ export function ConsolePanel({ state: s, engine }: { state: DemoState; engine: D
             )}
           </AnimatePresence>
         </div>
+        </>}
       </div>
     </div>
   );

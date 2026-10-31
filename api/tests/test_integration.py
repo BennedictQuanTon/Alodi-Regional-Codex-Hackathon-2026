@@ -1,7 +1,9 @@
 """Real SQLite/workflow integration; only cloud transcription/extraction is simulated."""
 
 import asyncio
+import sqlite3
 from datetime import UTC, datetime, timedelta
+from time import monotonic
 from types import SimpleNamespace
 
 import pytest
@@ -11,10 +13,12 @@ from alodi_ai.schema import DeliveryContext, empty_context
 from alodi_ai.settings import Settings as AISettings
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import func, select
+from sqlalchemy.engine import make_url
 
 from app.ai_bridge import LiveAdapter, WorkflowBridge
 from app.contracts import CourierAction, ModeChange, RescueReply
 from app.db.models import CallAttempt, Order, ProviderRequest, RescueCase, RescueResult
+from app.db.snapshot import restore_snapshot, save_snapshot, snapshot_path
 from app.demo import DemoService
 from app.integrated import create_integrated_app
 from app.morning import WorkflowError
@@ -138,6 +142,81 @@ async def test_scheduler_call_confirmed_revision_notes_persist_and_retry_is_idem
         assert await session.scalar(select(func.count()).select_from(RescueResult)) == 1
         host = await session.get(CallAttempt, call.id)
         assert host.status == "ended" and host.recording_consent
+
+
+@pytest.mark.parametrize(
+    ("drop_type", "label"),
+    [
+        ("hand_to_buyer", "Hand to buyer"),
+        ("security_desk", "Security desk"),
+        ("reception", "Reception"),
+        ("neighbour", "Neighbour"),
+        ("locker", "Locker"),
+    ],
+)
+async def test_ai_valid_empty_drop_note_maps_only_known_category_label(
+    integrated, drop_type, label
+):
+    env = integrated
+    call = await connected(env)
+    values = proposal().model_dump(mode="json", by_alias=True)
+    values["drop_location"] = {"type": drop_type, "note": "", "confidence": 1}
+    fields = DeliveryContext.model_validate(values)
+    assert (
+        await env.bridge.submit(call.snapshot, fields, "ai_call", True, 1, "confirmed") == "applied"
+    )
+    order = await current(env)
+    assert order.context["card"]["drop"] == label
+    assert order.context["extracted"]["drop_location"] == {
+        "type": drop_type,
+        "note": label,
+        "confidence": 1,
+    }
+    assert fields.drop_location.note == ""  # The verified AI proposal remains unchanged.
+
+
+@pytest.mark.parametrize("note", ["", "  "])
+async def test_other_location_with_no_details_requires_clarification(integrated, note):
+    env = integrated
+    call = await connected(env)
+    fields = proposal()
+    fields.drop_location.type, fields.drop_location.note = "other", note
+    assert (
+        await env.bridge.submit(call.snapshot, fields, "ai_call", True, 1, "confirmed")
+        == "needs_clarification"
+    )
+    assert (await current(env)).context.get("card") is None
+    async with env.database.sessions() as session:
+        assert (await session.get(CallAttempt, call.id)).status == "connected"
+
+
+async def test_other_location_preserves_confirmed_nonempty_details(integrated):
+    env = integrated
+    call = await connected(env)
+    fields = proposal()
+    fields.drop_location.type, fields.drop_location.note = "other", "Parcel counter inside lobby"
+    assert (
+        await env.bridge.submit(call.snapshot, fields, "ai_call", True, 1, "confirmed") == "applied"
+    )
+    assert (await current(env)).context["card"]["drop"] == "Parcel counter inside lobby"
+
+
+async def test_blank_drop_note_does_not_bypass_confirmation_or_confidence(integrated):
+    env = integrated
+    call = await connected(env)
+    fields = proposal()
+    fields.drop_location.note = "  "
+    assert (
+        await env.bridge.submit(call.snapshot, fields, "ai_call", False, 1, "unconfirmed")
+        == "needs_clarification"
+    )
+    assert (await current(env)).context.get("card") is None
+    fields.drop_location.confidence = 0.4
+    assert (
+        await env.bridge.submit(call.snapshot, fields, "ai_call", True, 2, "low-confidence")
+        == "needs_clarification"
+    )
+    assert (await current(env)).context.get("card") is None
 
 
 @pytest.mark.parametrize("action", ["delivered", "opt_out", "new_chat", "offline", "reset"])
@@ -472,3 +551,283 @@ async def test_configured_call_cap_and_gpt_model_reach_host_runtime(integrated):
             await client.post("/demo/mode", json={"generation_id": env.generation, "offline": True})
             config = (await client.get("/ai/config")).json()
             assert config["mode"] == "offline" and config["ready"] is False
+
+
+async def test_async_reset_closes_call_and_memo_fences_stale_results_and_prepares_route(
+    integrated,
+    monkeypatch,
+):
+    env = integrated
+    settings = env.service.settings.model_copy(
+        update={
+            "openai_api_key": env.ai_settings.openai_api_key,
+        }
+    )
+    app = create_integrated_app(settings, ai_settings=env.ai_settings, start_scheduler=False)
+    entered, cancelled, closed = asyncio.Event(), asyncio.Event(), asyncio.Event()
+
+    async def blocked_transcribe(settings, data):
+        entered.set()
+        try:
+            await asyncio.Event().wait()
+        finally:
+            cancelled.set()
+
+    class Media:
+        async def close(self):
+            closed.set()
+
+    monkeypatch.setattr("alodi_ai.runtime.transcribe", blocked_transcribe)
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app), base_url="http://test") as client:
+            generation = env.generation
+
+            async def clock(stamp):
+                response = await client.post(
+                    "/demo/clock",
+                    json={
+                        "generation_id": generation,
+                        "jump": f"2026-10-31T{stamp}:00+07:00",
+                        "paused": True,
+                        "speed": 1,
+                    },
+                )
+                assert response.status_code == 200, response.text
+                assert (
+                    await client.post(
+                        "/jobs/run-due",
+                        json={
+                            "generation_id": generation,
+                        },
+                    )
+                ).status_code == 200
+
+            async def tap(tracking, button):
+                order = (await client.get(f"/orders/{tracking}")).json()["order"]
+                response = await client.post(
+                    f"/orders/{tracking}/events",
+                    json={
+                        "generation_id": generation,
+                        "context_version": order["context_version"],
+                        "idempotency_key": f"{tracking}:{button}",
+                        "button": button,
+                    },
+                )
+                assert response.status_code == 201, response.text
+                return response.json()
+
+            await clock("10:00")
+            await tap(TRACKING, "A")
+            pending = (await client.get(f"/orders/{TRACKING}")).json()
+            assert pending["action_guard"]["can_tap"] is False
+            assert "pending" in pending["action_guard"]["reason"]
+            await clock("10:02")
+            await clock("11:02")
+            runtime = app.state.ai_runtime
+            call = next(iter(runtime.calls.values()))
+            assert (await client.get(f"/orders/{TRACKING}")).json()["calls"][0][
+                "answer_deadline_at"
+            ]
+            call.snapshot = await app.state.ai_bridge.call_started(call)
+            call.status, call.upstream = "connected", Media()
+            await runtime.emit(
+                call,
+                {
+                    "type": "transcript",
+                    "speaker": "buyer",
+                    "turn_id": "spoken",
+                    "text": "Known buyer " + call.snapshot.known_pii[0],
+                    "final": True,
+                },
+            )
+            observed = (await client.get(f"/orders/{TRACKING}/live")).json()
+            assert observed["generation_id"] == generation
+            assert observed["records"][-1]["payload"]["turn_id"] == "spoken"
+            assert call.snapshot.known_pii[0] not in str(observed)
+            second = "SPXVN0123459012"
+            event = await tap(second, "B")
+            await clock("11:04")
+            detail = (await client.get(f"/orders/{second}")).json()
+            upload = await client.post(
+                f"/orders/{second}/memo",
+                files={"audio": b"synthetic"},
+                data={
+                    "generation_id": generation,
+                    "context_version": detail["order"]["context_version"],
+                    "shipper_event_id": event["event_id"],
+                },
+            )
+            assert upload.status_code == 202, upload.text
+            memo_id = upload.json()["job_id"]
+            await asyncio.wait_for(entered.wait(), 2)
+            response = await client.post("/demo/workflow-reset", json={"generation_id": generation})
+            assert response.status_code == 202
+            reset_id = response.json()["job_id"]
+            duplicate = await client.post(
+                "/demo/workflow-reset", json={"generation_id": generation}
+            )
+            assert duplicate.json()["job_id"] == reset_id
+            blocked = await client.post(
+                "/demo/clock", json={"generation_id": generation, "speed": 2}
+            )
+            assert blocked.status_code == 409 and blocked.json()["code"] == "reset_in_progress"
+            assert (await client.get("/demo/clock")).json()["reset_job"]["job_id"] == reset_id
+            await asyncio.wait_for(app.state.reset_jobs.task, 180)
+            result = (await client.get(f"/demo/workflow-reset/{reset_id}")).json()
+            assert result["status"] == "completed", result
+            assert result["generation_id"] != generation
+            assert result["clock"]["paused"] and "T10:00:00" in result["clock"]["now"]
+            assert closed.is_set() and cancelled.is_set()
+            assert call.id not in runtime.calls and memo_id not in runtime.jobs
+            sequence = runtime.observations.sequence
+            runtime.observations.append(
+                call.snapshot, {"type": "status", "status": "late"}, call.id
+            )
+            assert runtime.observations.sequence == sequence
+            assert (
+                await app.state.ai_bridge.submit(
+                    call.snapshot, proposal(), "ai_call", True, 5, "late-confirmation"
+                )
+                == "rejected_stale"
+            )
+            stale = await client.post("/demo/workflow-reset", json={"generation_id": generation})
+            assert stale.status_code == 409 and stale.json()["code"] == "rejected_stale"
+            fresh = (await client.get(f"/orders/{TRACKING}")).json()
+            assert fresh["action_guard"]["can_tap"] and not fresh["pending_event"]
+            assert not fresh["calls"] and not fresh["rescue_cases"]
+            live = (await client.get(f"/orders/{TRACKING}/live")).json()
+            assert live["generation_id"] == result["generation_id"] and not live["records"]
+
+
+async def test_prepared_reset_restores_snapshot_under_a_new_generation(integrated):
+    env = integrated
+    app = create_integrated_app(
+        env.service.settings, ai_settings=env.ai_settings, start_scheduler=False
+    )
+
+    def rows(database):
+        connection = sqlite3.connect(database)
+        try:
+            tables = [
+                row[0]
+                for row in connection.execute(
+                    "SELECT name FROM sqlite_master WHERE type = 'table' "
+                    "AND name NOT LIKE 'sqlite_%'"
+                )
+            ]
+            counts = {
+                table: connection.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0]
+                for table in tables
+            }
+            generations = set()
+            for table in tables:
+                columns = [row[1] for row in connection.execute(f'PRAGMA table_info("{table}")')]
+                if "generation_id" in columns:
+                    generations |= {
+                        row[0]
+                        for row in connection.execute(
+                            f'SELECT DISTINCT generation_id FROM "{table}"'
+                        )
+                    }
+            return counts, generations
+        finally:
+            connection.close()
+
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app), base_url="http://test") as client:
+
+            async def reset(generation):
+                response = await client.post(
+                    "/demo/workflow-reset", json={"generation_id": generation}
+                )
+                assert response.status_code == 202, response.text
+                await asyncio.wait_for(app.state.reset_jobs.task, 180)
+                job = (await client.get(f"/demo/workflow-reset/{response.json()['job_id']}")).json()
+                assert job["status"] == "completed", job
+                return job
+
+            target = snapshot_path(env.service.settings)
+            assert not target.exists()
+            first = await reset(env.generation)
+            assert target.exists(), "a full reset captures the prepared state"
+            database = make_url(env.service.settings.database_url).database
+            prepared_counts, _ = rows(database)
+
+            order = (await client.get(f"/orders/{TRACKING}")).json()["order"]
+            dirtied = await client.post(
+                f"/orders/{TRACKING}/events",
+                json={
+                    "generation_id": first["generation_id"],
+                    "context_version": order["context_version"],
+                    "idempotency_key": "dirty",
+                    "button": "A",
+                },
+            )
+            assert dirtied.status_code == 201, dirtied.text
+
+            began = monotonic()
+            second = await reset(first["generation_id"])
+            assert monotonic() - began < 8, "the snapshot path skips the morning workflow"
+            assert second["generation_id"] != first["generation_id"]
+            assert second["clock"]["generation_id"] == second["generation_id"]
+            assert second["clock"]["paused"] and "T10:00:00" in second["clock"]["now"]
+            counts, generations = rows(database)
+            # Pausing the clock for the new generation audits one event; nothing else differs.
+            assert counts == prepared_counts | {"events": prepared_counts["events"] + 1}
+            assert generations == {second["generation_id"]}, "no row keeps an old generation"
+            fresh = (await client.get(f"/orders/{TRACKING}")).json()
+            assert fresh["action_guard"]["can_tap"] and not fresh["pending_event"]
+            assert not fresh["calls"] and not fresh["rescue_cases"]
+            stale = await client.post(
+                "/demo/workflow-reset", json={"generation_id": first["generation_id"]}
+            )
+            assert stale.status_code == 409 and stale.json()["code"] == "rejected_stale"
+            # The restored generation runs the real workflow again.
+            again = await client.post(
+                f"/orders/{TRACKING}/events",
+                json={
+                    "generation_id": second["generation_id"],
+                    "context_version": fresh["order"]["context_version"],
+                    "idempotency_key": "again",
+                    "button": "A",
+                },
+            )
+            assert again.status_code == 201, again.text
+
+
+async def test_unusable_snapshot_leaves_the_database_for_the_full_reset(integrated):
+    env = integrated
+    settings = env.service.settings
+    target = snapshot_path(settings)
+    assert await restore_snapshot(settings, "unused") is False, "no snapshot yet"
+    await save_snapshot(settings)
+    connection = sqlite3.connect(target)
+    connection.execute("UPDATE alembic_version SET version_num = 'older'")
+    connection.commit()
+    connection.close()
+    assert await restore_snapshot(settings, "unused") is False, "another schema is refused"
+    assert (await current(env)).generation_id == env.generation, "the database is untouched"
+    target.write_bytes(b"not a database")
+    assert await restore_snapshot(settings, "unused") is False, "a corrupt file is refused"
+    assert not target.exists()
+
+
+async def test_reset_removes_pending_outcome_and_rejects_old_generation_write(integrated):
+    env = integrated
+    order = await current(env)
+    command = CourierAction(
+        generation_id=env.generation,
+        context_version=order.context_version,
+        idempotency_key="pending-before-reset",
+        button="A",
+    )
+    await env.flow.tap(TRACKING, command)
+    assert (await current(env)).context["pending_event"]["button"] == "A"
+    result = await DemoService(env.scheduler).reset(env.generation, "A_main")
+    assert result["generation_id"] != env.generation
+    async with env.database.sessions() as session:
+        assert await session.scalar(select(func.count()).select_from(RescueCase)) == 0
+        assert (await session.get(Order, TRACKING)).context.get("pending_event") is None
+    with pytest.raises(WorkflowError) as stale:
+        await env.flow.tap(TRACKING, command)
+    assert stale.value.code == "rejected_stale"

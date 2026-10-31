@@ -8,6 +8,20 @@ from .privacy import mask
 from .schema import DeliveryContext, empty_context
 
 
+def normalize_location_note(context):
+    if context.drop_location and context.drop_location.note.strip() in {
+        "",
+        "/",
+        "-",
+        "—",
+        "–",
+    }:
+        # These standalone marks carry no location description. Keep the typed
+        # category and every substantive note; never invent missing details.
+        context.drop_location.note = ""
+    return context
+
+
 async def extract(
     settings, snapshot, text, source, metrics=None, expected_context=None
 ):
@@ -46,7 +60,7 @@ async def extract(
                 "note": "reception" if is_reception else "security desk",
                 "confidence": 0.9,
             }
-        return DeliveryContext.model_validate(result)
+        return normalize_location_note(DeliveryContext.model_validate(result))
     client = AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value(), timeout=30)
     schema = DeliveryContext.model_json_schema(by_alias=True)
     schema["required"] = list(schema["properties"])
@@ -54,7 +68,7 @@ async def extract(
         response = await client.responses.create(
             model=settings.openai_model,
             reasoning={"effort": settings.openai_reasoning_effort},
-            instructions="For assistant_readback, expected_context is a checklist, never evidence: extract only details explicitly spoken. Do not fill missing or contradictory details from the checklist. Only for free-text drop_location.note, delivery_notes, alt_receiver.relation and cannot_receive.reason: use the exact expected string if and only if the spoken paraphrase explicitly preserves every material instruction, condition and timing with no contradiction or added restriction. Otherwise return the actual different value or null. Never canonicalize conflicting date, time, drop_location.type, address, or phone values. Extract only explicitly stated delivery details. Return null for missing fields. Resolve Vietnamese relative dates using the business date. The text may contain multiple buyer turns in chronological order. Merge details across turns; a corrected answer replaces only the earlier conflicting field. Preserve explicit optional delivery instructions in delivery_notes, otherwise null. A brief negative answer to the optional notes question means no additional notes, not cannot_receive. Never infer phone numbers. Interpret after HH as HH:00-20:00, before HH as 08:00-HH:00; morning 08:00-12:00, afternoon 14:00-17:00, evening 17:00-20:00.",
+            instructions="For assistant_readback, expected_context is a checklist, never evidence: extract only details explicitly spoken. Do not fill missing or contradictory details from the checklist. Only for free-text drop_location.note, delivery_notes, alt_receiver.relation and cannot_receive.reason: use the exact expected string if and only if the spoken paraphrase explicitly preserves every material instruction, condition and timing with no contradiction or added restriction. Otherwise return the actual different value or null. Never canonicalize conflicting date, time, drop_location.type, address, or phone values. A security desk or bàn bảo vệ is security_desk; reception or lễ tân is reception. These are distinct categories. For drop_location.note, use an empty string when only the category was stated and there is no additional description; never invent placeholders such as / or -. Preserve any actual additional location description. Extract only explicitly stated delivery details. Return null for missing fields. Resolve Vietnamese relative dates using the business date. The text may contain multiple buyer turns in chronological order. Merge details across turns; a corrected answer replaces only the earlier conflicting field. Preserve explicit optional delivery instructions in delivery_notes, otherwise null. A brief negative answer to the optional notes question means no additional notes, not cannot_receive. Never infer phone numbers. Interpret after HH as HH:00-20:00, before HH as 08:00-HH:00; morning 08:00-12:00, afternoon 14:00-17:00, evening 17:00-20:00.",
             input=json.dumps(
                 {
                     "source": source,
@@ -89,4 +103,6 @@ async def extract(
                 "tokens": response.usage.model_dump(mode="json"),
             }
         )
-    return DeliveryContext.model_validate_json(response.output_text)
+    return normalize_location_note(
+        DeliveryContext.model_validate_json(response.output_text)
+    )
