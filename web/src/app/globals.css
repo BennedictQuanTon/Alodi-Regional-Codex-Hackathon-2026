@@ -313,7 +313,6 @@ body {
 .shipper-logo:hover img {
   filter: none;
   opacity: 1;
-  transform: translateY(-2px);
 }
 
 /* Tech-stack chip marquee: monochrome logo + name; never pauses, hover only tints the chip */
@@ -639,8 +638,8 @@ body {
   --d-text: #1f2a44;
   --d-text-2: #4a5268;
   --d-muted: #737373;
-  --d-primary: #d14e00;
-  --d-primary-hover: #b34300;
+  --d-primary: #f05a00;
+  --d-primary-hover: #d94f00;
   --d-primary-soft: #fff1e8;
   --d-accent: #f59e0b;
   --d-good: #15803d;
@@ -690,7 +689,7 @@ body {
 .d-card {
   background: var(--d-surface);
   border: 1px solid var(--d-border);
-  border-radius: 16px;
+  border-radius: 24px;
   transition:
     box-shadow 0.15s ease,
     transform 0.15s ease;
@@ -737,7 +736,7 @@ body {
   gap: 8px;
   height: 40px;
   padding: 0 16px;
-  border-radius: 8px;
+  border-radius: 18px;
   font-weight: 600;
   font-size: 14px;
   transition: all 0.15s ease;
@@ -910,25 +909,36 @@ html.theme-vt::view-transition-new(root) {
 }
 
 /* Demo gate (/start) */
-.gate { position: relative; min-height: 100dvh; display: grid; place-items: center; overflow: hidden; font-family: var(--font-sans); color: #1f2a44; background: radial-gradient(70% 60% at 50% 45%, #ffffff 0%, #f6f3f1 100%); }
-.gate-stage { position: absolute; inset: 2% 3% 4%; pointer-events: none; }
-.gate-person { position: absolute; display: grid; justify-items: center; gap: 8px; translate: -50% -50%; }
-.gate-person img { border-radius: 999px; box-shadow: 0 0 0 4px #fff, 0 18px 40px -18px rgba(31, 42, 68, 0.45); }
-.gate-person span { font-size: 13px; font-weight: 500; color: #3a4358; background: rgba(255, 255, 255, 0.85); padding: 3px 10px; border-radius: 999px; }
-.gate-center { position: relative; z-index: 2; display: grid; justify-items: center; gap: 18px; width: min(900px, calc(100vw - 32px)); text-align: center; }
-.gate-center h1 { font-size: clamp(40px, 5.2vw, 72px); font-weight: 500; line-height: 1.05; letter-spacing: -0.03em; }
+.gate { position: relative; min-height: 100dvh; display: flex; flex-direction: column; justify-content: space-between; gap: 48px; padding: clamp(32px, 6vh, 72px) clamp(16px, 7vw, 120px) clamp(28px, 5vh, 56px); overflow: hidden; font-family: var(--font-sans); color: #1f2a44; background: #f6f3f1; }
+.gate-center { display: grid; grid-template-columns: 1fr minmax(320px, 440px); column-gap: clamp(32px, 6vw, 110px); row-gap: 18px; align-items: end; margin-block: auto; text-align: left; }
+.gate-center > :first-child { grid-column: 1 / -1; justify-self: start; }
+.gate-center h1 { grid-column: 1; margin-top: clamp(16px, 4vh, 44px); font-size: clamp(52px, 7.4vw, 124px); font-weight: 500; line-height: 0.98; letter-spacing: -0.04em; }
 .gate-center h1 em { font-style: normal; color: #f05a00; }
-.gate-center > p { font-size: 19px; color: #3a4358; }
-.gate-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: min(720px, 100%); margin-top: 18px; }
-.gate-choice { transition: translate 150ms ease; display: inline-flex; align-items: center; justify-content: center; gap: 16px; height: 88px; padding: 0 24px; border-radius: 22px; border: 1px solid #e0dcd9; background: #fff; color: #1f2a44; cursor: pointer; box-shadow: 0 18px 40px -28px rgba(31, 42, 68, 0.5); }
-.gate-choice:hover { translate: 0 -2px; }
-.gate-choice b { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+.gate-center > p { grid-column: 1; font-size: clamp(17px, 1.5vw, 22px); color: #3a4358; }
+.gate-choices { grid-column: 2; grid-row: 2 / span 2; display: grid; gap: 14px; width: 100%; }
+.gate-choice { transition: translate 150ms ease, box-shadow 150ms ease; display: inline-flex; align-items: center; justify-content: center; gap: 16px; height: 92px; padding: 0 24px; border-radius: 22px; border: 1px solid #e0dcd9; background: #fff; color: #1f2a44; cursor: pointer; box-shadow: 0 18px 40px -30px rgba(31, 42, 68, 0.5); }
+.gate-choice:hover { translate: 0 -2px; box-shadow: 0 22px 44px -26px rgba(31, 42, 68, 0.55); }
+.gate-choice b { font-size: 23px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
 .gate-choice-dark { background: #1f2a44; border-color: #1f2a44; color: #fff; }
 .gate-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: rgba(255, 255, 255, 0.12); }
 .gate-faces { display: flex; }
 .gate-faces img { border-radius: 999px; box-shadow: 0 0 0 2px #fff; }
 .gate-faces img + img { margin-left: -10px; }
-@media (max-width: 760px) { .gate-choices { grid-template-columns: 1fr; } .gate-stage { display: none; } }
+/* The rescue as one line: people in the order it reaches them, an orange dot travelling through */
+.gate-line { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); }
+.gate-rail { position: absolute; left: calc(100% / 12); right: calc(100% / 12); top: 36px; height: 2px; background: #d5d0cc; transform-origin: left; }
+.gate-dot { position: absolute; top: 31px; left: calc(100% / 12); width: 12px; height: 12px; margin-left: -6px; border-radius: 999px; background: #f05a00; box-shadow: 0 0 0 5px rgba(240, 90, 0, 0.16); animation: gate-dot 7s cubic-bezier(0.65, 0, 0.35, 1) 1.2s infinite; }
+@keyframes gate-dot { from { left: calc(100% / 12); } to { left: calc(100% * 11 / 12); } }
+.gate-person { position: relative; display: grid; justify-items: center; gap: 10px; }
+.gate-person img { width: 72px; height: 72px; border-radius: 999px; background: #fff; box-shadow: 0 0 0 5px #f6f3f1; }
+.gate-person span { font-size: 14px; font-weight: 500; color: #3a4358; text-align: center; }
+@media (max-width: 760px) {
+  .gate-center { grid-template-columns: 1fr; }
+  .gate-choices { grid-column: 1; grid-row: auto; margin-top: 12px; }
+  .gate-line { grid-template-columns: repeat(3, 1fr); row-gap: 20px; }
+  .gate-rail, .gate-dot { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .gate-dot { animation: none; } }
 
 /* Live demo notice on the gate */
 .sorry-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(18, 26, 44, 0.45); backdrop-filter: blur(6px); }

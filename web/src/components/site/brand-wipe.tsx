@@ -1,7 +1,7 @@
 "use client";
 
-import { animate, motion, useMotionTemplate, useMotionValue, useReducedMotion } from "motion/react";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { animate, motion, useMotionTemplate, useMotionValue, useReducedMotion, useTransform } from "motion/react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 // The one big transition: the first time someone enters the product in a session, the logo builds itself on navy,
 // then its ring opens and the page is revealed through it. Everything after that is a quiet cross-fade.
@@ -25,7 +25,12 @@ export function BrandWipe() {
   const reduce = useReducedMotion();
   const [show, setShow] = useState(false);
   const r = useMotionValue(0);
-  const mask = useMotionTemplate`radial-gradient(circle at 50% 50%, transparent ${r}px, #000 calc(${r}px + 1px))`;
+  // the page opens from the centre of the logo's "o"
+  const cx = useMotionValue(0);
+  const cy = useMotionValue(0);
+  const o = useRef<HTMLSpanElement>(null);
+  const mask = useMotionTemplate`radial-gradient(circle at ${cx}px ${cy}px, transparent ${r}px, #000 calc(${r}px + 1px))`;
+  const ringOpacity = useTransform(r, (v) => (v > 0 ? 1 : 0));
   const ringStroke = useMotionTemplate`calc(${r}px * 2)`;
 
   useLayoutEffect(() => {
@@ -36,14 +41,19 @@ export function BrandWipe() {
 
   useEffect(() => {
     if (!show) return;
-    const far = Math.hypot(window.innerWidth, window.innerHeight) * 0.62;
+    const box = o.current?.getBoundingClientRect();
+    if (box) {
+      cx.set(box.left + box.width / 2);
+      cy.set(box.top + box.height / 2);
+    }
+    const far = Math.hypot(window.innerWidth, window.innerHeight);
     const open = animate(r, far, { delay: 1.15, duration: 0.75, ease: [0.76, 0, 0.24, 1] });
     const done = setTimeout(() => setShow(false), 1950);
     return () => {
       open.stop();
       clearTimeout(done);
     };
-  }, [show, r]);
+  }, [show, r, cx, cy]);
 
   if (!show) return null;
   return (
@@ -57,7 +67,7 @@ export function BrandWipe() {
           <motion.span initial={{ opacity: 0, x: "0.5em" }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5, duration: 0.55, ease: EASE }}>
             al
           </motion.span>
-          <span className="relative mx-[0.02em] inline-block w-[0.66em] self-center translate-y-[0.07em]">
+          <span ref={o} className="relative mx-[0.02em] inline-block w-[0.66em] self-center translate-y-[0.07em]">
             <svg viewBox="0 0 24 24" className="h-auto w-full overflow-visible">
               <motion.circle
                 cx="12"
@@ -95,8 +105,8 @@ export function BrandWipe() {
       </motion.div>
       {/* the brand ring travels on the edge of the opening */}
       <motion.div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-[18px] border-orange"
-        style={{ width: ringStroke, height: ringStroke, boxSizing: "content-box" }}
+        className="absolute rounded-full border-[18px] border-orange"
+        style={{ left: cx, top: cy, x: "-50%", y: "-50%", width: ringStroke, height: ringStroke, boxSizing: "content-box", opacity: ringOpacity }}
       />
     </div>
   );

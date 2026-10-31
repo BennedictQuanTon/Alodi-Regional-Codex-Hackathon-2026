@@ -426,7 +426,7 @@ export function Overview() {
   const openMock = open && open !== ORDER.tracking ? MOCK_CASES.find((c) => c.id === open) : null;
 
   return (
-    <DashShell reviewCount={DAY.cs_queue.total}>
+    <DashShell>
       <div className="mx-auto max-w-[1280px] px-5 py-7 md:px-8 md:py-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
