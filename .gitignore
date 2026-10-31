@@ -1,0 +1,11 @@
+.DS_Store
+# reference reels from other creators: too big for GitHub, not ours to publish
+/*.MP4
+
+# python
+__pycache__/
+*.pyc
+
+# duplicates of prep/02-technical/diagrams/
+/alodi-architecture.pdf
+/alodi-flow.pdf

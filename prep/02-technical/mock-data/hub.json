@@ -1,0 +1,19 @@
+{
+  "hub_id": "HCM-BTH-01",
+  "name": "Binh Thanh hub (fictional)",
+  "city": "Ho Chi Minh City",
+  "service_area_wards": [
+    "Binh Thanh",
+    "Gia Dinh",
+    "Thanh My Tay",
+    "Binh Loi Trung"
+  ],
+  "date": "2026-10-31",
+  "couriers": 20,
+  "orders": 4000,
+  "stops_per_route": 200,
+  "morning_run": "06:30",
+  "route_cutoff": "08:00",
+  "call_hours": "08:00–20:30",
+  "note": "Fictional hub. Ward names follow the HCMC ward-level structure in force since 1 July 2025; addresses, people and phone numbers are invented."
+}

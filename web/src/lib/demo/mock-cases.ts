@@ -1,0 +1,230 @@
+// Mock data for the CS / dispatcher dashboard. Not real data.
+
+export type MockCase = {
+  id: string;
+  buyer: string;
+  phone: string;
+  district: string;
+  cod: number;
+  trigger: "NO_ANSWER" | "RESCHEDULE" | "REFUSED" | "PRE_DELIVERY";
+  stage: "chat" | "call1" | "call2" | "ready" | "review" | "cs" | "closed";
+  cycle: 1 | 2;
+  channel: "Chat" | "AI call" | "Voice memo" | "—";
+  conf: number | null;
+  updated: string;
+  courier: string;
+  context?: string;
+  note?: string;
+  transcript?: string[];
+  suggestion?: string;
+};
+
+export const MOCK_CASES: MockCase[] = [
+  {
+    id: "SPXVN0123459012",
+    buyer: "Tram Nguyen",
+    phone: "0938 *** 102",
+    district: "Binh Thanh",
+    cod: 389000,
+    trigger: "NO_ANSWER",
+    stage: "ready",
+    cycle: 1,
+    channel: "Chat",
+    conf: 0.97,
+    updated: "10:41",
+    courier: "Tuan Nguyen",
+    context: "Today 17:30–19:00 · hand to buyer",
+    transcript: ["Buyer (chat): I’m home after 5:30 today", "Agent: Noted — 17:30–19:00 today."],
+  },
+  {
+    id: "SPXVN0123457781",
+    buyer: "Bao Tran",
+    phone: "0909 *** 554",
+    district: "Binh Thanh",
+    cod: 2150000,
+    trigger: "NO_ANSWER",
+    stage: "review",
+    cycle: 1,
+    channel: "AI call",
+    conf: 0.62,
+    updated: "10:37",
+    courier: "Hoa Le",
+    note: "Two answers conflict: chat picked “Tomorrow morning”, the call said “tonight”.",
+    transcript: ["Assistant: When would you like it?", "Buyer: Tonight… actually, maybe tomorrow…"],
+    suggestion: "Ask again in chat with two concrete windows",
+  },
+  {
+    id: "SPXVN0123451120",
+    buyer: "Lien Pham",
+    phone: "0913 *** 870",
+    district: "Phu Nhuan",
+    cod: 0,
+    trigger: "RESCHEDULE",
+    stage: "ready",
+    cycle: 1,
+    channel: "Voice memo",
+    conf: 0.93,
+    updated: "10:33",
+    courier: "Long Vu",
+    context: "Tomorrow 08:00–10:00 · Tower A reception",
+    transcript: ["Courier (memo): She wants tomorrow before ten, leave it at Tower A reception."],
+  },
+  {
+    id: "SPXVN0123450333",
+    buyer: "Huy Dang",
+    phone: "0977 *** 231",
+    district: "Go Vap",
+    cod: 1490000,
+    trigger: "REFUSED",
+    stage: "cs",
+    cycle: 1,
+    channel: "—",
+    conf: null,
+    updated: "10:29",
+    courier: "Phat Ho",
+    note: "Refused at the door. The agent did not contact the buyer.",
+    suggestion: "Suggested label “suspected bomb” · needs approval",
+  },
+  {
+    id: "SPXVN0123452290",
+    buyer: "Ha Vo",
+    phone: "0903 *** 448",
+    district: "Binh Thanh",
+    cod: 650000,
+    trigger: "NO_ANSWER",
+    stage: "call1",
+    cycle: 1,
+    channel: "AI call",
+    conf: null,
+    updated: "10:26",
+    courier: "Tuan Nguyen",
+    note: "AI call 1 in progress · 00:41",
+  },
+  {
+    id: "SPXVN0123456610",
+    buyer: "Khoa Bui",
+    phone: "0985 *** 019",
+    district: "District 3",
+    cod: 0,
+    trigger: "NO_ANSWER",
+    stage: "chat",
+    cycle: 1,
+    channel: "Chat",
+    conf: null,
+    updated: "10:21",
+    courier: "Hoa Le",
+    note: "Chat sent · AI call 1 at 11:21",
+  },
+  {
+    id: "SPXVN0123453374",
+    buyer: "Ngoc Truong",
+    phone: "0937 *** 663",
+    district: "Phu Nhuan",
+    cod: 3200000,
+    trigger: "NO_ANSWER",
+    stage: "call2",
+    cycle: 2,
+    channel: "AI call",
+    conf: null,
+    updated: "10:14",
+    courier: "Long Vu",
+    note: "Cycle 2 · call 1 unanswered · call 2 at 12:14",
+  },
+  {
+    id: "SPXVN0123458845",
+    buyer: "Tai Do",
+    phone: "0918 *** 377",
+    district: "Go Vap",
+    cod: 420000,
+    trigger: "NO_ANSWER",
+    stage: "cs",
+    cycle: 2,
+    channel: "AI call",
+    conf: null,
+    updated: "09:58",
+    courier: "Phat Ho",
+    note: "Two rescue cycles used, four unanswered calls.",
+    suggestion: "Suggested label “undeliverable” · needs approval",
+  },
+  {
+    id: "SPXVN0123455502",
+    buyer: "Duyen Mai",
+    phone: "0961 *** 840",
+    district: "Binh Thanh",
+    cod: 275000,
+    trigger: "PRE_DELIVERY",
+    stage: "ready",
+    cycle: 1,
+    channel: "Chat",
+    conf: 1,
+    updated: "07:12",
+    courier: "Tuan Nguyen",
+    context: "Today 14:00–16:00 (buyer tapped a slot)",
+    transcript: ["Buyer tapped: Afternoon · 14:00–16:00"],
+  },
+  {
+    id: "SPXVN0123454419",
+    buyer: "Nam Ly",
+    phone: "0932 *** 586",
+    district: "District 3",
+    cod: 980000,
+    trigger: "RESCHEDULE",
+    stage: "closed",
+    cycle: 1,
+    channel: "Voice memo",
+    conf: 0.9,
+    updated: "09:40",
+    courier: "Hoa Le",
+    context: "Delivered on attempt 2 · 09:40",
+  },
+  {
+    id: "SPXVN0123451987",
+    buyer: "Yen Cao",
+    phone: "0908 *** 712",
+    district: "Go Vap",
+    cod: 1150000,
+    trigger: "NO_ANSWER",
+    stage: "review",
+    cycle: 1,
+    channel: "Chat",
+    conf: 0.71,
+    updated: "09:36",
+    courier: "Phat Ho",
+    note: "Buyer asked to deliver to “my mum’s place in District 12” instead.",
+    suggestion: "Cross-district address change: needs approval and a new route",
+  },
+  {
+    id: "SPXVN0123450076",
+    buyer: "Gia Bao Tran",
+    phone: "0976 *** 905",
+    district: "Binh Thanh",
+    cod: 560000,
+    trigger: "NO_ANSWER",
+    stage: "closed",
+    cycle: 1,
+    channel: "AI call",
+    conf: 0.95,
+    updated: "09:12",
+    courier: "Tuan Nguyen",
+    context: "Delivered on attempt 2 · building security",
+  },
+];
+
+/** KPI cards: value, badge, and a 7-day spark series (last bar = today). */
+export const KPIS = [
+  { label: "Failed today", value: "812", badge: "8.1% of 10,024", tone: "neutral", spark: [760, 790, 845, 801, 830, 776, 812] },
+  { label: "Agent rescuing", value: "214", badge: "Live", tone: "primary", spark: [180, 196, 205, 188, 220, 201, 214] },
+  { label: "Handled autonomously", value: "61%", badge: "1.8% error", tone: "good", spark: [48, 52, 55, 57, 58, 60, 61] },
+  { label: "Needs a person", value: "23", badge: "6 min median wait", tone: "warn", spark: [31, 28, 30, 26, 25, 24, 23] },
+] as const;
+
+/** Rescue rate per day, last 14 days (%), vs the ~25% industry baseline. */
+export const RESCUE_DAILY = [24, 26, 25, 27, 29, 28, 31, 30, 32, 33, 31, 34, 35, 34];
+export const RESCUE_WEEKLY = [25, 26, 28, 30, 31, 33, 34];
+export const BASELINE = 25;
+
+export const REASONS = [
+  { label: "No answer", value: 52 },
+  { label: "Rescheduled", value: 31 },
+  { label: "Refused", value: 17 },
+];

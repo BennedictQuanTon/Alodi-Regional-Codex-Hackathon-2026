@@ -1,0 +1,134 @@
+[
+ [
+  "v01",
+  "af_heart",
+  0.96,
+  "Have you ever missed the courier's call... in the middle of a meeting?"
+ ],
+ [
+  "v02",
+  "af_heart",
+  0.98,
+  "Then your parcel goes back."
+ ],
+ [
+  "v03",
+  "af_heart",
+  1.0,
+  "Buyers and couriers told us it happens all the time."
+ ],
+ [
+  "v04",
+  "af_heart",
+  1.0,
+  "Every failed order can cost the seller forty thousand dong."
+ ],
+ [
+  "v05",
+  "af_heart",
+  1.0,
+  "Eight to twelve percent of orders are refused at the door."
+ ],
+ [
+  "v06",
+  "af_heart",
+  1.0,
+  "And buyers still have no way to pick a time."
+ ],
+ [
+  "v07",
+  "af_heart",
+  0.97,
+  "For one area, that's about four hundred and seventy million dong. Lost. Every month."
+ ],
+ [
+  "v08",
+  "af_heart",
+  0.95,
+  "Meet Alodi."
+ ],
+ [
+  "v09",
+  "af_heart",
+  1.0,
+  "One agent. Four screens. All live."
+ ],
+ [
+  "v10",
+  "af_heart",
+  1.0,
+  "Every morning, Alodi asks each buyer for two delivery windows."
+ ],
+ [
+  "v11",
+  "af_heart",
+  1.0,
+  "If a delivery still fails, the courier taps once. No typing."
+ ],
+ [
+  "v12",
+  "af_heart",
+  1.0,
+  "Alodi messages straight away, and calls if there's silence. Only inside the rules."
+ ],
+ [
+  "c01",
+  "af_bella",
+  1.0,
+  "Our courier missed you this morning. Tomorrow we have eight to twelve, or five to eight in the evening. Which works for you?"
+ ],
+ [
+  "c02",
+  "am_michael",
+  1.02,
+  "Tomorrow after five, please. I'm out until late, so leave it with security in Tower B... or call my wife."
+ ],
+ [
+  "v13",
+  "af_heart",
+  1.0,
+  "One sentence becomes structured context."
+ ],
+ [
+  "v14",
+  "af_heart",
+  1.0,
+  "So the next courier knows when, where, and who."
+ ],
+ [
+  "v15",
+  "af_heart",
+  1.0,
+  "And anything high stakes still goes to a person."
+ ],
+ [
+  "v16",
+  "af_heart",
+  1.0,
+  "Under the hood, OpenAI's open-weight model makes the decisions, on a server at each area."
+ ],
+ [
+  "v17",
+  "af_heart",
+  1.0,
+  "Structured Outputs turn speech into strict JSON, and every action passes a guard written in code."
+ ],
+ [
+  "v18",
+  "af_heart",
+  0.97,
+  "At best-in-class rescue rates, one area saves about one hundred and ninety four million dong a month."
+ ],
+ [
+  "v19",
+  "af_heart",
+  0.97,
+  "That's forty-one percent of the loss. Two point three billion a year. For four percent of the cost."
+ ],
+ [
+  "v20",
+  "af_heart",
+  0.92,
+  "Alodi. Make the second drop land."
+ ]
+]

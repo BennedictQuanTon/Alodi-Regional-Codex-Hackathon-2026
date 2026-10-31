@@ -1,0 +1,297 @@
+[
+  {
+    "scenario": "A_main",
+    "title": "No answer → AI call 1 answered → auto-applied → delivered next day",
+    "tracking_id": "SPXVN0123456789",
+    "steps": [
+      {
+        "clock": "2026-10-31T06:30:00+07:00",
+        "actor": "system",
+        "do": "morning_load",
+        "expect_ws": {
+          "ops": "orders_loaded 4000 · 4 windows"
+        }
+      },
+      {
+        "clock": "2026-10-31T06:32:00+07:00",
+        "actor": "agent",
+        "do": "ask_window",
+        "expect_ws": {
+          "buyer": "chat_message with 4 windows + Can't receive today"
+        }
+      },
+      {
+        "clock": "2026-10-31T08:00:00+07:00",
+        "actor": "system",
+        "do": "route_cutoff",
+        "expect": "answer_type=no_reply, deliver as planned"
+      },
+      {
+        "clock": "2026-10-31T10:02:00+07:00",
+        "actor": "courier",
+        "do": "tap A",
+        "expect_ws": {
+          "ops": "event_pending commit_at 10:04"
+        }
+      },
+      {
+        "clock": "2026-10-31T10:04:00+07:00",
+        "actor": "system",
+        "do": "commit",
+        "expect_ws": {
+          "buyer": "chat 'We just missed you…'",
+          "ops": "timer AI call 1 due 11:04"
+        }
+      },
+      {
+        "clock": "2026-10-31T11:04:00+07:00",
+        "actor": "agent",
+        "do": "place_call attempt=1",
+        "expect": "policy_check call_hours ok, calls 1/2"
+      },
+      {
+        "clock": "2026-10-31T11:05:00+07:00",
+        "actor": "buyer",
+        "do": "speak utterance A_main.call",
+        "expect_ws": {
+          "ops": "transcript + extraction"
+        }
+      },
+      {
+        "clock": "2026-10-31T11:05:00+07:00",
+        "actor": "agent",
+        "do": "extract",
+        "expect": {
+          "time_window": [
+            "2026-11-01",
+            "17:00",
+            "20:00",
+            0.94
+          ],
+          "drop_location": [
+            "security_desk",
+            "Tower B security",
+            0.88
+          ],
+          "alt_receiver": [
+            "wife",
+            0.91
+          ],
+          "decision": "auto_applied"
+        }
+      },
+      {
+        "clock": "2026-10-31T11:05:00+07:00",
+        "actor": "agent",
+        "do": "save + push card",
+        "expect_ws": {
+          "courier": "context_card",
+          "ops": "attempt 1 of 2"
+        }
+      },
+      {
+        "clock": "2026-11-01T17:22:00+07:00",
+        "actor": "courier",
+        "do": "tap DELIVERED",
+        "expect": "order delivered, case closed"
+      }
+    ]
+  },
+  {
+    "scenario": "B_memo",
+    "title": "Answered but rescheduled → courier memo → card",
+    "tracking_id": "SPXVN0123451120",
+    "steps": [
+      {
+        "clock": "2026-10-31T10:40:00+07:00",
+        "actor": "courier",
+        "do": "tap B",
+        "expect_ws": {
+          "ops": "event_pending"
+        }
+      },
+      {
+        "clock": "2026-10-31T10:41:00+07:00",
+        "actor": "courier",
+        "do": "record memo utterance B_memo.memo (9 s)"
+      },
+      {
+        "clock": "2026-10-31T10:42:00+07:00",
+        "actor": "system",
+        "do": "commit + ASR + mask + extract",
+        "expect": {
+          "time_window": [
+            "2026-11-01",
+            "08:00",
+            "10:00",
+            0.93
+          ],
+          "drop_location": [
+            "reception",
+            "Tower A reception",
+            0.9
+          ],
+          "decision": "auto_applied"
+        }
+      },
+      {
+        "clock": "2026-10-31T10:42:00+07:00",
+        "actor": "agent",
+        "do": "push card",
+        "expect_ws": {
+          "courier": "context_card"
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "REFUSE",
+    "title": "Refused at the door → no contact → CS approves return",
+    "tracking_id": "SPXVN0123450333",
+    "steps": [
+      {
+        "clock": "2026-10-31T11:10:00+07:00",
+        "actor": "courier",
+        "do": "tap C"
+      },
+      {
+        "clock": "2026-10-31T11:12:00+07:00",
+        "actor": "system",
+        "do": "commit",
+        "expect": "policy_block on any contact; case_escalated reason=refused; suggested_label='suspected bomb' (not applied)"
+      },
+      {
+        "clock": "2026-10-31T11:13:00+07:00",
+        "actor": "cs",
+        "do": "approve_label + return",
+        "expect": "label set by cs:lan; audit event with CS name"
+      }
+    ]
+  },
+  {
+    "scenario": "A_lowconf",
+    "title": "Vague answer → confirm in chat → CS picks the window",
+    "tracking_id": "SPXVN0123457781",
+    "steps": [
+      {
+        "clock": "2026-10-31T12:20:00+07:00",
+        "actor": "courier",
+        "do": "tap A"
+      },
+      {
+        "clock": "2026-10-31T13:22:00+07:00",
+        "actor": "agent",
+        "do": "place_call attempt=1"
+      },
+      {
+        "clock": "2026-10-31T13:23:00+07:00",
+        "actor": "buyer",
+        "do": "speak utterance A_lowconf.call",
+        "expect": {
+          "time_window_conf": 0.52,
+          "drop_location_conf": 0.41,
+          "decision": "confirm_in_chat"
+        }
+      },
+      {
+        "clock": "2026-10-31T13:24:00+07:00",
+        "actor": "agent",
+        "do": "send_chat with 2 concrete windows"
+      },
+      {
+        "clock": "2026-10-31T13:54:00+07:00",
+        "actor": "system",
+        "do": "no clear answer → needs_review",
+        "expect_ws": {
+          "ops": "CS queue reason low_confidence"
+        }
+      },
+      {
+        "clock": "2026-10-31T14:00:00+07:00",
+        "actor": "cs",
+        "do": "apply 14:00–17:00 tomorrow",
+        "expect": "decision cs_applied, card pushed"
+      }
+    ]
+  },
+  {
+    "scenario": "A_noanswer",
+    "title": "Two missed calls → CS, hotline routing on",
+    "tracking_id": "SPXVN0123458845",
+    "steps": [
+      {
+        "clock": "2026-10-31T14:30:00+07:00",
+        "actor": "courier",
+        "do": "tap A"
+      },
+      {
+        "clock": "2026-10-31T15:32:00+07:00",
+        "actor": "agent",
+        "do": "place_call attempt=1",
+        "expect": "missed after 30 s"
+      },
+      {
+        "clock": "2026-10-31T17:32:00+07:00",
+        "actor": "agent",
+        "do": "place_call attempt=2",
+        "expect": "missed"
+      },
+      {
+        "clock": "2026-10-31T17:33:00+07:00",
+        "actor": "system",
+        "do": "escalate",
+        "expect": "case_escalated reason=two_calls_unanswered; no third call possible"
+      }
+    ]
+  },
+  {
+    "scenario": "A_midway",
+    "title": "Buyer replies before call 1 → pending call cancelled",
+    "tracking_id": "SPXVN0123452290",
+    "steps": [
+      {
+        "clock": "2026-10-31T15:10:00+07:00",
+        "actor": "courier",
+        "do": "tap A"
+      },
+      {
+        "clock": "2026-10-31T15:12:00+07:00",
+        "actor": "system",
+        "do": "commit + chat",
+        "expect_ws": {
+          "ops": "timer AI call 1 due 16:12"
+        }
+      },
+      {
+        "clock": "2026-10-31T15:52:00+07:00",
+        "actor": "buyer",
+        "do": "chat utterance A_midway.chat",
+        "expect": "timer cancelled; extraction time_window 0.92, drop_location null → confirm in chat"
+      },
+      {
+        "clock": "2026-10-31T15:53:00+07:00",
+        "actor": "buyer",
+        "do": "tap 'Hand it to me'",
+        "expect": "auto_applied; card pushed"
+      }
+    ]
+  },
+  {
+    "scenario": "CANT_TODAY",
+    "title": "Morning answer: can't receive today → moved to tomorrow",
+    "tracking_id": "SPXVN0123459012",
+    "steps": [
+      {
+        "clock": "2026-10-31T06:32:00+07:00",
+        "actor": "agent",
+        "do": "ask_window"
+      },
+      {
+        "clock": "2026-10-31T06:47:00+07:00",
+        "actor": "buyer",
+        "do": "tap Can't receive today + reason 'Out of town until Monday'",
+        "expect": "order moved to 2026-11-02 (Mon), reason saved, stop removed from today's route"
+      }
+    ]
+  }
+]

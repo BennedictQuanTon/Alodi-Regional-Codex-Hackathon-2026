@@ -1,0 +1,220 @@
+[
+  {
+    "id": "TC-01",
+    "covers": [
+      "AC-01",
+      "FR-03"
+    ],
+    "scenario": "A_main",
+    "given": "4,000 orders seeded, clock 06:28",
+    "when": "clock passes 06:30",
+    "then": "4,000 availability_reply rows with 4 slots_offered; 4,000 chat_message events; /ops shows 'orders loaded 4,000'"
+  },
+  {
+    "id": "TC-02",
+    "covers": [
+      "AC-02",
+      "BR-03"
+    ],
+    "scenario": "unit",
+    "given": "buyer picks only W4",
+    "when": "reply webhook",
+    "then": "agent asks for one more window; no note created"
+  },
+  {
+    "id": "TC-03",
+    "covers": [
+      "AC-03",
+      "BR-06"
+    ],
+    "scenario": "A_main",
+    "given": "courier taps A at 10:02",
+    "when": "Undo at 10:03",
+    "then": "shipper_event.status=undone; no chat_message to buyer; /ops shows 'undone'"
+  },
+  {
+    "id": "TC-04",
+    "covers": [
+      "AC-04",
+      "BR-09",
+      "BR-10"
+    ],
+    "scenario": "A_noanswer",
+    "given": "chat at 14:32, no reply",
+    "when": "clock runs",
+    "then": "call 1 at 15:32, call 2 at 17:32, escalation at 17:33"
+  },
+  {
+    "id": "TC-05",
+    "covers": [
+      "AC-05",
+      "BR-11"
+    ],
+    "scenario": "unit",
+    "given": "tap A at 19:40 (chat 19:42)",
+    "when": "call 1 due 20:42",
+    "then": "policy_block call_hours; call moved to 08:00 next day"
+  },
+  {
+    "id": "TC-06",
+    "covers": [
+      "AC-06",
+      "BR-13"
+    ],
+    "scenario": "A_midway",
+    "given": "call 1 pending (due 16:12)",
+    "when": "buyer chats at 15:52",
+    "then": "timer cancelled event; no call placed"
+  },
+  {
+    "id": "TC-07",
+    "covers": [
+      "AC-07",
+      "BR-14"
+    ],
+    "scenario": "A_main",
+    "given": "call transcript A_main",
+    "when": "extract",
+    "then": "0.94/0.88/0.91 → auto_applied; attempt_count=1; card on /courier < 10 s"
+  },
+  {
+    "id": "TC-08",
+    "covers": [
+      "AC-08",
+      "BR-15"
+    ],
+    "scenario": "A_lowconf",
+    "given": "conf 0.52/0.41",
+    "when": "extract",
+    "then": "confirm_in_chat; then needs_review with reason low_confidence"
+  },
+  {
+    "id": "TC-09",
+    "covers": [
+      "AC-09",
+      "BR-07"
+    ],
+    "scenario": "REFUSE",
+    "given": "tap C",
+    "when": "commit",
+    "then": "zero buyer contacts; case in CS queue; label suggested, not applied"
+  },
+  {
+    "id": "TC-10",
+    "covers": [
+      "AC-10",
+      "BR-19"
+    ],
+    "scenario": "REFUSE",
+    "given": "suggested label",
+    "when": "CS approves",
+    "then": "label applied with actor cs:<name> in events"
+  },
+  {
+    "id": "TC-11",
+    "covers": [
+      "AC-11",
+      "BR-17"
+    ],
+    "scenario": "unit",
+    "given": "attempt_count=2",
+    "when": "3rd attempt fails",
+    "then": "status with_cs; no new rescue case"
+  },
+  {
+    "id": "TC-12",
+    "covers": [
+      "AC-12",
+      "BR-20"
+    ],
+    "scenario": "unit",
+    "given": "pending call",
+    "when": "buyer writes 'stop'",
+    "then": "opt_out=true; all timers cancelled; no further contact"
+  },
+  {
+    "id": "TC-13",
+    "covers": [
+      "AC-13",
+      "NFR-04"
+    ],
+    "scenario": "A_main",
+    "given": "iPad offline 20 s",
+    "when": "reconnect",
+    "then": "GET /state restores identical case view < 3 s"
+  },
+  {
+    "id": "TC-14",
+    "covers": [
+      "AC-14",
+      "NFR-10"
+    ],
+    "scenario": "eval",
+    "given": "all eval samples",
+    "when": "run extraction",
+    "then": "logged prompts contain no unmasked phone or street number"
+  },
+  {
+    "id": "TC-15",
+    "covers": [
+      "BR-04",
+      "FR-05"
+    ],
+    "scenario": "CANT_TODAY",
+    "given": "morning question",
+    "when": "Can't receive today + reason",
+    "then": "order moved to next day; reason stored; stop removed from R07"
+  },
+  {
+    "id": "TC-16",
+    "covers": [
+      "FR-13",
+      "FR-25"
+    ],
+    "scenario": "B_memo",
+    "given": "tap B + 9 s memo (audio/mp4)",
+    "when": "upload",
+    "then": "ASR transcript, masked, extracted; card pushed"
+  },
+  {
+    "id": "TC-17",
+    "covers": [
+      "BR-16"
+    ],
+    "scenario": "eval",
+    "given": "sample with cross-ward address change",
+    "when": "extract",
+    "then": "same_district=false → needs_review regardless of confidence"
+  },
+  {
+    "id": "TC-18",
+    "covers": [
+      "BR-18"
+    ],
+    "scenario": "eval",
+    "given": "'next Saturday'",
+    "when": "extract",
+    "then": "date beyond 5 days rejected → cannot_receive / CS"
+  },
+  {
+    "id": "TC-19",
+    "covers": [
+      "NFR-01"
+    ],
+    "scenario": "A_main",
+    "given": "3 devices on hotspot",
+    "when": "tap A on phone",
+    "then": "event_pending visible on iPad within 300 ms (p95 over 20 taps)"
+  },
+  {
+    "id": "TC-20",
+    "covers": [
+      "FR-70",
+      "FR-72"
+    ],
+    "scenario": "control",
+    "given": "/control",
+    "when": "Reset, speed 600×, offline mode",
+    "then": "DB back to seed, clock 06:28, cached outputs replayed"
+  }
+]

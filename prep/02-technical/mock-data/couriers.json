@@ -1,0 +1,182 @@
+[
+  {
+    "courier_id": "C01",
+    "name": "Cuong Do",
+    "route_id": "HCM-BTH-R01",
+    "ward": "Binh Thanh",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C02",
+    "name": "Hoa Le",
+    "route_id": "HCM-BTH-R02",
+    "ward": "Gia Dinh",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C03",
+    "name": "Long Vu",
+    "route_id": "HCM-BTH-R03",
+    "ward": "Thanh My Tay",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C04",
+    "name": "Phat Ho",
+    "route_id": "HCM-BTH-R04",
+    "ward": "Binh Loi Trung",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C05",
+    "name": "An Tran",
+    "route_id": "HCM-BTH-R05",
+    "ward": "Binh Thanh",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C06",
+    "name": "Binh Pham",
+    "route_id": "HCM-BTH-R06",
+    "ward": "Gia Dinh",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C07",
+    "name": "Tuan Nguyen",
+    "route_id": "HCM-BTH-R07",
+    "ward": "Thanh My Tay",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "demo phone /courier"
+  },
+  {
+    "courier_id": "C08",
+    "name": "Dung Ngo",
+    "route_id": "HCM-BTH-R08",
+    "ward": "Binh Loi Trung",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C09",
+    "name": "Hai Bui",
+    "route_id": "HCM-BTH-R09",
+    "ward": "Binh Thanh",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C10",
+    "name": "Hieu Dang",
+    "route_id": "HCM-BTH-R10",
+    "ward": "Gia Dinh",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C11",
+    "name": "Kiet Vo",
+    "route_id": "HCM-BTH-R11",
+    "ward": "Thanh My Tay",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C12",
+    "name": "Lam Truong",
+    "route_id": "HCM-BTH-R12",
+    "ward": "Binh Loi Trung",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C13",
+    "name": "Loc Phan",
+    "route_id": "HCM-BTH-R13",
+    "ward": "Binh Thanh",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C14",
+    "name": "Nhan Ly",
+    "route_id": "HCM-BTH-R14",
+    "ward": "Gia Dinh",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C15",
+    "name": "Phuc Duong",
+    "route_id": "HCM-BTH-R15",
+    "ward": "Thanh My Tay",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C16",
+    "name": "Quan Ho",
+    "route_id": "HCM-BTH-R16",
+    "ward": "Binh Loi Trung",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C17",
+    "name": "Sang Nguyen",
+    "route_id": "HCM-BTH-R17",
+    "ward": "Binh Thanh",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C18",
+    "name": "Thinh Le",
+    "route_id": "HCM-BTH-R18",
+    "ward": "Gia Dinh",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C19",
+    "name": "Vinh Tran",
+    "route_id": "HCM-BTH-R19",
+    "ward": "Thanh My Tay",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  },
+  {
+    "courier_id": "C20",
+    "name": "Vu Hoang",
+    "route_id": "HCM-BTH-R20",
+    "ward": "Binh Loi Trung",
+    "vehicle": "motorbike",
+    "shift": "08:00–20:30",
+    "device": "simulated"
+  }
+]

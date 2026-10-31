@@ -1,0 +1,359 @@
+{
+  "loss": {
+    "failed_per_day": 320.0,
+    "returned_per_day": 240.0,
+    "items": {
+      "Return fees paid by sellers": [
+        288000000.0,
+        288000000.0
+      ],
+      "Courier pay for redelivery attempts": [
+        86400000.0,
+        115200000.0
+      ],
+      "Courier time lost when the buyer doesn't answer": [
+        27350427.350427352,
+        51282051.28205129
+      ],
+      "Hub / CS staff calling buyers back": [
+        44800000.0,
+        44800000.0
+      ]
+    },
+    "total": [
+      446550427.3504273,
+      499282051.28205127
+    ]
+  },
+  "loss_mid": 472916239.3162393,
+  "hardware_one_time": [
+    74800000,
+    98000000
+  ],
+  "rows": [
+    {
+      "setup": "local_first",
+      "messaging": "risky_only",
+      "scenario": "conservative",
+      "cost_items": {
+        "OpenAI API fallback (10% of LLM calls, gpt-5-mini)": 229320.0,
+        "OpenAI TTS for dynamic phrases (gpt-4o-mini-tts)": 608400.0,
+        "Local models: gpt-oss-20b, PhoWhisper, Piper TTS": 0,
+        "Viettel Mobile SIP trunk (calls + line)": 3185600,
+        "Zalo ZNS (risky only)": 11250000,
+        "Electricity (≈ 272 kWh)": 816479.9999999999,
+        "Business fibre with static IP": 800000,
+        "Off-site encrypted backup (Amazon S3, ~10 GB)": 52000,
+        "Remote ops 0.1 FTE (shared across hubs)": 3600000,
+        "Hardware upkeep reserve (5% of hardware a year)": 360000.0
+      },
+      "cost_month": 20901800.0,
+      "saving_items": {
+        "Return fees avoided": 57600000.0,
+        "Redelivery attempts avoided": 0.0,
+        "Courier door time saved": 0.0,
+        "CS calls handled by the agent": 17920000.0
+      },
+      "gross_month": 75520000.0,
+      "gross_pct": 0.15969001214504655,
+      "net_month": 54618200.0,
+      "net_pct": 0.11549233343936152,
+      "net_year": 655418400.0,
+      "hardware_payback_months": 1.5818902856556971
+    },
+    {
+      "setup": "local_first",
+      "messaging": "risky_only",
+      "scenario": "base",
+      "cost_items": {
+        "OpenAI API fallback (10% of LLM calls, gpt-5-mini)": 229320.0,
+        "OpenAI TTS for dynamic phrases (gpt-4o-mini-tts)": 608400.0,
+        "Local models: gpt-oss-20b, PhoWhisper, Piper TTS": 0,
+        "Viettel Mobile SIP trunk (calls + line)": 3185600,
+        "Zalo ZNS (risky only)": 11250000,
+        "Electricity (≈ 272 kWh)": 816479.9999999999,
+        "Business fibre with static IP": 800000,
+        "Off-site encrypted backup (Amazon S3, ~10 GB)": 52000,
+        "Remote ops 0.1 FTE (shared across hubs)": 3600000,
+        "Hardware upkeep reserve (5% of hardware a year)": 360000.0
+      },
+      "cost_month": 20901800.0,
+      "saving_items": {
+        "Return fees avoided": 76800000.0,
+        "Redelivery attempts avoided": 10079999.999999994,
+        "Courier door time saved": 5897435.897435894,
+        "CS calls handled by the agent": 26879999.999999996
+      },
+      "gross_month": 119657435.89743589,
+      "gross_pct": 0.2530203574113701,
+      "net_month": 98755635.89743589,
+      "net_pct": 0.20882267870568502,
+      "net_year": 1185067630.7692306,
+      "hardware_payback_months": 0.8748867769909556
+    },
+    {
+      "setup": "local_first",
+      "messaging": "risky_only",
+      "scenario": "best_in_class",
+      "cost_items": {
+        "OpenAI API fallback (10% of LLM calls, gpt-5-mini)": 229320.0,
+        "OpenAI TTS for dynamic phrases (gpt-4o-mini-tts)": 608400.0,
+        "Local models: gpt-oss-20b, PhoWhisper, Piper TTS": 0,
+        "Viettel Mobile SIP trunk (calls + line)": 3185600,
+        "Zalo ZNS (risky only)": 11250000,
+        "Electricity (≈ 272 kWh)": 816479.9999999999,
+        "Business fibre with static IP": 800000,
+        "Off-site encrypted backup (Amazon S3, ~10 GB)": 52000,
+        "Remote ops 0.1 FTE (shared across hubs)": 3600000,
+        "Hardware upkeep reserve (5% of hardware a year)": 360000.0
+      },
+      "cost_month": 20901800.0,
+      "saving_items": {
+        "Return fees avoided": 153600000.0,
+        "Redelivery attempts avoided": 20160000.000000004,
+        "Courier door time saved": 11794871.794871798,
+        "CS calls handled by the agent": 29120000.0
+      },
+      "gross_month": 214674871.7948718,
+      "gross_pct": 0.45393846509744956,
+      "net_month": 193773071.7948718,
+      "net_pct": 0.40974078639176453,
+      "net_year": 2325276861.5384617,
+      "hardware_payback_months": 0.44588238809292885
+    },
+    {
+      "setup": "local_first",
+      "messaging": "all_orders",
+      "scenario": "conservative",
+      "cost_items": {
+        "OpenAI API fallback (10% of LLM calls, gpt-5-mini)": 229320.0,
+        "OpenAI TTS for dynamic phrases (gpt-4o-mini-tts)": 608400.0,
+        "Local models: gpt-oss-20b, PhoWhisper, Piper TTS": 0,
+        "Viettel Mobile SIP trunk (calls + line)": 3185600,
+        "Zalo ZNS (all orders)": 54990000,
+        "Electricity (≈ 272 kWh)": 816479.9999999999,
+        "Business fibre with static IP": 800000,
+        "Off-site encrypted backup (Amazon S3, ~10 GB)": 52000,
+        "Remote ops 0.1 FTE (shared across hubs)": 3600000,
+        "Hardware upkeep reserve (5% of hardware a year)": 360000.0
+      },
+      "cost_month": 64641800.0,
+      "saving_items": {
+        "Return fees avoided": 57600000.0,
+        "Redelivery attempts avoided": 0.0,
+        "Courier door time saved": 0.0,
+        "CS calls handled by the agent": 17920000.0
+      },
+      "gross_month": 75520000.0,
+      "gross_pct": 0.15969001214504655,
+      "net_month": 10878200.0,
+      "net_pct": 0.023002382019547744,
+      "net_year": 130538400.0,
+      "hardware_payback_months": 7.942490485558272
+    },
+    {
+      "setup": "local_first",
+      "messaging": "all_orders",
+      "scenario": "base",
+      "cost_items": {
+        "OpenAI API fallback (10% of LLM calls, gpt-5-mini)": 229320.0,
+        "OpenAI TTS for dynamic phrases (gpt-4o-mini-tts)": 608400.0,
+        "Local models: gpt-oss-20b, PhoWhisper, Piper TTS": 0,
+        "Viettel Mobile SIP trunk (calls + line)": 3185600,
+        "Zalo ZNS (all orders)": 54990000,
+        "Electricity (≈ 272 kWh)": 816479.9999999999,
+        "Business fibre with static IP": 800000,
+        "Off-site encrypted backup (Amazon S3, ~10 GB)": 52000,
+        "Remote ops 0.1 FTE (shared across hubs)": 3600000,
+        "Hardware upkeep reserve (5% of hardware a year)": 360000.0
+      },
+      "cost_month": 64641800.0,
+      "saving_items": {
+        "Return fees avoided": 76800000.0,
+        "Redelivery attempts avoided": 10079999.999999994,
+        "Courier door time saved": 5897435.897435894,
+        "CS calls handled by the agent": 26879999.999999996
+      },
+      "gross_month": 119657435.89743589,
+      "gross_pct": 0.2530203574113701,
+      "net_month": 55015635.89743589,
+      "net_pct": 0.11633272728587125,
+      "net_year": 660187630.7692306,
+      "hardware_payback_months": 1.5704626255901704
+    },
+    {
+      "setup": "local_first",
+      "messaging": "all_orders",
+      "scenario": "best_in_class",
+      "cost_items": {
+        "OpenAI API fallback (10% of LLM calls, gpt-5-mini)": 229320.0,
+        "OpenAI TTS for dynamic phrases (gpt-4o-mini-tts)": 608400.0,
+        "Local models: gpt-oss-20b, PhoWhisper, Piper TTS": 0,
+        "Viettel Mobile SIP trunk (calls + line)": 3185600,
+        "Zalo ZNS (all orders)": 54990000,
+        "Electricity (≈ 272 kWh)": 816479.9999999999,
+        "Business fibre with static IP": 800000,
+        "Off-site encrypted backup (Amazon S3, ~10 GB)": 52000,
+        "Remote ops 0.1 FTE (shared across hubs)": 3600000,
+        "Hardware upkeep reserve (5% of hardware a year)": 360000.0
+      },
+      "cost_month": 64641800.0,
+      "saving_items": {
+        "Return fees avoided": 153600000.0,
+        "Redelivery attempts avoided": 20160000.000000004,
+        "Courier door time saved": 11794871.794871798,
+        "CS calls handled by the agent": 29120000.0
+      },
+      "gross_month": 214674871.7948718,
+      "gross_pct": 0.45393846509744956,
+      "net_month": 150033071.7948718,
+      "net_pct": 0.3172508349719508,
+      "net_year": 1800396861.5384617,
+      "hardware_payback_months": 0.5758730323013568
+    },
+    {
+      "setup": "aws_managed",
+      "messaging": "risky_only",
+      "scenario": "conservative",
+      "cost_items": {
+        "AWS platform (EKS, EC2, RDS Multi-AZ, …, 1-year commitment)": 27794000,
+        "Bedrock + Transcribe + Connect + TTS": 20381400.0,
+        "Zalo ZNS (risky only)": 11250000,
+        "Ops 0.25 FTE": 9000000
+      },
+      "cost_month": 68425400.0,
+      "saving_items": {
+        "Return fees avoided": 57600000.0,
+        "Redelivery attempts avoided": 0.0,
+        "Courier door time saved": 0.0,
+        "CS calls handled by the agent": 17920000.0
+      },
+      "gross_month": 75520000.0,
+      "gross_pct": 0.15969001214504655,
+      "net_month": 7094600.0,
+      "net_pct": 0.015001810913191834,
+      "net_year": 85135200.0,
+      "hardware_payback_months": null
+    },
+    {
+      "setup": "aws_managed",
+      "messaging": "risky_only",
+      "scenario": "base",
+      "cost_items": {
+        "AWS platform (EKS, EC2, RDS Multi-AZ, …, 1-year commitment)": 27794000,
+        "Bedrock + Transcribe + Connect + TTS": 20381400.0,
+        "Zalo ZNS (risky only)": 11250000,
+        "Ops 0.25 FTE": 9000000
+      },
+      "cost_month": 68425400.0,
+      "saving_items": {
+        "Return fees avoided": 76800000.0,
+        "Redelivery attempts avoided": 10079999.999999994,
+        "Courier door time saved": 5897435.897435894,
+        "CS calls handled by the agent": 26879999.999999996
+      },
+      "gross_month": 119657435.89743589,
+      "gross_pct": 0.2530203574113701,
+      "net_month": 51232035.89743589,
+      "net_pct": 0.10833215617951535,
+      "net_year": 614784430.7692306,
+      "hardware_payback_months": null
+    },
+    {
+      "setup": "aws_managed",
+      "messaging": "risky_only",
+      "scenario": "best_in_class",
+      "cost_items": {
+        "AWS platform (EKS, EC2, RDS Multi-AZ, …, 1-year commitment)": 27794000,
+        "Bedrock + Transcribe + Connect + TTS": 20381400.0,
+        "Zalo ZNS (risky only)": 11250000,
+        "Ops 0.25 FTE": 9000000
+      },
+      "cost_month": 68425400.0,
+      "saving_items": {
+        "Return fees avoided": 153600000.0,
+        "Redelivery attempts avoided": 20160000.000000004,
+        "Courier door time saved": 11794871.794871798,
+        "CS calls handled by the agent": 29120000.0
+      },
+      "gross_month": 214674871.7948718,
+      "gross_pct": 0.45393846509744956,
+      "net_month": 146249471.7948718,
+      "net_pct": 0.30925026386559484,
+      "net_year": 1754993661.5384617,
+      "hardware_payback_months": null
+    },
+    {
+      "setup": "aws_managed",
+      "messaging": "all_orders",
+      "scenario": "conservative",
+      "cost_items": {
+        "AWS platform (EKS, EC2, RDS Multi-AZ, …, 1-year commitment)": 27794000,
+        "Bedrock + Transcribe + Connect + TTS": 20381400.0,
+        "Zalo ZNS (all orders)": 54990000,
+        "Ops 0.25 FTE": 9000000
+      },
+      "cost_month": 112165400.0,
+      "saving_items": {
+        "Return fees avoided": 57600000.0,
+        "Redelivery attempts avoided": 0.0,
+        "Courier door time saved": 0.0,
+        "CS calls handled by the agent": 17920000.0
+      },
+      "gross_month": 75520000.0,
+      "gross_pct": 0.15969001214504655,
+      "net_month": -36645400.0,
+      "net_pct": -0.07748814050662195,
+      "net_year": -439744800.0,
+      "hardware_payback_months": null
+    },
+    {
+      "setup": "aws_managed",
+      "messaging": "all_orders",
+      "scenario": "base",
+      "cost_items": {
+        "AWS platform (EKS, EC2, RDS Multi-AZ, …, 1-year commitment)": 27794000,
+        "Bedrock + Transcribe + Connect + TTS": 20381400.0,
+        "Zalo ZNS (all orders)": 54990000,
+        "Ops 0.25 FTE": 9000000
+      },
+      "cost_month": 112165400.0,
+      "saving_items": {
+        "Return fees avoided": 76800000.0,
+        "Redelivery attempts avoided": 10079999.999999994,
+        "Courier door time saved": 5897435.897435894,
+        "CS calls handled by the agent": 26879999.999999996
+      },
+      "gross_month": 119657435.89743589,
+      "gross_pct": 0.2530203574113701,
+      "net_month": 7492035.897435889,
+      "net_pct": 0.01584220475970156,
+      "net_year": 89904430.76923066,
+      "hardware_payback_months": null
+    },
+    {
+      "setup": "aws_managed",
+      "messaging": "all_orders",
+      "scenario": "best_in_class",
+      "cost_items": {
+        "AWS platform (EKS, EC2, RDS Multi-AZ, …, 1-year commitment)": 27794000,
+        "Bedrock + Transcribe + Connect + TTS": 20381400.0,
+        "Zalo ZNS (all orders)": 54990000,
+        "Ops 0.25 FTE": 9000000
+      },
+      "cost_month": 112165400.0,
+      "saving_items": {
+        "Return fees avoided": 153600000.0,
+        "Redelivery attempts avoided": 20160000.000000004,
+        "Courier door time saved": 11794871.794871798,
+        "CS calls handled by the agent": 29120000.0
+      },
+      "gross_month": 214674871.7948718,
+      "gross_pct": 0.45393846509744956,
+      "net_month": 102509471.7948718,
+      "net_pct": 0.2167603124457811,
+      "net_year": 1230113661.5384617,
+      "hardware_payback_months": null
+    }
+  ]
+}

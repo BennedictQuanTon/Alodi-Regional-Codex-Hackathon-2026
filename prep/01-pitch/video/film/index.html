@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Alodi film</title>
+<style>
+@font-face { font-family: "Geist"; src: url("../../charts/fonts/Geist.ttf") format("truetype"); font-weight: 100 900; }
+@font-face { font-family: "Geist Mono"; src: url("../../charts/fonts/GeistMono.ttf") format("truetype"); font-weight: 100 900; }
+:root { --navy:#1F2A44; --deep:#121A2C; --orange:#F05A00; --parch:#F6F3F1; --slate:#5A6173; --slate2:#B8BFCF; --blue:#3F5FAE; --blue2:#6D8AD6; --line:#E2DCD6; --track:#E9E3DE; }
+html, body { margin: 0; background: #000; }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--deep); font-family: "Geist", sans-serif; color: var(--navy); -webkit-font-smoothing: antialiased; }
+.abs { position: absolute; }
+.layer { position: absolute; inset: 0; }
+.mono { font-family: "Geist Mono", monospace; letter-spacing: .04em; text-transform: uppercase; }
+.k { position: absolute; font-weight: 500; letter-spacing: -0.025em; line-height: 1.04; white-space: nowrap; }
+.k span { display: inline-block; will-change: transform, opacity, filter; }
+.acc { color: var(--orange); }
+.num { position: absolute; font-weight: 600; letter-spacing: -0.035em; line-height: .95; white-space: nowrap; }
+.src { position: absolute; left: 96px; bottom: 52px; font-family: "Geist Mono", monospace; font-size: 19px; letter-spacing: .02em; color: var(--slate); white-space: nowrap; }
+.label { position: absolute; font-family: "Geist Mono", monospace; font-size: 20px; letter-spacing: .08em; text-transform: uppercase; }
+.dev { position: absolute; overflow: hidden; }
+.dev video { position: absolute; top: 0; left: 0; }
+.card { position: absolute; background: #fff; border-radius: 24px; box-shadow: 0 1px 0 rgba(18,26,44,.04), 0 24px 60px -24px rgba(18,26,44,.08); }
+.pill { position: absolute; display: flex; align-items: center; gap: 14px; padding: 14px 22px 14px 16px; border-radius: 999px; background: #fff; font-family: "Geist Mono", monospace; font-size: 20px; letter-spacing: .03em; box-shadow: 0 18px 40px -18px rgba(18,26,44,.08); white-space: nowrap; }
+.tag { position: absolute; font-family: "Geist Mono", monospace; font-size: 16px; letter-spacing: .08em; padding: 7px 12px; border-radius: 10px; border: 1.5px solid var(--orange); color: var(--orange); }
+.bar { position: absolute; height: 100%; top: 0; }
+.dot { position: absolute; border-radius: 50%; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+// ------------------------------------------------------------------ helpers
+const S = document.getElementById("stage");
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, d) => clamp((t - a) / d);
+const eo = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));           // out-expo
+const eio = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2); // in-out cubic
+const spring = (x) => (x <= 0 ? 0 : 1 - Math.exp(-7 * x) * Math.cos(9 * x));
+const lerp = (a, b, k) => a + (b - a) * k;
+function el(tag, cls, parent, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; (parent || S).appendChild(e); return e; }
+function css(e, o) { Object.assign(e.style, o); return e; }
+function show(e, t, a, b, fi = 0.35, fo = 0.35) {
+  const v = t >= a - 0.001 && t <= b + fo;
+  e.style.display = v ? "" : "none";
+  if (v) e.style.opacity = Math.min(eo(P(t, a, fi)), 1 - eio(P(t, b, fo)));
+  return v;
+}
+const fmtM = (v) => `${Math.round(v)}M`;
+
+// kinetic words; *word* = accent
+function Kinetic(parent, text, o = {}) {
+  const box = el("div", "k", parent);
+  css(box, { left: (o.x ?? 0) + "px", top: (o.y ?? 0) + "px", fontSize: (o.size ?? 72) + "px", color: o.color ?? "var(--navy)", textAlign: o.align ?? "left", width: o.w ? o.w + "px" : "" });
+  if (o.align === "center") { box.style.transform = "translateX(-50%)"; }
+  const lines = text.split("\n");
+  const spans = [];
+  lines.forEach((ln, li) => {
+    const line = el("div", "", box);
+    ln.split(" ").forEach((w, i, arr) => {
+      const acc = /^\*.*\*[.,?!]*$/.test(w);
+      const s = el("span", acc ? "acc" : "", line, w.replace(/\*/g, "") + (i < arr.length - 1 ? "&nbsp;" : ""));
+      spans.push(s);
+    });
+  });
+  return {
+    box,
+    update(t, at, out, st = o.stagger ?? 0.09) {
+      const vis = t >= at - 0.05 && t <= out + 0.6;
+      box.style.display = vis ? "" : "none";
+      if (!vis) return;
+      const e = eio(P(t, out, 0.45));
+      spans.forEach((s, i) => {
+        const k = eo(P(t, at + i * st, 0.6));
+        s.style.opacity = k * (1 - e);
+        s.style.transform = `translateY(${(1 - k) * 0.42 - e * 0.18}em)`;
+        s.style.filter = `blur(${(1 - k) * 9 + e * 7}px)`;
+      });
+    },
+  };
+}
+
+// numbers that count up
+function Counter(parent, o) {
+  const e = el("div", "num", parent);
+  css(e, { left: o.x + "px", top: o.y + "px", fontSize: (o.size ?? 180) + "px", color: o.color ?? "var(--navy)" });
+  if (o.align === "right") css(e, { left: "", right: (1920 - o.x) + "px" });
+  return {
+    e,
+    update(t, at, d, from, to, fmt) {
+      const k = eo(P(t, at, d));
+      e.textContent = fmt(lerp(from, to, k));
+      e.style.transform = `translateY(${(1 - eo(P(t, at, 0.5))) * 26}px)`;
+      e.style.filter = `blur(${(1 - eo(P(t, at, 0.5))) * 8}px)`;
+    },
+  };
+}
+
+// recorded UI clips, cropped to the device
+const CLIPS = {
+  courier: { w: 560, h: 1000, crop: [72, 4, 416, 858], r: 58 },
+  buyer: { w: 560, h: 1000, crop: [72, 4, 416, 858], r: 58 },
+  ops: { w: 1280, h: 1000, crop: [70, 2, 1140, 896], r: 30 },
+  control: { w: 1600, h: 1000, crop: [0, 0, 1600, 1000], r: 14 },
+};
+const REG = [];
+function Device(parent, run, kind, at) {
+  const c = CLIPS[kind];
+  const root = el("div", "dev", parent);
+  const v = el("video", "", root);
+  v.src = `../clips/${run}-${kind}.mp4`; v.muted = true; v.preload = "auto"; v.playsInline = true;
+  const d = { root, v, at, kind, c };
+  d.place = (x, y, h, extra = {}) => {
+    const s = h / c.crop[3];
+    css(root, { left: x + "px", top: y + "px", width: c.crop[2] * s + "px", height: h + "px", borderRadius: c.r * s + "px", ...extra });
+    css(v, { width: c.w * s + "px", height: c.h * s + "px", left: -c.crop[0] * s + "px", top: -c.crop[1] * s + "px" });
+    d.s = s; d.w = c.crop[2] * s; d.h = h;
+    return d;
+  };
+  REG.push(d);
+  return d;
+}
+async function seekAll(t) {
+  await Promise.all(REG.map(async (d) => {
+    const want = d.at(t);
+    if (want == null || d.root.offsetParent === null) return;
+    const v = d.v;
+    if (v.readyState < 2) await new Promise((r) => { v.addEventListener("loadeddata", r, { once: true }); setTimeout(r, 4000); });
+    const target = Math.max(0, Math.min(want, (v.duration || 999) - 0.04));
+    if (Math.abs(v.currentTime - target) < 0.004) return;
+    await new Promise((res) => {
+      const done = () => { v.removeEventListener("seeked", done); res(); };
+      v.addEventListener("seeked", done);
+      v.currentTime = target;
+      setTimeout(done, 3000);
+    });
+  }));
+}
+const map = (t0, c0, speed = 1) => (t) => c0 + (t - t0) * speed;
+
+// brand mark C: ring + three sound bars
+function Mark(parent, size, o = {}) {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", "0 0 512 512");
+  css(svg, { position: "absolute", width: size + "px", height: size + "px", overflow: "visible" });
+  parent.appendChild(svg);
+  const ring = document.createElementNS(ns, "circle");
+  [["cx", 256], ["cy", 256], ["r", 184.08], ["fill", "none"], ["stroke", "#F05A00"], ["stroke-width", 103.84]].forEach(([k, v]) => ring.setAttribute(k, v));
+  ring.setAttribute("transform", "rotate(-90 256 256)");
+  const C = 2 * Math.PI * 184.08;
+  ring.setAttribute("stroke-dasharray", C);
+  svg.appendChild(ring);
+  const track = o.track ? (() => { const tr = ring.cloneNode(); tr.setAttribute("stroke", o.track); tr.setAttribute("stroke-dashoffset", 0); svg.insertBefore(tr, ring); return tr; })() : null;
+  const bars = (o.noBars ? [] : [[187.28, 81.94], [242.78, 148.02], [298.29, 81.94]]).map(([x, h]) => {
+    const r = document.createElementNS(ns, "rect");
+    r.setAttribute("x", x); r.setAttribute("width", 26.43); r.setAttribute("rx", 13.22); r.setAttribute("fill", o.bar ?? "#1F2A44");
+    svg.appendChild(r);
+    return { r, h };
+  });
+  return {
+    svg,
+    ring(k) { ring.setAttribute("stroke-dashoffset", C * (1 - k)); },
+    bars(ks) { bars.forEach((b, i) => { const h = Math.max(26.43, b.h * ks[i]); b.r.setAttribute("height", h); b.r.setAttribute("y", 256 - h / 2); }); },
+  };
+}
+
+// ring + check (brand mark B) for passed rules
+function checkSVG(color = "#1F2A44", ring = "#F05A00", size = 34) {
+  return `<svg viewBox="0 0 512 512" width="${size}" height="${size}"><circle cx="256" cy="256" r="184" fill="none" stroke="${ring}" stroke-width="104"/><path d="M178 262 l56 54 l104 -112" fill="none" stroke="${color}" stroke-width="54" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+// ------------------------------------------------------------------ build
+let T;
+const L = {};
+function layer(name) { const l = el("div", "layer", S); l.dataset.scene = name; L[name] = l; return l; }
+
+function build() {
+  const sc = T.scenes;
+  // global: background + section label + sources
+  const bg = el("div", "layer", S); L.bg = bg;
+  const section = el("div", "label", S); css(section, { left: "96px", top: "64px", fontSize: "18px" }); L.section = section;
+
+  // 1 · HOOK ---------------------------------------------------------------
+  { const l = layer("hook");
+    L.caret = css(el("div", "abs", l), { left: "958px", top: "490px", width: "4px", height: "96px", background: "#F6F3F1", borderRadius: "2px" });
+    L.h1 = Kinetic(l, "Have you ever", { x: 960, y: 470, size: 92, color: "#F6F3F1", align: "center" });
+    L.h2 = Kinetic(l, "missed the courier’s call", { x: 960, y: 470, size: 92, color: "#F6F3F1", align: "center" });
+    L.h3 = Kinetic(l, "in the middle of a *meeting?*", { x: 960, y: 470, size: 92, color: "#F6F3F1", align: "center" });
+    // lock screen
+    const ph = css(el("div", "abs", l), { left: "300px", top: "120px", width: "420px", height: "860px", borderRadius: "64px", background: "#0B1120", border: "14px solid #1F2A44", boxSizing: "border-box" });
+    L.lock = ph;
+    css(el("div", "abs", ph, "10:02"), { left: 0, right: 0, top: "120px", textAlign: "center", fontSize: "96px", fontWeight: 300, color: "#F6F3F1", letterSpacing: "-0.03em" });
+    css(el("div", "abs mono", ph, "Saturday 31 October"), { left: 0, right: 0, top: "92px", textAlign: "center", fontSize: "15px", color: "#B8BFCF" });
+    css(el("div", "abs", ph), { left: "50%", top: "18px", width: "120px", height: "34px", marginLeft: "-60px", borderRadius: "20px", background: "#000" });
+    L.notes = [["Courier · SPX", "Missed call"], ["Courier · SPX", "Missed call (2)"], ["Shopee", "Your parcel is being returned to the seller."]].map(([a, b], i) => {
+      const n = css(el("div", "abs", ph), { left: "20px", right: "20px", top: 300 + i * 112 + "px", borderRadius: "22px", background: "rgba(246,243,241,.12)", padding: "16px 18px", color: "#F6F3F1" });
+      el("div", "mono", n, a).style.cssText = "font-size:13px;color:#B8BFCF;margin-bottom:6px";
+      el("div", "", n, b).style.cssText = `font-size:${i === 2 ? 21 : 22}px;line-height:1.25;font-weight:500`;
+      return n;
+    });
+    L.h4 = Kinetic(l, "Then your parcel\n*goes back.*", { x: 860, y: 430, size: 96, color: "#F6F3F1" });
+  }
+
+  // 2 · SURVEY -------------------------------------------------------------
+  { const l = layer("survey");
+    L.s_t = Kinetic(l, "Buyers and couriers\n*told us.*", { x: 96, y: 170, size: 84 });
+    L.s_tag = css(el("div", "tag", l, "MOCK DATA · REPLACE WITH SURVEY RESULTS"), { left: "96px", top: "128px" });
+    L.s_rows = [[56, "courier called while I was busy"], [81, "had to remind the courier"], [86, "want to choose a delivery time"]].map(([v, lab], i) => {
+      const y = 470 + i * 150;
+      const c = Counter(l, { x: 96, y, size: 92 });
+      const lb = css(el("div", "abs", l, lab), { left: "330px", top: y + 18 + "px", fontSize: "30px", color: "var(--navy)" });
+      const tr = css(el("div", "abs", l), { left: "330px", top: y + 72 + "px", width: "620px", height: "10px", background: "var(--track)", borderRadius: "5px", overflow: "hidden" });
+      const fill = css(el("div", "bar", tr), { left: 0, background: i === 2 ? "var(--orange)" : "var(--blue)", borderRadius: "5px" });
+      return { c, v, lb, fill };
+    });
+    L.s_dots = Array.from({ length: 12 }, (_, i) => css(el("div", "dot", l), { left: 1180 + (i % 6) * 96 + "px", top: 500 + Math.floor(i / 6) * 96 + "px", width: "68px", height: "68px", background: i < 10 ? "var(--orange)" : "#C9C3BD" }));
+    L.s_d = Kinetic(l, "10 of 12 couriers want it.\nNone said no.", { x: 1180, y: 720, size: 40, stagger: 0.05 });
+  }
+
+  // 3 · FEE ----------------------------------------------------------------
+  { const l = layer("fee");
+    const card = css(el("div", "card", l), { left: "96px", top: "250px", width: "820px", height: "520px", overflow: "hidden" });
+    L.f_card = card;
+    const bar = css(el("div", "abs mono", card, "help.shopee.vn · Return &amp; Refund Policy §7.1"), { left: "32px", top: "28px", fontSize: "16px", color: "var(--slate)", textTransform: "none", letterSpacing: ".02em" });
+    css(el("div", "abs", card), { left: 0, right: 0, top: "76px", height: "1px", background: "var(--line)" });
+    [0, 1, 2, 4, 5].forEach((i) => css(el("div", "abs", card), { left: "32px", top: 120 + i * 62 + "px", width: [700, 640, 690, 0, 610, 520][i] + "px", height: "14px", borderRadius: "7px", background: "#EEE9E5" }));
+    css(el("div", "abs", card, "If delivery fails, the <b>seller pays the return shipping</b>: up to <b>40,000 VND</b> per order."), { left: "32px", top: "296px", width: "740px", fontSize: "30px", lineHeight: 1.3, color: "var(--navy)" });
+    L.f_ul = css(el("div", "abs", card), { left: "32px", top: "380px", height: "5px", background: "var(--orange)", borderRadius: "3px", width: "0px" });
+    L.f_num = Counter(l, { x: 990, y: 380, size: 150 });
+    L.f_cap = Kinetic(l, "per failed order,\npaid by the seller", { x: 1006, y: 580, size: 46, stagger: 0.05 });
+    L.f_src = el("div", "src", l, "Source: Shopee Return &amp; Refund Policy §7.1 · effective 11 Mar 2026");
+  }
+
+  // 4 · REFUSED ------------------------------------------------------------
+  { const l = layer("refused");
+    L.r_num = Counter(l, { x: 96, y: 250, size: 230 });
+    L.r_cap = Kinetic(l, "of orders are *refused* at the door", { x: 104, y: 500, size: 48, stagger: 0.05 });
+    L.r_rows = [["Nationwide", 8, 12], ["Today (expert)", 10, 15], ["Remote areas", 0, 20], ["Sale season", 25, 30]].map(([lab, lo, hi], i) => {
+      const y = 300 + i * 120;
+      const lb = css(el("div", "abs", l, lab), { left: "1060px", top: y + "px", fontSize: "26px", color: "var(--slate)" });
+      const tr = css(el("div", "abs", l), { left: "1060px", top: y + 44 + "px", width: "720px", height: "16px" });
+      const base = css(el("div", "bar", tr), { left: 0, background: "var(--track)", borderRadius: "3px" });
+      const f = css(el("div", "bar", tr), { background: hi === 30 ? "var(--orange)" : "var(--blue)", borderRadius: "3px" });
+      const v = css(el("div", "abs", l, lo ? `${lo}–${hi}%` : `up to ${hi}%`), { top: y + 34 + "px", fontSize: "26px", fontWeight: 500 });
+      return { lo, hi, base, f, v, lb };
+    });
+    L.r_src = el("div", "src", l, "Source: VECOM and Tran Anh Tung (UEF) · Nguoi Lao Dong, 19 Jul 2025");
+  }
+
+  // 5 · ZERO ---------------------------------------------------------------
+  { const l = layer("zero");
+    L.z_q = css(el("div", "abs", l), { left: "96px", top: "300px", width: "1500px", fontFamily: "'Geist Mono', monospace", fontSize: "44px", lineHeight: 1.3, color: "var(--navy)" });
+    L.z_qtext = "“Shopee does not yet support choosing a specific delivery time.”";
+    L.z_num = css(el("div", "num", l, "0"), { left: "96px", top: "470px", fontSize: "300px", color: "var(--orange)" });
+    L.z_cap = Kinetic(l, "ways for a buyer\nto pick a time", { x: 360, y: 560, size: 64, stagger: 0.06 });
+    L.z_src = el("div", "src", l, "Source: Shopee Help Center, article 79559");
+  }
+
+  // 6 · LOSS ---------------------------------------------------------------
+  { const l = layer("loss");
+    L.l_k = css(el("div", "label", l, "One area · 20 couriers · 4,000 orders a day"), { left: "96px", top: "200px", color: "var(--slate)" });
+    L.l_num = Counter(l, { x: 96, y: 250, size: 230 });
+    L.l_unit = Kinetic(l, "VND lost *every month*", { x: 104, y: 500, size: 56, stagger: 0.06 });
+    L.l_trk = css(el("div", "abs", l), { left: "96px", top: "680px", width: "1728px", height: "64px" });
+    const segs = [["Return fees", 288, "var(--orange)"], ["Courier pay for redelivery", 100.8, "var(--blue)"], ["CS calls", 44.8, "#5D78BF"], ["Courier time", 39.4, "#8EA2D3"]];
+    let acc = 0;
+    L.l_segs = segs.map(([lab, v, c], i) => {
+      const left = acc / 473 * 1728; acc += v;
+      const s = css(el("div", "bar", L.l_trk), { left: left + "px", width: (v / 473 * 1728 - 4) + "px", background: c, transformOrigin: "left", borderRadius: "4px" });
+      const tx = css(el("div", "abs", l, `<div style="font-weight:600;font-size:30px">${Math.round(v)}M</div><div style="font-size:20px;color:var(--slate);margin-top:4px;white-space:nowrap">${lab}</div>`), { left: 96 + left + "px", top: "764px" });
+      return { s, tx };
+    });
+    L.l_src = el("div", "src", l, "Modelled: Shopee §7.1 · VECOM 8% · Shipsy 25% rescue (vendor) · GHN 6–8k VND per order · Glints courier income · PRD §18.8");
+  }
+
+  // 7 · DROP ---------------------------------------------------------------
+  { const l = layer("drop");
+    L.d_wipe = css(el("div", "abs", S), { left: 0, top: 0, width: "1920px", height: "1080px", background: "var(--orange)", zIndex: 30, display: "none" });
+    const box = css(el("div", "abs", l), { left: "760px", top: "300px", width: "400px", height: "400px" });
+    L.d_mark = Mark(box, 400, { bar: "#F6F3F1" });
+    L.d_word = css(el("img", "abs", l), { left: "1220px", top: "390px", height: "150px" }); L.d_word.src = "../../../04-brand/logo/alodi-wordmark-white.svg";
+    L.d_tag = Kinetic(l, "Make the second drop land.", { x: 960, y: 800, size: 54, color: "#F6F3F1", align: "center", stagger: 0.07 });
+  }
+
+  // 8 · MOSAIC -------------------------------------------------------------
+  { const l = layer("mosaic");
+    L.m_t = Kinetic(l, "One agent. Four screens. *All live.*", { x: 96, y: 120, size: 72 });
+    const t0 = sc.mosaic[0];
+    const defs = [["courier", "01 · Courier · phone", 96, 330, 600], ["buyer", "02 · Buyer · phone", 420, 330, 600], ["ops", "03 · Ops · iPad", 750, 360, 470], ["control", "04 · Control · laptop", 1370, 430, 280]];
+    L.m_dev = defs.map(([k, lab, x, y, h]) => {
+      const d = Device(l, "main", k, (t) => (t >= sc.mosaic[0] - 0.5 && t <= sc.mosaic[1] + 0.5 ? clamp(0.3 + (t - t0) * 1.2, 0, 60) : null)).place(x, y, h);
+      if (k === "control") css(d.root, { boxShadow: "0 0 0 10px #1F2A44" });
+      const lb = css(el("div", "label", l, lab), { left: x + "px", top: y - 44 + "px", fontSize: "17px", color: "var(--slate)" });
+      return { d, lb, x, y };
+    });
+  }
+
+  // 9 · MORNING ------------------------------------------------------------
+  { const l = layer("morning");
+    L.mo_dev = Device(l, "main", "buyer", (t) => (t >= sc.morning[0] - 0.5 && t <= sc.morning[1] + 0.5 ? 2.6 + (t - sc.morning[0]) : null)).place(380, 120, 880);
+    L.mo_t = Kinetic(l, "Every morning,\n*ask first.*", { x: 1000, y: 360, size: 96 });
+    L.mo_s = Kinetic(l, "Windows from the route planner · pick ≥ 2", { x: 1006, y: 620, size: 30, color: "var(--slate)", stagger: 0.03 });
+  }
+
+  // 10 · TAP ---------------------------------------------------------------
+  { const l = layer("tap");
+    const t0 = sc.tap[0];
+    L.ta_dev = Device(l, "main", "courier", (t) => (t >= t0 - 0.5 && t <= sc.tap[1] + 0.5 ? 9.0 + (t - t0) * 1.35 : null)).place(380, 120, 880);
+    L.ta_dot = css(el("div", "abs", l), { width: "64px", height: "64px", borderRadius: "50%", background: "rgba(246,243,241,.35)", border: "3px solid #F6F3F1", boxSizing: "border-box", display: "none" });
+    L.ta_t = Kinetic(l, "One tap.\n*No typing.*", { x: 1000, y: 360, size: 96 });
+    L.ta_s = Kinetic(l, "No answer · Rescheduled · Refused", { x: 1006, y: 620, size: 30, color: "var(--slate)", stagger: 0.03 });
+  }
+
+  // 11 · CHAT --------------------------------------------------------------
+  { const l = layer("chat");
+    const t0 = sc.chat[0];
+    L.ch_b = Device(l, "main", "buyer", (t) => (t >= t0 - 0.5 && t <= sc.call[0] + 1.4 ? (t < sc.chat[1] ? 15.0 + (t - t0) * 0.6 : 22.0 + (t - sc.chat[1]) * 2.2) : null)).place(140, 230, 780);
+    L.ch_o = Device(l, "main", "ops", (t) => (t >= t0 - 0.5 && t <= sc.chat[1] + 0.5 ? 16.5 + (t - t0) * 1.05 : null)).place(720, 290, 600);
+    L.ch_t = Kinetic(l, "Chat first. Call on silence.", { x: 96, y: 120, size: 60, stagger: 0.06 });
+    L.ch_pill = css(el("div", "pill", l, `${checkSVG()}<span>08:00–20:30 · call 1 of 2 · policy OK</span>`), { left: "1080px", top: "930px" });
+  }
+
+  // 12 · CALL --------------------------------------------------------------
+  { const l = layer("call");
+    const [a, b] = sc.call;
+    const c1 = T.vo.c01, c2 = T.vo.c02;
+    L.ca_dev = Device(l, "main", "buyer", (t) => {
+      if (t < a - 0.5 || t > b + 0.5) return null;
+      if (t < c1) return 22.0 + (t - a) * 2.2;
+      if (t < c2) return 33.0 + (t - c1) * (2.9 / (T.durations.c01 + 0.2));
+      return 36.0 + (t - c2) * (2.9 / (T.durations.c02 + 0.2));
+    }).place(260, 80, 920);
+    const mb = css(el("div", "abs", l), { left: "920px", top: "170px", width: "220px", height: "220px" });
+    L.ca_mark = Mark(mb, 220, { bar: "#F6F3F1" });
+    L.ca_lab = css(el("div", "label", l), { left: "1180px", top: "220px", color: "#B8BFCF" });
+    L.ca_sub = css(el("div", "abs", l), { left: "920px", top: "470px", width: "880px", fontSize: "50px", lineHeight: 1.22, color: "#F6F3F1", fontWeight: 500, letterSpacing: "-0.02em" });
+    L.ca_meta = css(el("div", "label", l, "AI call 1 · 11:02 · recording consent: yes"), { left: "920px", top: "900px", fontSize: "17px", color: "#7C849A" });
+    L.ca_lines = {
+      c01: "Our courier missed you this morning. Tomorrow we have eight to twelve, or five to eight in the evening. Which works for you?",
+      c02: "Tomorrow after five, please. I’m out until late, so leave it with security in Tower B… or call my wife.",
+    };
+  }
+
+  // 13 · EXTRACT -----------------------------------------------------------
+  { const l = layer("extract");
+    const t0 = sc.extract[0];
+    L.ex_wrap = css(el("div", "abs", l), { left: "800px", top: "170px", width: "1030px", height: "800px", transformOrigin: "100% 25%" });
+    L.ex_dev = Device(L.ex_wrap, "main", "ops", (t) => (t >= t0 - 0.5 && t <= sc.extract[1] + 0.5 ? 44.6 + (t - t0) * 1.2 : null)).place(0, 0, 800);
+    L.ex_t = Kinetic(l, "One sentence →\n*three fields.*", { x: 96, y: 380, size: 80 });
+    L.ex_stamp = css(el("div", "pill", l, `${checkSVG()}<span>Auto-applied · every field ≥ 0.85</span>`), { left: "96px", top: "640px" });
+  }
+
+  // 14 · CARD --------------------------------------------------------------
+  { const l = layer("card");
+    const t0 = sc.card[0];
+    L.cd_dev = Device(l, "main", "courier", (t) => (t >= t0 - 0.5 && t <= sc.card[1] + 0.5 ? (t < t0 + 2.3 ? 49.0 + (t - t0) : 57.4 + (t - t0 - 2.3)) : null)).place(380, 120, 880);
+    L.cd_t = Kinetic(l, "The next courier knows\n*when, where, who.*", { x: 1000, y: 380, size: 76 });
+    L.cd_pill = css(el("div", "pill", l, `${checkSVG()}<span>Delivered · attempt 2</span>`), { left: "1006px", top: "640px" });
+  }
+
+  // 15 · REFUSE ------------------------------------------------------------
+  { const l = layer("refuse");
+    const t0 = sc.refuse[0];
+    L.rf_c = Device(l, "refuse", "courier", (t) => (t >= t0 - 0.5 && t <= sc.refuse[1] + 0.5 ? 10.4 + (t - t0) * 1.4 : null)).place(140, 230, 780);
+    L.rf_o = Device(l, "refuse", "ops", (t) => (t >= t0 - 0.5 && t <= sc.refuse[1] + 0.5 ? 16.0 + (t - t0) * 1.5 : null)).place(720, 290, 600);
+    L.rf_t = Kinetic(l, "High stakes stay *human.*", { x: 96, y: 120, size: 60, stagger: 0.06 });
+  }
+
+  // 16 · CORE --------------------------------------------------------------
+  { const l = layer("core");
+    L.co_t = Kinetic(l, "Under the hood", { x: 96, y: 150, size: 64, color: "#F6F3F1" });
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 1920 1080"); css(svg, { position: "absolute", left: 0, top: 0, width: "1920px", height: "1080px" });
+    l.appendChild(svg);
+    const N = {
+      tap: [250, 560, "Courier tap", "A · B · C"],
+      agent: [760, 560, "Alodi Agent", "gpt-oss-20b · on the area server"],
+      chat: [1250, 400, "Chat", "Shopee Chat · Zalo"],
+      call: [1250, 560, "AI call", "OpenAI TTS · PhoWhisper"],
+      ext: [1250, 720, "Extract", "Structured Outputs"],
+      guard: [1640, 560, "Policy guard", "code, not a prompt"],
+      api: [760, 330, "OpenAI API", "fallback · masked · hard 10%"],
+    };
+    const E = [["tap", "agent"], ["agent", "chat"], ["agent", "call"], ["agent", "ext"], ["chat", "guard"], ["call", "guard"], ["ext", "guard"], ["agent", "api"]];
+    L.co_edges = E.map(([a, b], i) => {
+      const [x1, y1] = N[a], [x2, y2] = N[b];
+      const p = document.createElementNS(ns, "path");
+      const mx = (x1 + x2) / 2;
+      p.setAttribute("d", a === "agent" && b === "api" ? `M${x1} ${y1 - 60} L${x2} ${y2 + 56}` : `M${x1 + 110} ${y1} C${mx} ${y1}, ${mx} ${y2}, ${x2 - 110} ${y2}`);
+      p.setAttribute("fill", "none"); p.setAttribute("stroke", b === "api" ? "#F05A00" : "#6D8AD6"); p.setAttribute("stroke-width", 2.5);
+      svg.appendChild(p);
+      const len = p.getTotalLength();
+      p.setAttribute("stroke-dasharray", len);
+      return { p, len };
+    });
+    L.co_nodes = Object.entries(N).map(([k, [x, y, t1, t2]], i) => {
+      const n = css(el("div", "abs", l), { left: x - 150 + "px", top: y - 56 + "px", width: "300px", height: "112px", borderRadius: "22px", background: k === "agent" ? "#F6F3F1" : "rgba(246,243,241,.07)", border: k === "agent" ? "none" : "1.5px solid rgba(246,243,241,.18)", boxSizing: "border-box", padding: "18px 22px", color: k === "agent" ? "#1F2A44" : "#F6F3F1" });
+      el("div", "", n, t1).style.cssText = "font-size:28px;font-weight:600;letter-spacing:-0.02em";
+      el("div", "mono", n, t2).style.cssText = `font-size:14px;margin-top:8px;color:${k === "agent" ? "#5A6173" : "#B8BFCF"};text-transform:none;letter-spacing:.02em`;
+      if (k === "agent" || k === "api") {
+        const img = css(el("img", "abs", n), { right: "20px", top: "18px", height: "34px", filter: k === "api" ? "invert(1)" : "none" });
+        img.src = "../../../05-assets/logos/tech/openai.svg";
+      }
+      return n;
+    });
+    L.co_order = ["tap", "agent", "chat", "call", "ext", "guard", "api"];
+    L.co_stack = css(el("div", "abs", l), { left: "96px", top: "880px", display: "flex", gap: "40px", alignItems: "center" });
+    [["openai", "OpenAI"], ["vinai-phowhisper", "PhoWhisper"], ["nextjs", "Next.js"], ["fastapi", "FastAPI"], ["postgresql", "PostgreSQL"], ["docker", "Docker"]].forEach(([f, n]) => {
+      const it = css(el("div", "", L.co_stack), { display: "flex", alignItems: "center", gap: "12px", color: "#B8BFCF", fontSize: "20px" });
+      const im = el("img", "", it); im.src = `../../../05-assets/logos/tech/${f}.${f.includes("phowhisper") ? "png" : "svg"}`; css(im, { height: "30px", filter: ["openai", "nextjs"].includes(f) ? "invert(1)" : "none" });
+      el("span", "", it, n);
+    });
+  }
+
+  // 17 · RULES -------------------------------------------------------------
+  { const l = layer("rules");
+    L.ru_lab = css(el("div", "label", l, "Structured Outputs · strict JSON"), { left: "96px", top: "180px", color: "#B8BFCF" });
+    L.ru_code = css(el("pre", "abs", l), { left: "96px", top: "230px", margin: 0, width: "960px", fontFamily: "'Geist Mono', monospace", fontSize: "25px", lineHeight: 1.55, color: "#F6F3F1" });
+    L.ru_text = `{\n  "time_window": {\n    "date": "2026-11-01", "from": "17:00", "to": "20:00",\n    "confidence": 0.94 },\n  "drop_location": {\n    "type": "security_desk", "note": "Tower B",\n    "confidence": 0.88 },\n  "alt_receiver": { "relation": "wife", "confidence": 0.91 },\n  "opt_out": false\n}`;
+    L.ru_lab2 = css(el("div", "label", l, "Policy guard · code, not a prompt"), { left: "1160px", top: "180px", color: "#B8BFCF" });
+    L.ru_rules = ["Calls only 08:00–20:30", "At most 2 calls per cycle", "Reschedule within 5 days", "Recording consent first", "Auto-apply only at ≥ 0.85", "Refused → no contact"].map((r, i) => {
+      const row = css(el("div", "abs", l, `${checkSVG("#F6F3F1", "#F05A00", 40)}<span>${r}</span>`), { left: "1160px", top: 250 + i * 96 + "px", display: "flex", alignItems: "center", gap: "20px", fontSize: "32px", color: "#F6F3F1", fontWeight: 500 });
+      return row;
+    });
+  }
+
+  // 18 · SAVE --------------------------------------------------------------
+  { const l = layer("save");
+    L.sv_k = css(el("div", "label", l, "One area · per month · projected"), { left: "96px", top: "180px", color: "var(--slate)" });
+    L.sv_t = Kinetic(l, "At best-in-class rescue rates", { x: 96, y: 220, size: 56, stagger: 0.05 });
+    L.sv_num = Counter(l, { x: 96, y: 330, size: 210 });
+    L.sv_cap = css(el("div", "abs", l), { left: "104px", top: "560px", fontSize: "34px", color: "var(--slate)" });
+    L.sv_trk = css(el("div", "abs", l), { left: "96px", top: "700px", width: "1728px", height: "72px" });
+    const before = [["Return fees", 288, 134.4], ["Redelivery", 100.8, 80.6], ["CS calls", 44.8, 15.7], ["Courier time", 39.4, 27.6]];
+    L.sv_segs = before.map(([lab, a, b], i) => ({ a, b, s: css(el("div", "bar", L.sv_trk), { background: ["#3F5FAE", "#5D78BF", "#8EA2D3", "#AFBDE0"][i], borderRadius: "4px" }) }));
+    L.sv_cost = css(el("div", "bar", L.sv_trk), { background: "#C9C3BD", borderRadius: "4px" });
+    L.sv_save = css(el("div", "bar", L.sv_trk), { background: "var(--orange)", borderRadius: "4px" });
+    L.sv_l1 = css(el("div", "abs", l), { top: "800px", fontSize: "22px", color: "var(--slate)" });
+    L.sv_l2 = css(el("div", "abs", l), { top: "800px", fontSize: "22px", color: "var(--navy)", fontWeight: 600 });
+    L.sv_src = el("div", "src", l, "Projected. Rescue 25% → 65% = Shipsy best-in-class 50–65% (vendor). Loss: Shopee §7.1, VECOM, GHN, Glints. PRD §18.8");
+  }
+
+  // 19 · SHARE -------------------------------------------------------------
+  { const l = layer("share");
+    const mb = css(el("div", "abs", l), { left: "150px", top: "230px", width: "560px", height: "560px" });
+    L.sh_mark = Mark(mb, 560, { track: "#E9E3DE", noBars: true });
+    L.sh_pct = css(el("div", "num", l), { left: "150px", top: "450px", width: "560px", textAlign: "center", fontSize: "120px", color: "var(--navy)" });
+    L.sh_pcap = css(el("div", "label", l, "of the loss, cut"), { left: "150px", top: "830px", width: "560px", textAlign: "center", color: "var(--slate)" });
+    L.sh_y = Counter(l, { x: 860, y: 220, size: 120 });
+    L.sh_yc = Kinetic(l, "VND saved a year", { x: 866, y: 360, size: 40, color: "var(--slate)", stagger: 0.05 });
+    L.sh_c = Kinetic(l, "Runs for *21M VND* a month:\n4% of what is lost.", { x: 866, y: 460, size: 48, stagger: 0.05 });
+    L.sh_tiles = [["6 s", "buyer’s answer → courier’s card"], ["65%", "of failed deliveries handled alone"]].map(([big, lab], i) => {
+      const c = css(el("div", "card", l), { left: 866 + i * 470 + "px", top: "660px", width: "440px", height: "230px" });
+      css(el("div", "abs mono", c, "Mock · target"), { left: "28px", top: "24px", fontSize: "15px", color: "var(--slate)" });
+      css(el("div", "num abs", c, big), { left: "28px", top: "64px", fontSize: "88px" });
+      css(el("div", "abs", c, lab), { left: "28px", top: "168px", fontSize: "22px", color: "var(--slate)" });
+      return c;
+    });
+    L.sh_src = el("div", "src", l, "Projected (Shipsy best-in-class, vendor) · running cost: Viettel SIP, Zalo ZNS, EVN tariff, OpenAI fallback · PRD §18.8");
+  }
+
+  // 20 · END ---------------------------------------------------------------
+  { const l = layer("end");
+    L.en_team = [["nomura-yoshio", "Nomura Yoshio", "Team Lead · Presenter"], ["long-quan-ton", "Long Quan Ton", "AI Engineer · Architect"], ["khanh-tuong-huynh", "Khanh Tuong Huynh", "AI Engineer · Deployment"], ["thanh-loi-tran", "Thanh Loi Tran", "Data Engineer · Backend"]].map(([f, n, r], i) => {
+      const box = css(el("div", "abs", l), { left: 210 + i * 400 + "px", top: "330px", width: "300px", textAlign: "center", color: "#F6F3F1" });
+      const im = el("img", "", box); im.src = `../../../05-assets/team/${f}.jpg`; css(im, { width: "200px", height: "200px", borderRadius: "50%", objectFit: "cover", filter: "grayscale(0.15)" });
+      el("div", "", box, n).style.cssText = "font-size:30px;font-weight:600;margin-top:26px;letter-spacing:-0.02em";
+      el("div", "mono", box, r).style.cssText = "font-size:15px;color:#B8BFCF;margin-top:10px";
+      return box;
+    });
+    L.en_dev = css(el("div", "label", l, "Team Develarper"), { left: 0, right: 0, top: "220px", textAlign: "center", color: "#B8BFCF" });
+    const mb = css(el("div", "abs", l), { left: "560px", top: "330px", width: "300px", height: "300px" });
+    L.en_mark = Mark(mb, 300, { bar: "#F6F3F1" });
+    L.en_word = css(el("img", "abs", l), { left: "900px", top: "400px", height: "120px" }); L.en_word.src = "../../../04-brand/logo/alodi-wordmark-white.svg";
+    L.en_tag = Kinetic(l, "Make the second drop land.", { x: 960, y: 740, size: 56, color: "#F6F3F1", align: "center", stagger: 0.07 });
+  }
+}
+
+// ------------------------------------------------------------------ render
+const NIGHT = [["hook"], ["drop"], ["call"], ["core", "rules"], ["end"]];
+function isNight(t) {
+  const s = T.scenes;
+  return (t < s.hook[1]) || (t >= s.drop[0] && t < s.drop[1]) || (t >= s.call[0] && t < s.call[1]) || (t >= s.core[0] && t < s.rules[1]) || t >= s.end[0];
+}
+
+function render(t) {
+  const s = T.scenes;
+  // background crossfade
+  const night = isNight(t);
+  S.style.background = night ? "#121A2C" : "#F6F3F1";
+  // section label
+  const sec = t < s.survey[0] ? "" : t < s.drop[0] ? "01 · The problem" : t < s.mosaic[0] ? "" : t < s.core[0] ? "02 · The product, live" : t < s.save[0] ? "03 · OpenAI at the core" : t < s.end[0] ? "04 · The output" : "";
+  L.section.textContent = sec;
+  css(L.section, { color: night ? "#7C849A" : "#8A8F9C", display: sec ? "" : "none" });
+
+  // HOOK
+  if (show(L.hook, t, 0, s.hook[1] - 0.3, 0.01, 0.35)) {
+    L.caret.style.display = t < 0.45 ? "" : "none";
+    L.caret.style.opacity = Math.floor(t * 4) % 2 ? 0.2 : 1;
+    L.h1.update(t, 0.4, 1.2); L.h2.update(t, 1.3, 2.45); L.h3.update(t, 2.6, 4.1);
+    const lv = show(L.lock, t, 4.3, 8.4, 0.5, 0.45);
+    if (lv) {
+      const shake = (t > 4.5 && t < 4.8) || (t > 5.15 && t < 5.45) ? Math.sin(t * 120) * 4 : 0;
+      L.lock.style.transform = `translateY(${(1 - eo(P(t, 4.3, 0.8))) * 60}px) translateX(${shake}px)`;
+      [4.5, 5.15, 5.8].forEach((a, i) => {
+        const n = L.notes[i];
+        const k = spring(P(t, a, 0.6));
+        n.style.opacity = clamp(k * 2) * (i < 2 && t > 6.4 ? 0.45 : 1);
+        n.style.transform = `translateY(${(1 - k) * -30}px) scale(${0.92 + 0.08 * k})`;
+        if (i === 2) n.style.background = t > 5.8 ? "rgba(240,90,0,.22)" : "rgba(246,243,241,.12)";
+      });
+    }
+    L.h4.update(t, 5.6, 8.2);
+  }
+
+  // SURVEY
+  if (show(L.survey, t, s.survey[0], s.survey[1] - 0.3)) {
+    L.s_t.update(t, 9.2, 13.4);
+    L.s_tag.style.opacity = eo(P(t, 9.6, 0.4));
+    L.s_rows.forEach((r, i) => {
+      const a = 9.6 + i * 0.35;
+      r.c.update(t, a, 1.4, 0, r.v, (v) => Math.round(v) + "%");
+      r.c.e.style.opacity = eo(P(t, a, 0.3));
+      r.lb.style.opacity = eo(P(t, a + 0.1, 0.4));
+      r.fill.style.width = r.v * eo(P(t, a, 1.4)) + "%";
+    });
+    L.s_dots.forEach((d, i) => { const k = spring(P(t, 12.0 + i * 0.11, 0.5)); d.style.transform = `scale(${k})`; });
+    L.s_d.update(t, 12.4, 13.4, 0.05);
+  }
+
+  // FEE
+  if (show(L.fee, t, s.fee[0], s.fee[1] - 0.3)) {
+    L.f_card.style.transform = `translateY(${(1 - eo(P(t, 13.9, 0.8))) * 80}px)`;
+    L.f_ul.style.width = 560 * eio(P(t, 15.3, 0.8)) + "px";
+    L.f_num.update(t, 14.6, 1.7, 0, 40000, (v) => Math.round(v / 100) * 100 >= 40000 ? "40,000 VND" : Math.round(v).toLocaleString("en-US"));
+    L.f_num.e.style.opacity = eo(P(t, 14.6, 0.3));
+    L.f_cap.update(t, 15.4, 18.0, 0.05);
+    L.f_src.style.opacity = eo(P(t, 14.4, 0.5));
+  }
+
+  // REFUSED
+  if (show(L.refused, t, s.refused[0], s.refused[1] - 0.3)) {
+    const k = eo(P(t, 18.9, 1.4));
+    L.r_num.e.textContent = `${Math.round(lerp(0, 8, k))}–${Math.round(lerp(0, 12, k))}%`;
+    L.r_num.e.style.opacity = eo(P(t, 18.9, 0.3));
+    L.r_num.e.style.filter = `blur(${(1 - eo(P(t, 18.9, 0.5))) * 8}px)`;
+    L.r_cap.update(t, 19.5, 22.3, 0.05);
+    L.r_rows.forEach((r, i) => {
+      const a = 18.7 + i * 0.25;
+      const kk = eo(P(t, a, 1.1));
+      const W = 720 / 32;
+      r.base.style.width = (r.lo ? r.lo : 0) * W * kk + "px";
+      css(r.f, { left: (r.lo ? r.lo * W : 0) * kk + "px", width: (r.hi - r.lo) * W * kk + "px" });
+      r.v.style.left = 1060 + r.hi * W * kk + 16 + "px";
+      r.v.style.opacity = r.lb.style.opacity = eo(P(t, a, 0.4));
+    });
+    L.r_src.style.opacity = eo(P(t, 19.0, 0.5));
+  }
+
+  // ZERO
+  if (show(L.zero, t, s.zero[0], s.zero[1] - 0.3)) {
+    const n = Math.floor(L.z_qtext.length * clamp((t - 23.0) / 2.6));
+    L.z_q.innerHTML = L.z_qtext.slice(0, n) + (t < 25.8 && Math.floor(t * 4) % 2 === 0 ? "<span style='color:#F05A00'>▍</span>" : "");
+    L.z_q.style.transform = `translateY(${-90 * eio(P(t, 25.6, 0.5))}px)`;
+    const k = spring(P(t, 25.9, 0.6));
+    css(L.z_num, { opacity: clamp(k * 2), transform: `scale(${0.8 + 0.2 * k})` });
+    L.z_cap.update(t, 26.0, 26.6, 0.06);
+    L.z_src.style.opacity = eo(P(t, 23.2, 0.5));
+  }
+
+  // LOSS
+  if (show(L.loss, t, s.loss[0], s.loss[1] - 0.5, 0.35, 0.5)) {
+    L.l_k.style.opacity = eo(P(t, 27.0, 0.5));
+    L.l_num.update(t, 27.6, 3.4, 0, 473, (v) => fmtM(v));
+    L.l_num.e.style.opacity = eo(P(t, 27.6, 0.3));
+    L.l_unit.update(t, 28.0, 33.2, 0.06);
+    L.l_segs.forEach((g, i) => {
+      const k = eo(P(t, 27.6 + i * 0.35, 1.0));
+      g.s.style.transform = `scaleX(${k})`;
+      g.tx.style.opacity = eo(P(t, 27.9 + i * 0.35, 0.4));
+    });
+    L.l_src.style.opacity = eo(P(t, 28.0, 0.5));
+  }
+
+  // DROP (orange wipe → logo)
+  const w0 = s.drop[0];
+  if (t >= w0 && t < w0 + 0.75) {
+    L.d_wipe.style.display = "";
+    const up = eio(P(t, w0, 0.3)), out = eio(P(t, w0 + 0.35, 0.4));
+    L.d_wipe.style.transform = `translateY(${(1 - up) * 100 - out * 100}%)`;
+  } else L.d_wipe.style.display = "none";
+  if (show(L.drop, t, w0 + 0.3, s.drop[1] - 0.3, 0.01, 0.35)) {
+    L.d_mark.ring(eo(P(t, w0 + 0.35, 0.6)));
+    L.d_mark.bars([0, 1, 2].map((i) => spring(P(t, w0 + 0.65 + i * 0.07, 0.6))));
+    const k = eo(P(t, w0 + 1.1, 0.8));
+    css(L.d_word, { opacity: k, transform: `translateX(${(1 - k) * -40}px)` });
+    L.d_mark.svg.parentElement.style.transform = `translateX(${-260 * eio(P(t, w0 + 1.0, 0.8))}px)`;
+    L.d_word.style.left = 1220 - 260 * eio(P(t, w0 + 1.0, 0.8)) + "px";
+    L.d_tag.update(t, w0 + 1.9, s.drop[1] - 0.4, 0.07);
+  }
+
+  // MOSAIC
+  if (show(L.mosaic, t, s.mosaic[0], s.mosaic[1] - 0.3)) {
+    L.m_t.update(t, 38.0, 41.5, 0.07);
+    L.m_dev.forEach((m, i) => {
+      const k = eo(P(t, 38.5 + i * 0.4, 0.8));
+      m.d.root.style.opacity = k; m.lb.style.opacity = k;
+      m.d.root.style.transform = `translateY(${(1 - k) * 60}px)`;
+    });
+  }
+
+  // MORNING
+  if (show(L.morning, t, s.morning[0], s.morning[1] - 0.3)) {
+    const k = eo(P(t, s.morning[0], 0.8));
+    L.mo_dev.root.style.transform = `translateY(${(1 - k) * 80}px) scale(${1 + 0.04 * P(t, s.morning[0], 4.9)})`;
+    L.mo_t.update(t, 42.3, 46.4); L.mo_s.update(t, 43.2, 46.4, 0.03);
+  }
+
+  // TAP
+  if (show(L.tap, t, s.tap[0], s.tap[1] - 0.3)) {
+    const k = eo(P(t, s.tap[0], 0.8));
+    L.ta_dev.root.style.transform = `translateY(${(1 - k) * 80}px)`;
+    L.ta_t.update(t, 47.1, 51.3); L.ta_s.update(t, 48.0, 51.3, 0.03);
+    const d = L.ta_dev, tap = 50.45;
+    const bx = 380 + (280 - 72) * d.s, by = 120 + (689 - 4) * d.s;
+    if (t > tap - 0.35 && t < tap + 0.5) {
+      const kk = P(t, tap - 0.35, 0.85);
+      css(L.ta_dot, { display: "", left: bx - 32 + "px", top: by - 32 + "px", opacity: Math.sin(Math.PI * kk), transform: `scale(${t < tap ? 1.15 - 0.15 * P(t, tap - 0.35, 0.35) : 1 + 0.6 * P(t, tap, 0.5)})` });
+    } else L.ta_dot.style.display = "none";
+  }
+
+  // CHAT
+  if (show(L.chat, t, s.chat[0], s.call[0] - 0.2, 0.35, 0.3)) {
+    L.ch_t.update(t, 52.0, 56.4, 0.06);
+    const k = eo(P(t, s.chat[0], 0.8));
+    L.ch_b.root.style.transform = `translateY(${(1 - k) * 60}px)`;
+    const ko = eo(P(t, s.chat[0] + 0.25, 0.8));
+    L.ch_o.root.style.transform = `translateY(${(1 - ko) * 60}px)`;
+    L.ch_o.root.style.opacity = t < s.chat[1] ? 1 : 1 - eio(P(t, s.chat[1] - 0.2, 0.3));
+    const kp = spring(P(t, 55.4, 0.6));
+    css(L.ch_pill, { opacity: clamp(kp * 2), transform: `translateY(${(1 - kp) * 20}px)` });
+  }
+
+  // CALL
+  if (show(L.call, t, s.call[0], s.call[1] - 0.3, 0.3, 0.35)) {
+    const c1 = T.vo.c01, c2 = T.vo.c02;
+    const k = eo(P(t, s.call[0], 0.6));
+    L.ca_dev.root.style.transform = `translateX(${(1 - k) * -40}px)`;
+    let who = "", line = "", st = 0, dur = 1, envA = null;
+    if (t >= c1 && t < c2) { who = "Assistant · AI call"; line = L.ca_lines.c01; st = c1; dur = T.durations.c01; envA = T.env.c01; }
+    else if (t >= c2) { who = "Buyer · Minh"; line = L.ca_lines.c02; st = c2; dur = T.durations.c02; envA = T.env.c02; }
+    else { who = "Incoming · verified brand name"; }
+    L.ca_lab.textContent = who;
+    L.ca_mark.ring(eo(P(t, s.call[0] + 0.1, 0.6)));
+    let e = 0.15;
+    if (envA) { const i = Math.floor((t - st) * 30); e = envA[clamp(i, 0, envA.length - 1)] ?? 0; if (t - st > dur) e = 0; }
+    const wob = (o) => clamp(0.55 + e * (1.1 + 0.35 * Math.sin(t * 17 + o)), 0.4, 1.9);
+    L.ca_mark.bars(t < c1 ? [0.3, 0.3 + 0.3 * Math.abs(Math.sin(t * 6)), 0.3] : [wob(0), wob(1.7), wob(3.1)]);
+    if (line) {
+      const words = line.split(" ");
+      const n = Math.ceil(words.length * clamp((t - st) / (dur * 0.92)));
+      L.ca_sub.innerHTML = words.map((w, i) => `<span style="opacity:${i < n ? 1 : 0.18}">${w}</span>`).join(" ");
+    } else L.ca_sub.innerHTML = "";
+  }
+
+  // EXTRACT
+  if (show(L.extract, t, s.extract[0], s.extract[1] - 0.3)) {
+    const z = eio(P(t, s.extract[0] + 0.3, 3.0));
+    L.ex_wrap.style.transform = `translateY(${(1 - eo(P(t, s.extract[0], 0.7))) * 60}px) scale(${1 + 0.16 * z})`;
+    L.ex_t.update(t, 74.0, 76.9);
+    const kp = spring(P(t, 76.2, 0.6));
+    css(L.ex_stamp, { opacity: clamp(kp * 2), transform: `scale(${0.9 + 0.1 * kp})` });
+  }
+
+  // CARD
+  if (show(L.card, t, s.card[0], s.card[1] - 0.3)) {
+    L.cd_dev.root.style.transform = `translateY(${(1 - eo(P(t, s.card[0], 0.7))) * 60}px)`;
+    L.cd_t.update(t, 77.5, 80.3, 0.07);
+    const kp = spring(P(t, 79.8, 0.6));
+    css(L.cd_pill, { opacity: clamp(kp * 2), transform: `translateY(${(1 - kp) * 20}px)` });
+  }
+
+  // REFUSE
+  if (show(L.refuse, t, s.refuse[0], s.refuse[1] - 0.3)) {
+    L.rf_t.update(t, 80.9, 83.7, 0.06);
+    L.rf_c.root.style.transform = `translateY(${(1 - eo(P(t, s.refuse[0], 0.7))) * 60}px)`;
+    L.rf_o.root.style.transform = `translateY(${(1 - eo(P(t, s.refuse[0] + 0.25, 0.7))) * 60}px)`;
+  }
+
+  // CORE
+  if (show(L.core, t, s.core[0], s.core[1] - 0.2, 0.35, 0.3)) {
+    L.co_t.update(t, 84.2, 90.2);
+    L.co_order.forEach((k, i) => {
+      const n = L.co_nodes[i];
+      const kk = spring(P(t, 84.7 + i * 0.55, 0.6));
+      css(n, { opacity: clamp(kk * 2), transform: `scale(${0.9 + 0.1 * kk})` });
+    });
+    L.co_edges.forEach((g, i) => {
+      const a = 85.0 + (i < 4 ? i * 0.45 : i < 7 ? 2.4 + (i - 4) * 0.3 : 3.6);
+      g.p.setAttribute("stroke-dashoffset", g.len * (1 - eio(P(t, a, 0.9))));
+      if (i === 7) g.p.style.opacity = 0.4 + 0.6 * Math.abs(Math.sin((t - 88) * 3)) * (t > 88.5 && t < 89.8 ? 1 : 0.4);
+    });
+    L.co_stack.style.opacity = eo(P(t, 88.0, 0.6));
+  }
+
+  // RULES
+  if (show(L.rules, t, s.rules[0], s.rules[1] - 0.3)) {
+    L.ru_lab.style.opacity = eo(P(t, 90.8, 0.4));
+    const n = Math.floor(L.ru_text.length * clamp((t - 91.0) / 2.1));
+    L.ru_code.innerHTML = L.ru_text.slice(0, n).replace(/(".*?")(?=:)/g, "<span style='color:#B8BFCF'>$1</span>").replace(/(0\.9[14]|0\.88)/g, "<span style='color:#F05A00'>$1</span>");
+    L.ru_lab2.style.opacity = eo(P(t, 93.2, 0.4));
+    L.ru_rules.forEach((r, i) => {
+      const kk = spring(P(t, 93.6 + i * 0.5, 0.6));
+      css(r, { opacity: clamp(kk * 2), transform: `translateX(${(1 - kk) * 30}px)` });
+    });
+  }
+
+  // SAVE
+  if (show(L.save, t, s.save[0], s.save[1] - 0.3)) {
+    L.sv_k.style.opacity = eo(P(t, 98.2, 0.4));
+    L.sv_t.update(t, 98.4, 104.9, 0.05);
+    const drain = eio(P(t, 99.6, 2.8));
+    const W = 1728 / 473;
+    let x = 0;
+    L.sv_segs.forEach((g) => { const v = lerp(g.a, g.b, drain); css(g.s, { left: x * W + "px", width: Math.max(v * W - 4, 0) + "px" }); x += v; });
+    const cost = 20.9 * drain, save = 193.8 * drain;
+    css(L.sv_cost, { left: x * W + "px", width: Math.max(cost * W - 4, 0) + "px" }); x += cost;
+    css(L.sv_save, { left: x * W + "px", width: Math.max(save * W - 4, 0) + "px" });
+    L.sv_trk.style.opacity = eo(P(t, 98.6, 0.5));
+    if (t < 102.5) {
+      L.sv_num.update(t, 98.9, 0.01, 473, 473, () => fmtM(lerp(473, 279.2, drain)) + " VND");
+      css(L.sv_num.e, { color: "var(--navy)" });
+      L.sv_cap.textContent = drain > 0.02 ? "still lost, after Alodi and its running cost" : "lost every month today";
+    } else {
+      const kk = spring(P(t, 102.6, 0.6));
+      L.sv_num.e.textContent = "−194M VND";
+      css(L.sv_num.e, { color: "var(--orange)", transform: `scale(${0.94 + 0.06 * kk})`, transformOrigin: "left center", filter: "none" });
+      L.sv_cap.textContent = "saved every month, after running costs";
+    }
+    L.sv_num.e.style.opacity = eo(P(t, 98.9, 0.4));
+    css(L.sv_l1, { left: "96px", opacity: eo(P(t, 99.0, 0.4)), })
+    L.sv_l1.textContent = drain < 0.05 ? "Return fees · redelivery · CS calls · courier time" : `Still lost ${fmtM(258.3 * drain + 473 * (1 - drain))} · running cost 21M`;
+    const sx = 96 + (473 - 193.8 * drain) * W;
+    css(L.sv_l2, { left: Math.min(sx, 1500) + "px", opacity: eo(P(t, 101.2, 0.5)) });
+    L.sv_l2.textContent = "Saved 194M (41%)";
+    L.sv_src.style.opacity = eo(P(t, 99.0, 0.5));
+  }
+
+  // SHARE
+  if (show(L.share, t, s.share[0], s.share[1] - 0.3)) {
+    const k = eio(P(t, 105.8, 1.6));
+    L.sh_mark.ring(0.41 * k);
+    L.sh_mark.bars([0.0001, 0.0001, 0.0001]);
+    L.sh_pct.textContent = Math.round(41 * k) + "%";
+    L.sh_pct.style.opacity = eo(P(t, 105.8, 0.4));
+    L.sh_pcap.style.opacity = eo(P(t, 106.6, 0.4));
+    L.sh_y.update(t, 107.0, 1.4, 0, 2.33, (v) => "≈ " + v.toFixed(1) + "B");
+    L.sh_y.e.style.opacity = eo(P(t, 107.0, 0.3));
+    L.sh_yc.update(t, 107.5, 111.6, 0.05);
+    L.sh_c.update(t, 108.3, 111.6, 0.05);
+    L.sh_tiles.forEach((c, i) => { const kk = spring(P(t, 110.0 + i * 0.5, 0.6)); css(c, { opacity: clamp(kk * 2), transform: `translateY(${(1 - kk) * 30}px)` }); });
+    L.sh_src.style.opacity = eo(P(t, 106.0, 0.5));
+  }
+
+  // END
+  if (show(L.end, t, s.end[0], s.end[1] - 0.6, 0.35, 0.6)) {
+    const teamOut = eio(P(t, 113.7, 0.5));
+    L.en_dev.style.opacity = eo(P(t, 112.1, 0.4)) * (1 - teamOut);
+    L.en_team.forEach((b, i) => { const kk = eo(P(t, 112.2 + i * 0.35, 0.7)); css(b, { opacity: kk * (1 - teamOut), transform: `translateY(${(1 - kk) * 40 - teamOut * 20}px)`, filter: `blur(${teamOut * 8}px)` }); });
+    const lv = t > 114.0;
+    L.en_mark.svg.style.display = L.en_word.style.display = lv ? "" : "none";
+    if (lv) {
+      L.en_mark.ring(eo(P(t, 114.1, 0.6)));
+      const beat = [116.0, 116.5, 117.0].reduce((m, b) => Math.max(m, t >= b ? Math.exp(-(t - b) * 9) : 0), 0);
+      L.en_mark.bars([0, 1, 2].map((i) => spring(P(t, 114.4 + i * 0.07, 0.6)) * (1 + 0.35 * beat * (i === 1 ? 1.2 : 1))));
+      const kw = eo(P(t, 114.8, 0.8));
+      css(L.en_word, { opacity: kw, transform: `translateX(${(1 - kw) * -40}px)` });
+    }
+    L.en_tag.update(t, 115.4, 119.2, 0.07);
+  }
+  const fadeEnd = eio(P(t, 119.3, 0.7));
+  S.style.filter = fadeEnd > 0 ? `brightness(${1 - fadeEnd})` : "";
+}
+
+// ------------------------------------------------------------------ boot
+window.__film = {
+  ready: false,
+  async seek(t) { render(t); await seekAll(t); render(t); return true; },
+};
+(async () => {
+  T = await (await fetch("../timeline.json")).json();
+  await document.fonts.load("500 40px Geist"); await document.fonts.load("400 20px 'Geist Mono'");
+  build();
+  render(0);
+  await document.fonts.ready;
+  window.__film.end = T.end; window.__film.fps = T.fps;
+  window.__film.ready = true;
+})();
+</script>
+</body>
+</html>

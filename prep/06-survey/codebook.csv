@@ -1,0 +1,46 @@
+﻿audience,column,question_en,question_vi,type,values
+customer,persona_segment,Respondent group (assigned when coding),Nhóm đối tượng,category,Busy office worker | Student | Shift worker | Self-employed / online seller | Homemaker / retired
+customer,age_group,Age group,Nhóm tuổi,ordinal,18–24 | 25–34 | 35–44 | 45–54 | 55+
+customer,area_type,Area type,Loại khu vực,category,Urban core | Suburban | Rural
+customer,housing_type,Where you receive parcels,Nơi nhận hàng,category,Apartment with security desk | Alley house | Townhouse | Dormitory
+customer,work_schedule,Work schedule,Lịch làm việc,category,Fixed office hours | Shift work | Flexible | Not working
+customer,income_band_vnd_month,Monthly income (VND),Thu nhập/tháng,ordinal,< 5M | 5–10M | 10–20M | 20–40M | > 40M
+customer,orders_per_month,Online orders per month,Số đơn online mỗi tháng,integer,≥ 1
+customer,shopper_segment,Shopper segment (from orders_per_month),Phân khúc mua sắm,ordinal,Light (1–2) | Regular (3–5) | Heavy (6–10) | Power (> 10)
+customer,carriers_used,"Carriers that delivered to you (multi-select, | separated)",Đơn vị vận chuyển đã nhận,multi,SPX Express | GHN | GHTK | J&T Express | BEST Express | Viettel Post
+customer,q01_courier_called_while_busy,"In the last 3 months, how often did a courier call while you were busy (meeting, driving, working)?","3 tháng qua, shipper gọi lúc bạn đang bận (họp, chạy xe, làm việc) bao nhiêu lần?",likert_freq,1 Never … 5 Very often
+customer,q02_missed_courier_call,How often did you miss the courier's call?,Bạn lỡ cuộc gọi của shipper thường xuyên không?,likert_freq,1 Never … 5 Very often
+customer,q03_called_back_courier_unreachable,How often did you call the courier back and could not reach them?,Bạn gọi lại shipper nhưng không liên lạc được bao nhiêu lần?,likert_freq,1 Never … 5 Very often
+customer,q04_ignored_unknown_number,How often do you ignore calls from unknown numbers?,Bạn có hay bỏ qua cuộc gọi số lạ không?,likert_freq,1 Never … 5 Very often
+customer,q05_courier_came_when_not_home,How often did the courier come when you were not home?,Shipper đến lúc bạn không có nhà bao nhiêu lần?,likert_freq,1 Never … 5 Very often
+customer,q06_had_to_remind_courier,How often did you have to remind the courier of a time or instruction you had already given?,Bạn phải nhắc lại shipper giờ hẹn/lời dặn đã nói trước đó bao nhiêu lần?,likert_freq,1 Never … 5 Very often
+customer,q07_instruction_not_followed,How often was your instruction (e.g. leave with security) not followed?,Lời dặn (vd: gửi bảo vệ) không được làm theo bao nhiêu lần?,likert_freq,1 Never … 5 Very often
+customer,q08_failed_deliveries_last_3m,Number of failed deliveries to you in the last 3 months,Số lần giao không thành công trong 3 tháng qua,integer,≥ 0
+customer,q09_order_returned_last_3m,Was any order returned or cancelled because delivery failed?,Có đơn nào bị hoàn/hủy vì giao không thành công?,binary,Yes | No
+customer,q10_want_to_choose_window,I would like to choose a delivery time window,Tôi muốn được chọn khung giờ giao hàng,likert_agree,1 Strongly disagree … 5 Strongly agree
+customer,q11_preferred_contact_channel,Preferred way for the carrier to contact you,Kênh liên lạc mong muốn,category,Shopee chat | Zalo | Phone call | SMS | AI call
+customer,q12_ok_with_automated_call,I am comfortable receiving an automated call from the carrier,Tôi thoải mái nhận cuộc gọi tự động từ đơn vị vận chuyển,likert_agree,1 … 5
+customer,q13_concern_call_recording,I am concerned about calls being recorded,Tôi lo ngại việc ghi âm cuộc gọi,likert_agree,1 … 5
+customer,q14_preferred_contact_time,Best time to contact you,Thời gian liên lạc phù hợp,category,Morning (08–12) | Noon (12–14) | Afternoon (14–17) | Evening (17–20)
+customer,q15_biggest_frustration,Biggest frustration with deliveries,Điều phiền nhất khi nhận hàng,category,Calls at a bad time | Can't reach the courier back | My instructions are forgotten | No way to choose a time | Order returned after a missed call
+customer,q16_would_use_alodi_like_service,"If the carrier messaged you to pick a time and remembered your instructions, would you use it?","Nếu đơn vị vận chuyển nhắn hỏi giờ và nhớ lời dặn của bạn, bạn có dùng không?",category,Yes | Maybe | No
+customer,pain_index_1to5,"Mean of q01, q02, q03, q05, q06, q07 (derived)",Chỉ số phiền (tính toán),float,1–5
+courier,company,Carrier you work for,Công ty,category,SPX Express | GHN | J&T Express | BEST Express | GHTK | Viettel Post
+courier,experience_band,Experience band,Thâm niên,ordinal,< 1 year | 1–3 years | 3–5 years | > 5 years
+courier,employment_type,Employment type,Hình thức làm việc,category,Full-time | Part-time | Gig / per order
+courier,orders_per_day,Orders you deliver per day,Số đơn giao mỗi ngày,integer,≥ 0
+courier,q01_calls_to_buyers_per_day,Calls you make to buyers per day,Số cuộc gọi cho khách mỗi ngày,integer,≥ 0
+courier,q02_unanswered_call_pct,Share of your calls that buyers do not answer (%),% cuộc gọi khách không nghe,integer,0–100
+courier,q03_minutes_per_day_on_calls,Minutes per day spent calling buyers,Số phút gọi khách mỗi ngày,integer,≥ 0
+courier,q04_failed_deliveries_per_day,Failed deliveries per day,Số đơn giao không thành công mỗi ngày,integer,≥ 0
+courier,q05_reschedule_requests_per_day,Buyers asking to reschedule per day,Số khách hẹn lại mỗi ngày,integer,≥ 0
+courier,q06_forgot_buyer_instruction,How often do you forget a time or instruction a buyer gave you?,Anh/chị có hay quên giờ/lời dặn của khách không?,likert_freq,1 Never … 5 Very often
+courier,q07_buyer_calls_while_riding,How often do buyers call you while you are riding?,Khách gọi lúc đang chạy xe thường xuyên không?,likert_freq,1 Never … 5 Very often
+courier,q08_where_notes_are_kept,Where you keep buyers' instructions,Anh/chị ghi lời dặn của khách ở đâu?,category,Memory | Phone notes app | Paper | Carrier app note field
+courier,q09_refusals_per_week,Refused (bombed) orders per week,Số đơn bom mỗi tuần,integer,≥ 0
+courier,q10_wasted_return_trips_per_week,Return trips that ended in another failure per week,Số lần quay lại vẫn không giao được mỗi tuần,integer,≥ 0
+courier,q11_app_lets_buyer_pick_time,Does your app let buyers pick a delivery time?,App có cho khách chọn giờ giao không?,category,Yes | Partly (date + half-day) | No
+courier,q12_would_like_alodi_like_system,"If a system asked buyers for a time and gave you a card with the time, drop-off and backup contact, saving you time and keeping everyone on the same page, would you like it?","Nếu có hệ thống hỏi giờ khách trước và đưa anh/chị thẻ ghi giờ, nơi để hàng, người nhận thay — tiết kiệm thời gian và thống nhất hơn — anh/chị có thích không?",category,Yes | Not sure | No
+courier,q13_expected_minutes_saved_per_day,Minutes you think it would save per day,Ước tính tiết kiệm bao nhiêu phút mỗi ngày,integer,≥ 0
+courier,q14_most_useful_feature,Most useful feature,Tính năng hữu ích nhất,category,"Time window known before delivery | Auto follow-up after a failed call | Context card for the next attempt | Voice memo instead of typing | CS handles refusals, not me"
+courier,q15_main_concern,Main concern,Lo ngại lớn nhất,category,None | Another app to learn | Buyers may not answer a bot | Is the information accurate? | Phone battery and data
