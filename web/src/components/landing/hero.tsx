@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { Mark } from "@/components/site/brand";
-import { SHIPPER_LOGOS, LIVE_DEMO_URL } from "@/lib/content";
+import { SHIPPER_LOGOS } from "@/lib/content";
 import { Reveal, RevealText } from "./motion";
 
 const W = 1440;
@@ -262,9 +262,9 @@ export function Hero() {
           </Reveal>
           <Reveal delay={0.14}>
             <div className="mt-11 flex flex-wrap items-center justify-center gap-4">
-              <a href={LIVE_DEMO_URL} className="btn btn-dark">
+              <Link href="/start" className="btn btn-dark">
                 Watch the demo
-              </a>
+              </Link>
               <Link href="/console" className="btn btn-ghost">
                 See the dashboard
               </Link>
