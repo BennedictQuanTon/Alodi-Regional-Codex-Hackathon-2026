@@ -91,7 +91,7 @@ net_pct = BEST["net_pct"]
 # ---------------------------------------------------------------- front matter
 cover = f"""
 <section class="cover">
-  <div class="ctop"><span class="logo">{LOGO_W}</span><div class="event"><img class="ev-hack" src="{(HERE / 'event/regional-codex-hackathon.png').as_uri()}"><img class="ev-sea" src="{(HERE / 'event/sea-openai.png').as_uri()}"></div></div>
+  <div class="ctop"><span class="logo">{LOGO_W}</span><img class="ev-sea" src="{(HERE / 'event/sea-openai.png').as_uri()}"></div>
   <div class="cmid">
     <div class="ey">Project report</div>
     <h1>Alodi</h1>
@@ -363,8 +363,8 @@ CSS = font_css + """
 body { margin: 0; font-family: 'Geist', sans-serif; color: #1f2a44; font-size: 10pt; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 b { font-weight: 600; }
 .cover { width: 210mm; height: 297mm; background: #121a2c; color: #f6f3f1; padding: 22mm 20mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; }
-.event { display: flex; flex-direction: column; align-items: flex-end; gap: 3mm; } .ev-sea { height: 8.5mm; display: block; } .ev-hack { height: 17mm; display: block; }
-.ctop { display: flex; justify-content: space-between; align-items: flex-start; }
+.ev-sea { height: 11mm; display: block; }
+.ctop { display: flex; justify-content: space-between; align-items: center; }
 .ctop svg { height: 12mm; width: auto; }
 .ey { font-size: 9pt; letter-spacing: .1em; text-transform: uppercase; color: #f05a00; font-weight: 600; }
 h1 { font-family: 'Be Vietnam Pro'; font-size: 64pt; line-height: 1; letter-spacing: -0.04em; margin: 5mm 0 0; }

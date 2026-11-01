@@ -59,7 +59,7 @@ font_css = "\n".join(f"@font-face {{ font-family: '{k}'; src: url('{v.as_uri()}'
 
 cover = f"""
 <section class="cover">
-  <div class="ctop"><span class="logo">{LOGO}</span><div class="event"><img class="ev-hack" src="{(HERE / 'event/regional-codex-hackathon.png').as_uri()}"><img class="ev-sea" src="{(HERE / 'event/sea-openai.png').as_uri()}"></div></div>
+  <div class="ctop"><span class="logo">{LOGO}</span><span class="ev-x">×</span><img class="ev-sea" src="{(HERE / 'event/sea-openai.png').as_uri()}"></div>
   <div>
     <h1>Make the second<br><i>drop land.</i></h1>
     <p class="abs">Alodi is the agentic recovery system for last-mile delivery in Vietnam. One shipper tap starts chat and voice outreach, and the next attempt arrives knowing when, where and who. The model proposes, and backend rules decide what is applied.</p>
@@ -205,8 +205,8 @@ body { margin: 0; font-family: 'Geist', sans-serif; color: #1f2a44; font-size: 1
 b { font-weight: 600; }
 p { margin: 0 0 2.2mm; }
 .cover { width: 210mm; height: 297mm; background: #121a2c; color: #f6f3f1; padding: 18mm 18mm 15mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; }
-.event { display: flex; flex-direction: column; align-items: flex-end; gap: 3mm; } .ev-sea { height: 8.5mm; display: block; } .ev-hack { height: 17mm; display: block; }
-.ctop { display: flex; justify-content: space-between; align-items: flex-start; } .ctop svg { height: 12mm; width: auto; display: block; }
+.ev-x { font-size: 16pt; color: #f6f3f1; } .ev-sea { height: 11mm; display: block; }
+.ctop { display: flex; justify-content: flex-end; align-items: center; gap: 3.5mm; } .ctop svg { height: 12mm; width: auto; display: block; }
 .ey { font-size: 9pt; letter-spacing: .1em; text-transform: uppercase; color: #ff7a2e; font-weight: 600; }
 h1 { font-family: 'BVP'; font-weight: 400; font-size: 46pt; line-height: 1.06; letter-spacing: -.03em; margin: 0; } h1 i { font-style: normal; color: #ff7a2e; }
 .abs { font-size: 13pt; line-height: 1.42; color: #dfe3ec; margin: 5mm 0 0; }
