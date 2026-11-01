@@ -91,12 +91,12 @@ net_pct = BEST["net_pct"]
 # ---------------------------------------------------------------- front matter
 cover = f"""
 <section class="cover">
-  <div class="ctop"><span class="logo">{LOGO_W}</span></div>
+  <div class="ctop"><span class="logo">{LOGO_W}</span><img class="ev-sea" src="{(HERE / 'event/sea-openai.png').as_uri()}"></div>
   <div class="cmid">
     <div class="ey">Project report</div>
     <h1>Alodi</h1>
     <p class="tag">Make the second drop land.</p>
-    <p class="abs">An AI agent that rescues failed deliveries for Vietnamese e-commerce: the problem, the product, the architecture,
+    <p class="abs">The agentic recovery system for last-mile delivery in Vietnam: the problem, the product, the architecture,
     the OpenAI stack, the evaluation plan, the economics and the road to a pilot.</p>
   </div>
   <dl class="meta">
@@ -186,7 +186,7 @@ c3 = chapter(3, "What we heard: the survey", "We asked both sides of the same mi
 {note(f"Shipper sample: {', '.join(f'{k} {v}' for k, v in companies.most_common())}. Instrument: 16 buyer and 15 shipper questions in Vietnamese and English (prep/06-survey/codebook.csv). Names and phone numbers are dropped before saving (Vietnam PDPL).")}
 """)
 
-c4 = chapter(4, "Alodi", "The AI agent that rescues failed deliveries. Autonomous where the rules are clear; human where they aren’t.", f"""
+c4 = chapter(4, "Alodi", "The agentic recovery system for last-mile delivery. Autonomous where the rules are clear; human where they aren’t.", f"""
 {sub("4.1", "The flow, in eight steps")}
 <ol class="steps8">
 <li><b>Load orders and windows</b><span>every morning, per area</span></li><li><b>Ask for a window</b><span>≥ 2 options from the route planner</span></li>
@@ -363,6 +363,8 @@ CSS = font_css + """
 body { margin: 0; font-family: 'Geist', sans-serif; color: #1f2a44; font-size: 10pt; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 b { font-weight: 600; }
 .cover { width: 210mm; height: 297mm; background: #121a2c; color: #f6f3f1; padding: 22mm 20mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; }
+.ev-sea { height: 11mm; display: block; }
+.ctop { display: flex; justify-content: space-between; align-items: center; }
 .ctop svg { height: 12mm; width: auto; }
 .ey { font-size: 9pt; letter-spacing: .1em; text-transform: uppercase; color: #f05a00; font-weight: 600; }
 h1 { font-family: 'Be Vietnam Pro'; font-size: 64pt; line-height: 1; letter-spacing: -0.04em; margin: 5mm 0 0; }

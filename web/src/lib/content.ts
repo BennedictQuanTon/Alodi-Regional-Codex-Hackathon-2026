@@ -98,12 +98,12 @@ export const SOURCES: Source[] = [
 
 /** TL;DR: what Alodi is, in one sentence and five lines. Sits right above "How Alodi works". */
 export const TLDR = {
-  headline: "Alodi is the AI agent that rescues failed deliveries.",
-  body: "When a shipper can’t reach the buyer, they tap one button. Alodi messages the buyer, calls if there’s silence, and hands the next shipper a card with when, where and who to deliver to.",
+  headline: "Alodi is the agentic recovery system for last-mile delivery.",
+  body: "Alodi turns a failed delivery into a confirmed next attempt. One shipper tap starts chat and voice outreach, and the next shipper gets a rule-checked card: when, where and who.",
   facts: [
     { k: "For", v: "Carriers like SPX, their shippers and buyers" },
     { k: "Starts with", v: "One tap: No answer · Rescheduled · Refused" },
-    { k: "Does", v: "Chats now, calls if silent, extracts a context card" },
+    { k: "Does", v: "Asks for a window before dispatch, recovers by chat and voice, writes a context card" },
     { k: "Never", v: "Labels or returns an order without a person" },
     { k: "Built on", v: "GPT-Live-1, the Decisions API on GPT-6 Luna and GPT-6.1 Terra; built with Codex" },
   ],

@@ -26,7 +26,7 @@ const logo = Be_Vietnam_Pro({
 export const metadata: Metadata = {
   title: "Alodi · Make the second drop land",
   description:
-    "Alodi rescues failed deliveries. The shipper taps one button; the agent messages and calls the buyer, then hands back structured context for the next attempt.",
+    "Alodi is the agentic recovery system for last-mile delivery in Vietnam. One shipper tap starts chat and voice outreach, and the next shipper gets a rule-checked card: when, where and who.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

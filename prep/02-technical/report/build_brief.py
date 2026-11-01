@@ -5,6 +5,7 @@ Usage (from the repo root):
 Writes prep/02-technical/report/alodi-brief.pdf and copies it to submission/. Cover, three pages answering the judging
 criteria, one page of sources. Money comes from cost_model.py; screenshots live in prep/02-technical/report/shots.
 """
+import base64
 import importlib.util
 import shutil
 import subprocess
@@ -58,14 +59,15 @@ font_css = "\n".join(f"@font-face {{ font-family: '{k}'; src: url('{v.as_uri()}'
 
 cover = f"""
 <section class="cover">
-  <div class="ctop"><span class="logo">{LOGO}</span></div>
+  <div class="ctop"><span class="logo">{LOGO}</span><span class="ev-x">×</span><img class="ev-sea" src="{(HERE / 'event/sea-openai.png').as_uri()}"></div>
   <div>
     <h1>Make the second<br><i>drop land.</i></h1>
-    <p class="abs">Alodi is the AI agent that rescues failed deliveries for Vietnamese e-commerce. The shipper taps once. Alodi reaches the buyer by chat and voice, and the next attempt arrives knowing when, where and who.</p>
+    <p class="abs">Alodi is the agentic recovery system for last-mile delivery in Vietnam. One shipper tap starts chat and voice outreach, and the next attempt arrives knowing when, where and who. The model proposes, and backend rules decide what is applied.</p>
   </div>
   <img class="hero" src="{shot('start')}">
   <dl class="meta">
     <div><dt>Team</dt><dd>Develarper</dd></div>
+    <div><dt>Result</dt><dd>Top 3 Overall</dd></div>
     <div><dt>Event</dt><dd>Sea × OpenAI Regional Codex Hackathon, Ho Chi Minh City, 31 October 2026</dd></div>
     <div><dt>Build direction</dt><dd>Autonomous &amp; Adaptive AI · Deep Domain AI</dd></div>
   </dl>
@@ -102,12 +104,12 @@ p3 = f"""
 <section class="pg">
 {head(3, "The product", "Build Quality")}
 <p class="lead">Three working surfaces on one rescue workflow.</p>
-<div class="g2"><figure><img src="{shot('console')}"><figcaption>Hub dashboard: pipeline by business step, policy guard, exception queue, routes.</figcaption></figure>
-<figure><img src="{shot('live')}"><figcaption>Live stage: the shipper uses a real phone; customer, dashboard and agent run sync here.</figcaption></figure></div>
+<div class="g2"><figure><img src="{shot('console')}"><figcaption>Hub dashboard, on a simulated day: pipeline by business step, failures by hour, policy guard.</figcaption></figure>
+<figure><img src="{shot('live')}"><figcaption>Live stage, ready to start: the shipper uses a real phone; customer, dashboard and agent run sync here.</figcaption></figure></div>
 <div class="g2 r2"><figure><img src="{shot('integrated')}"><figcaption>Backend workspace: real orders, business timers, calls issued by policy, and the order’s evidence.</figcaption></figure>
 <div class="tile rules"><b>Hard rules, enforced in code</b><ul><li>Calls only 08:00–20:30</li><li>At most two calls a cycle</li><li>Applies alone only at confidence ≥ 0.85</li><li>“Stop” ends all contact</li><li>Shippers can undo a tap for 2 minutes</li><li>A person approves every label and return</li></ul></div></div>
 <table><thead><tr><th>Component</th><th>What runs today</th></tr></thead><tbody>
-<tr><td><b>Workflow backend</b></td><td>FastAPI and SQLite with migrations: morning availability, shipper outcomes, rescue policy, customer-service decisions and a durable scheduler that survives restarts, on 4,000 synthetic orders. <b>193 automated tests pass</b>, with AI providers simulated, and CI checks every change.</td></tr>
+<tr><td><b>Workflow backend</b></td><td>FastAPI and SQLite with migrations: morning availability, shipper outcomes, rescue policy, customer-service decisions and a durable scheduler that survives restarts, on 4,000 synthetic orders. <b>255 automated tests pass</b>, with AI providers simulated, and CI checks every change.</td></tr>
 <tr><td><b>End-to-end path</b></td><td>On the running backend: a No answer tap opens a rescue case, the 60-minute timer fires, and the policy-checked call is issued.</td></tr>
 <tr><td><b>Voice and memo</b></td><td>GPT-Live-1 over WebRTC, GPT Transcribe and GPT-6.1 Terra extraction, with consent gates, a 180-second call cap and memo limits. Stub and live modes.</td></tr>
 <tr><td><b>Interfaces</b></td><td>Landing, a judges’ demo with a scripted scenario, an SPX-style dashboard on mock operational data, and the live stage with its shipper phone screen, whose backend connection is the next step.</td></tr>
@@ -174,12 +176,11 @@ SOURCES = [
     ("Competitor comparison", "ClickPost, Shipsy and others, from public product pages", "Report PDF, chapter 11"),
     ("Notionists by Zoish", "Illustrated people in the product (CC0)", "dicebear.com/styles/notionists"),
 ]
-TEAM = [("nomura-yoshio", "Nomura Yoshio", "Team Lead, Project Presenter"), ("long-quan-ton", "Long Quan Ton", "Product Manager, AI Engineer"), ("khanh-tuong-huynh", "Khanh Tuong Huynh", "Applied AI Software Engineer"), ("thanh-loi-tran", "Thanh Loi Tran", "Data Engineer · Backend")]
+TEAM = [("nomura-yoshio", "Nomura Yoshio", "Team Lead<br>Project Presenter"), ("long-quan-ton", "Long Quan Ton", "Product Manager<br>AI Engineer"), ("khanh-tuong-huynh", "Khanh Tuong Huynh", "Applied AI<br>Software Engineer"), ("thanh-loi-tran", "Thanh Loi Tran", "Data Engineer<br>Backend Developer")]
 
 
 def portrait(k):
-    d = ROOT / "web/public/team"
-    return next(d.glob(f"{k}.*")).as_uri()
+    return (HERE / "portraits" / f"{k}.jpg").as_uri()
 
 
 p5 = f"""
@@ -189,13 +190,13 @@ p5 = f"""
 {''.join(f'<tr><td><b>{a}</b></td><td>{b}</td><td class=ep>{c}</td></tr>' for a, b, c in SOURCES)}
 </tbody></table>
 <p class="cap"><b>How to read our numbers.</b> Sourced figures come from the public documents above, checked 31 October 2026. Survey values are placeholders until the interview export lands. The monthly loss is modelled from them with stated assumptions. Savings are projected until a pilot measures them, and ten seconds is a target. Dashboard figures in the screenshots are simulated.</p>
-<div class="hd" style="margin-top:6mm"><h2>Team Develarper</h2></div>
+<div class="hd" style="margin-top:3mm"><h2>Team Develarper</h2></div>
 <div class="team">{''.join(f'<div><img src="{portrait(k)}"><b>{n}</b><span>{r}</span></div>' for k, n, r in TEAM)}</div>
 </section>"""
 
 CSS = font_css + """
 @page { size: A4; margin: 13mm 15mm 14mm;
-  @bottom-left { content: "Alodi · Project write-up"; font-family: 'Geist'; font-size: 8pt; color: #5a6173; }
+  @bottom-left { content: url("__FOOT_LOGO__"); vertical-align: middle; }
   @bottom-right { content: counter(page) " / " counter(pages); font-family: 'Geist'; font-size: 8pt; color: #5a6173; }
 }
 @page :first { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
@@ -204,7 +205,8 @@ body { margin: 0; font-family: 'Geist', sans-serif; color: #1f2a44; font-size: 1
 b { font-weight: 600; }
 p { margin: 0 0 2.2mm; }
 .cover { width: 210mm; height: 297mm; background: #121a2c; color: #f6f3f1; padding: 18mm 18mm 15mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; }
-.ctop { display: flex; justify-content: space-between; align-items: center; } .ctop svg { height: 12mm; width: auto; display: block; }
+.ev-x { font-size: 16pt; color: #f6f3f1; } .ev-sea { height: 11mm; display: block; }
+.ctop { display: flex; justify-content: flex-start; align-items: center; gap: 3.5mm; } .ctop svg { height: 12mm; width: auto; display: block; }
 .ey { font-size: 9pt; letter-spacing: .1em; text-transform: uppercase; color: #ff7a2e; font-weight: 600; }
 h1 { font-family: 'BVP'; font-weight: 400; font-size: 46pt; line-height: 1.06; letter-spacing: -.03em; margin: 0; } h1 i { font-style: normal; color: #ff7a2e; }
 .abs { font-size: 13pt; line-height: 1.42; color: #dfe3ec; margin: 5mm 0 0; }
@@ -249,9 +251,11 @@ td { padding: 1.6mm 2.4mm 1.6mm 0; border-bottom: 1px solid #e3e5ea; vertical-al
 .cx { padding-left: 4mm; margin: 1mm 0 0; font-size: 9.7pt; line-height: 1.36; } .cx li { margin-bottom: .8mm; }
 .status { font-size: 8.8pt; padding: 1.2mm 2.4mm; border-radius: 1.6mm; background: #fbe3d4; margin: 1mm 0; line-height: 1.3; }
 .srct td:first-child { white-space: normal; width: 50mm; } .srct td:nth-child(2) { width: 62mm; } .ep { word-break: break-word; }
-.team { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin-top: 2.5mm; } .team img { width: 100%; height: 27mm; object-fit: cover; object-position: top; border-radius: 2.4mm; display: block; } .team b { display: block; margin-top: 1.4mm; font-size: 10.6pt; } .team span { font-size: 9.2pt; color: #3a4358; line-height: 1.25; display: block; }
+.team { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin-top: 2.5mm; } .team img { width: 27mm; height: 27mm; object-fit: cover; border-radius: 2.4mm; display: block; } .team b { display: block; margin-top: 1.4mm; font-size: 10.6pt; } .team span { font-size: 9.2pt; color: #3a4358; line-height: 1.25; display: block; }
 """
 
+FOOT_LOGO = (ROOT / "prep/04-brand/logo/alodi-wordmark-navy.svg").read_text().replace('width="563" height="244"', 'width="60" height="26"').encode()
+CSS = CSS.replace("__FOOT_LOGO__", "data:image/svg+xml;base64," + base64.b64encode(FOOT_LOGO).decode())
 doc = f"<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Alodi · Project write-up</title><style>{CSS}</style></head><body>{cover}{p2}{p3}{p4}{p5}</body></html>"
 out_html = HERE / "alodi-brief.html"
 out_pdf = HERE / "alodi-brief.pdf"
