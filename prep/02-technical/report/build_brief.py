@@ -206,7 +206,7 @@ b { font-weight: 600; }
 p { margin: 0 0 2.2mm; }
 .cover { width: 210mm; height: 297mm; background: #121a2c; color: #f6f3f1; padding: 18mm 18mm 15mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; }
 .ev-x { font-size: 16pt; color: #f6f3f1; } .ev-sea { height: 11mm; display: block; }
-.ctop { display: flex; justify-content: flex-end; align-items: center; gap: 3.5mm; } .ctop svg { height: 12mm; width: auto; display: block; }
+.ctop { display: flex; justify-content: flex-start; align-items: center; gap: 3.5mm; } .ctop svg { height: 12mm; width: auto; display: block; }
 .ey { font-size: 9pt; letter-spacing: .1em; text-transform: uppercase; color: #ff7a2e; font-weight: 600; }
 h1 { font-family: 'BVP'; font-weight: 400; font-size: 46pt; line-height: 1.06; letter-spacing: -.03em; margin: 0; } h1 i { font-style: normal; color: #ff7a2e; }
 .abs { font-size: 13pt; line-height: 1.42; color: #dfe3ec; margin: 5mm 0 0; }
