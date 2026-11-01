@@ -144,8 +144,8 @@ async function cover(file, w, h, pos = "centre") {
   {
     const s = pres.addSlide({ masterName: "Light", sectionTitle: "Opening" });
     eyebrow(s, "01", "TL;DR");
-    title(s, "Alodi is the AI agent", "that rescues failed deliveries.", { w: 5.85, h: 1.65 });
-    const facts = [["For", "Carriers like SPX, their shippers and buyers"], ["Starts with", "One tap: No answer · Rescheduled · Refused"], ["Does", "Chats now, calls if silent, writes a context card"], ["Never", "Labels or returns an order without a person"]];
+    title(s, "The agentic recovery", "system for last-mile delivery.", { w: 5.85, h: 1.65 });
+    const facts = [["For", "Carriers like SPX, their shippers and buyers"], ["Starts with", "One tap: No answer · Rescheduled · Refused"], ["Does", "Asks for a window first, recovers by chat and voice, writes a context card"], ["Never", "Labels or returns an order without a person"]];
     facts.forEach(([k, v], i) => {
       const y = 2.5 + i * 1.0;
       s.addShape(pres.shapes.LINE, { x: M, y, w: 5.8, h: 0, line: { color: i === 0 ? H.ink : H.line, width: i === 0 ? 1 : 0.75 }, objectName: `Fact rule ${i}` });

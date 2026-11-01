@@ -6,8 +6,8 @@
 
 <p align="center">
   <b>Make the second drop land.</b><br/>
-  An AI agent that rescues failed deliveries for Vietnamese e-commerce.<br/>
-  The shipper taps once. Alodi reaches the buyer, and the next attempt arrives knowing when, where and who.
+  The agentic recovery system for last-mile delivery in Vietnam.<br/>
+  One shipper tap starts chat and voice outreach, and the next attempt arrives knowing when, where and who.
 </p>
 
 <p align="center">
@@ -21,6 +21,16 @@
 <p align="center"><sub>Team Develarper · Sea × OpenAI Regional Codex Hackathon, Vietnam · 31 October 2026</sub></p>
 
 ---
+
+## What Alodi is
+
+A failed delivery is a negotiation that happens off the system: a missed call, and everything that could fix the next attempt is lost. Alodi brings that negotiation into the system. It asks buyers for a delivery window before dispatch. When a drop still fails, one shipper tap starts the recovery: chat first, then a disclosed, consent-based voice call. Each conversation becomes structured context for the next shipper. The model proposes, and backend rules decide what is applied. Anything uncertain, refused or out of bounds goes to a person, with every step on the audit trail.
+
+| | |
+|---|---|
+| **Prevent** | Ask buyers for a delivery window before dispatch |
+| **Recover** | One tap starts chat and voice outreach, then produces a context card |
+| **Govern** | Backend rules gate every action, and people own the hard calls |
 
 ## Why Alodi
 
@@ -198,10 +208,10 @@ OpenAI keys stay on the server. In live mode, call audio goes to OpenAI.
 
 | | What it covers |
 |---|---|
-| **Working, local** | Backend with SQLite, scheduler, rules, audit trail and customer-service decisions, on 4,000 made-up orders across 20 routes. 193 automated tests pass, with OpenAI simulated |
+| **Working, local** | Backend with SQLite, scheduler, rules, audit trail and customer-service decisions, on 4,000 made-up orders across 20 routes. 255 automated tests pass (182 backend, 73 AI package), with OpenAI simulated |
 | **Implemented, live use needs a key** | GPT Live calls, GPT Transcribe memos and GPT-6.1 Terra extraction |
 | **Working, developer screen** | `/dev/integrated` runs real orders against the backend: a No answer tap opens a case, the 60-minute timer fires and a policy-checked call is issued |
-| **Scripted, mock data** | `/demo` tells the full story with sound and no backend; `/console` and `/metrics` use mock data |
+| **Scripted, mock data** | `/demo` and `/tour` tell the full story in English, with sound and no backend; `/console` and `/metrics` use mock data |
 | **Needs the local backend** | `/live?session=<id>` and `/live/shipper?session=<id>` run real calls through `scripts/start-live-sessions.ps1`; they don't work on the deployed website |
 | **Production design, not built** | Decisions API, Agents SDK, Evals gating, gpt-oss-20b, real phone lines, Zalo messages, carrier integration |
 
