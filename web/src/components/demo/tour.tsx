@@ -89,7 +89,6 @@ export function DemoTour() {
   }, [engine, audio]);
 
   const begin = (live: boolean) => {
-    audio.unlock();
     setLiveAnswer(null);
     setPerson(false);
     setIsLive(live);
@@ -98,8 +97,9 @@ export function DemoTour() {
     engine.reset("A_main");
     engine.play();
   };
-  const start = () => { mic?.getTracks().forEach((t) => t.stop()); setMic(null); begin(false); };
+  const start = () => { audio.unlock(); mic?.getTracks().forEach((t) => t.stop()); setMic(null); begin(false); };
   const startLive = async () => {
+    audio.unlock(); // inside the tap, before the permission prompt, or Safari refuses to play the voices
     try {
       mic?.getTracks().forEach((t) => t.stop());
       setMic(await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }));
@@ -152,6 +152,7 @@ export function DemoTour() {
           trial={trial}
           onTrial={setTrial}
           onAck={audio.acknowledge}
+          onCaption={(text) => setSpeech({ text, voice: "buyer" })}
           onDone={(answer) => {
             setLiveAnswer(answer);
             if (answer?.outcome === "person") engine.branch("A_lowconf");

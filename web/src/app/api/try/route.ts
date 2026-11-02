@@ -19,7 +19,7 @@ const reply = (body: object, status = 200) => Response.json(body, { status, head
 export async function GET(request: Request) {
   const ip = clientIp(request);
   const { state, left } = await readState(ip);
-  return reply({ state, left, token: state === "ready" ? issueToken(ip) : null });
+  return reply({ state, left, token: state === "ready" ? issueToken() : null });
 }
 
 export async function POST(request: Request) {
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   const ip = clientIp(request);
   const form = await request.formData().catch(() => null);
   const audio = form?.get("audio");
-  const token = checkToken(String(form?.get("token") ?? ""), ip);
+  const token = checkToken(String(form?.get("token") ?? ""));
   if (!form || !(audio instanceof Blob) || !token) return reply({ state: "blocked" }, 403);
   const bytes = new Uint8Array(await audio.arrayBuffer());
   if (!validAudio(bytes)) return reply({ state: "bad_audio" }, 400);
@@ -50,17 +50,18 @@ export async function POST(request: Request) {
     const stt = Date.now() - started;
     if (transcript.length < 4) {
       await slot.release(); // silence is not a try
-      return reply({ state: "retry", left: slot.left + 1, token: issueToken(ip) });
+      return reply({ state: "retry", left: slot.left + 1, token: issueToken() });
     }
     const answer = decide(transcript, await extract(transcript));
-    return reply({ state: "done", left: slot.left, token: issueToken(ip), answer, ms: { stt, total: Date.now() - started } });
+    return reply({ state: "done", left: slot.left, token: issueToken(), answer, ms: { stt, total: Date.now() - started } });
   } catch (error) {
     if (!heard) await slot.release().catch(() => {});
     if (error instanceof OpenAiError && (error.code === "project_spend_limit_exceeded" || error.code === "insufficient_quota" || error.code === "credit_balance_exhausted")) {
       await closeTrials().catch(() => {});
       return reply({ state: "ended" }, 429);
     }
-    console.error("try failed:", error instanceof OpenAiError ? error.message : error instanceof Error ? error.name : "unknown"); // never the audio or the words
-    return reply({ state: "failed" }, 502);
+    const reason = error instanceof OpenAiError ? `openai_${error.status}_${error.code}` : error instanceof Error ? error.name : "unknown";
+    console.error("try failed:", reason); // never the audio or the words
+    return reply({ state: "failed", reason, token: issueToken() }, 502);
   }
 }
