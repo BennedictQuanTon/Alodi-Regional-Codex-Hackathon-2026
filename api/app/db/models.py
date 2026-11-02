@@ -61,7 +61,7 @@ class Hub(Base):
     city: Mapped[str] = mapped_column(String)
     service_area_wards: Mapped[list[str]] = mapped_column(JSON)
     delivery_date: Mapped[date] = mapped_column(Date)
-    morning_run: Mapped[time] = mapped_column(Time, default=time(6, 30))
+    morning_run: Mapped[time] = mapped_column(Time, default=time(6, 0))
     data_source: Mapped[str] = mapped_column(String, default="synthetic")
 
 

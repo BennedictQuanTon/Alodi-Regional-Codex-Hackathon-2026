@@ -64,7 +64,7 @@ hub = {
     "couriers": 20,
     "orders": 4000,
     "stops_per_route": 200,
-    "morning_run": "06:30",
+    "morning_run": "06:00",
     "route_cutoff": "08:00",
     "call_hours": "08:00–20:30",
     "note": "Fictional hub. Ward names follow the HCMC ward-level structure in force since 1 July 2025; addresses, people and phone numbers are invented.",
@@ -295,8 +295,8 @@ demo_cases = [
         "scenario": "A_main", "title": "No answer → AI call 1 answered → auto-applied → delivered next day",
         "tracking_id": "SPXVN0123456789",
         "steps": [
-            {"clock": ts(DAY, "06:30"), "actor": "system", "do": "morning_load", "expect_ws": {"ops": "orders_loaded 4000 · 4 windows"}},
-            {"clock": ts(DAY, "06:32"), "actor": "agent", "do": "ask_window", "expect_ws": {"buyer": "chat_message with 4 windows + Can't receive today"}},
+            {"clock": ts(DAY, "06:00"), "actor": "system", "do": "morning_load", "expect_ws": {"ops": "orders_loaded 4000 · 4 windows"}},
+            {"clock": ts(DAY, "06:02"), "actor": "agent", "do": "ask_window", "expect_ws": {"buyer": "chat_message with 4 windows + Can't receive today"}},
             {"clock": ts(DAY, "08:00"), "actor": "system", "do": "route_cutoff", "expect": "answer_type=no_reply, deliver as planned"},
             {"clock": ts(DAY, "10:02"), "actor": "courier", "do": "tap A", "expect_ws": {"ops": "event_pending commit_at 10:04"}},
             {"clock": ts(DAY, "10:04"), "actor": "system", "do": "commit", "expect_ws": {"buyer": "chat 'We just missed you…'", "ops": "timer AI call 1 due 11:04"}},
@@ -362,7 +362,7 @@ demo_cases = [
         "scenario": "CANT_TODAY", "title": "Morning answer: can't receive today → moved to tomorrow",
         "tracking_id": "SPXVN0123459012",
         "steps": [
-            {"clock": ts(DAY, "06:32"), "actor": "agent", "do": "ask_window"},
+            {"clock": ts(DAY, "06:02"), "actor": "agent", "do": "ask_window"},
             {"clock": ts(DAY, "06:47"), "actor": "buyer", "do": "tap Can't receive today + reason 'Out of town until Monday'", "expect": "order moved to 2026-11-02 (Mon), reason saved, stop removed from today's route"},
         ],
     },
@@ -477,7 +477,7 @@ for src, vi, en, gold in HARD:
 
 # ---------- test cases ----------
 tests = [
-    {"id": "TC-01", "covers": ["AC-01", "FR-03"], "scenario": "A_main", "given": "4,000 orders seeded, clock 06:28", "when": "clock passes 06:30", "then": "4,000 availability_reply rows with 4 slots_offered; 4,000 chat_message events; /ops shows 'orders loaded 4,000'"},
+    {"id": "TC-01", "covers": ["AC-01", "FR-03"], "scenario": "A_main", "given": "4,000 orders seeded, clock 05:58", "when": "clock passes 06:00", "then": "4,000 availability_reply rows with 4 slots_offered; 4,000 chat_message events; /ops shows 'orders loaded 4,000'"},
     {"id": "TC-02", "covers": ["AC-02", "BR-03"], "scenario": "unit", "given": "buyer picks only W4", "when": "reply webhook", "then": "agent asks for one more window; no note created"},
     {"id": "TC-03", "covers": ["AC-03", "BR-06"], "scenario": "A_main", "given": "courier taps A at 10:02", "when": "Undo at 10:03", "then": "shipper_event.status=undone; no chat_message to buyer; /ops shows 'undone'"},
     {"id": "TC-04", "covers": ["AC-04", "BR-09", "BR-10"], "scenario": "A_noanswer", "given": "chat at 14:32, no reply", "when": "clock runs", "then": "call 1 at 15:32, call 2 at 17:32, escalation at 17:33"},
@@ -496,7 +496,7 @@ tests = [
     {"id": "TC-17", "covers": ["BR-16"], "scenario": "eval", "given": "sample with cross-ward address change", "when": "extract", "then": "same_district=false → needs_review regardless of confidence"},
     {"id": "TC-18", "covers": ["BR-18"], "scenario": "eval", "given": "'next Saturday'", "when": "extract", "then": "date beyond 5 days rejected → cannot_receive / CS"},
     {"id": "TC-19", "covers": ["NFR-01"], "scenario": "A_main", "given": "3 devices on hotspot", "when": "tap A on phone", "then": "event_pending visible on iPad within 300 ms (p95 over 20 taps)"},
-    {"id": "TC-20", "covers": ["FR-70", "FR-72"], "scenario": "control", "given": "/control", "when": "Reset, speed 600×, offline mode", "then": "DB back to seed, clock 06:28, cached outputs replayed"},
+    {"id": "TC-20", "covers": ["FR-70", "FR-72"], "scenario": "control", "given": "/control", "when": "Reset, speed 600×, offline mode", "then": "DB back to seed, clock 05:58, cached outputs replayed"},
 ]
 
 # ---------- write ----------

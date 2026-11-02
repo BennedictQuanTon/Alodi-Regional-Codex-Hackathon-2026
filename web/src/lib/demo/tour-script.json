@@ -1,5 +1,5 @@
 {
-  "p_fetch": { "voice": "narrator", "text": "Six thirty in the morning, in Binh Thanh. Alodi picks up today's orders and flags the ones likely to fail, like this air fryer, paid cash on delivery." },
+  "p_fetch": { "voice": "narrator", "text": "Six in the morning, in Binh Thanh. Alodi picks up today's orders and flags the ones likely to fail, like this air fryer, paid cash on delivery." },
   "p_slots": { "voice": "narrator", "text": "It asks the buyer to choose a delivery window, with quick replies from the route planner." },
   "p_cutoff": { "voice": "narrator", "text": "There's no reply by eight o'clock, when the route locks. So the route runs as planned." },
   "p_arrive": { "voice": "narrator", "text": "Just after ten, the shipper arrives and calls twice. No answer. On most days, that's where the trail goes cold." },

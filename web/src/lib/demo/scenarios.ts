@@ -81,7 +81,7 @@ export function initialState(scenario: ScenarioId = "A_main"): DemoState {
   return {
     scenario,
     step: 0,
-    clock: t(6, 28),
+    clock: t(5, 58),
     playing: false,
     auto: true,
     speed: 1,
@@ -139,15 +139,15 @@ function bumpOco(n: DemoState, by: OrderContext["updated_by"], fn: (o: OrderCont
 }
 
 // ---------------------------------------------------------------------------
-// Shared prefix: from 06:30 until the shipper taps a button
+// Shared prefix: from 06:00 until the shipper taps a button
 // ---------------------------------------------------------------------------
 
 const PREFIX: Step[] = [
   {
     id: "p_fetch",
-    to: t(6, 30),
+    to: t(6, 0),
     ms: 1600,
-    caption: "06:30 · Alodi pulls today’s orders for Binh Thanh",
+    caption: "06:00 · Alodi pulls today’s orders for Binh Thanh",
     apply: mut((n) => {
       log(n, "system", "1,284 orders today from Carrier OMS · 96 flagged risky");
       log(n, "agent", `Risk flag: COD ${ORDER.cod}, rescheduled once before`, "warn");

@@ -9,7 +9,7 @@ const generation = "generation-1";
 const detail = {
   order: { tracking_id: "ORDER-ACTUAL", buyer_name: "Fixture Buyer", item: "Fixture Item", address: "Fixture Address", cod_amount: 153000, status: "out_for_delivery", generation_id: generation },
   data_source: "synthetic", context: {}, context_card: null, pending_event: null, calls: [], rescue_cases: [], provider_requests: [], events: [],
-  messages: [{ text: "Real morning message", status: "sent", sent_at: "2026-10-31T06:30:00+07:00" }, { text: "Unsent draft", status: "queued" }],
+  messages: [{ text: "Real morning message", status: "sent", sent_at: "2026-10-31T06:00:00+07:00" }, { text: "Unsent draft", status: "queued" }],
   rescue_messages: [{ kind: "rescue_chat", text: "Real rescue message", status: "sent", sent_at: "2026-10-31T10:02:00+07:00" }],
 };
 const monitorState = () => ({ config: { mode: "live", ready: true }, generation, detail, clock: { generation_id: generation }, records: [] });

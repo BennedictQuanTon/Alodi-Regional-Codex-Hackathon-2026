@@ -1,7 +1,7 @@
 // Generated from prep/02-technical/mock-data (fixed seed 31102026). Fictional hub, not real data.
 // Regenerate: python3 -I prep/02-technical/mock-data/export_dashboard.py prep/02-technical/mock-data web/src/lib/dash/hub-day.ts
 
-export const HUB = {"id": "HCM-BTH-01", "name": "Binh Thanh hub", "date": "2026-10-31", "shippers": 20, "wards": ["Binh Thanh", "Gia Dinh", "Thanh My Tay", "Binh Loi Trung"], "morningRun": "06:30", "cutoff": "08:00", "callHours": "08:00–20:30"} as const;
+export const HUB = {"id": "HCM-BTH-01", "name": "Binh Thanh hub", "date": "2026-10-31", "shippers": 20, "wards": ["Binh Thanh", "Gia Dinh", "Thanh My Tay", "Binh Loi Trung"], "morningRun": "06:00", "cutoff": "08:00", "callHours": "08:00–20:30"} as const;
 
 export const DAY = {"orders": 3993, "window_questions_sent": 3993, "morning": {"windows": 1437, "cannot_today": 196, "no_reply": 2360}, "attempted_today": 3797, "delivered_first_attempt": 3447, "failed_first_attempt": {"A": 209, "B": 91, "C": 50, "total": 350}, "flow_a": {"chat_sent": 209, "replied_in_chat": 89, "call_1": 117, "call_1_answered": 47, "call_2": 70, "call_2_answered": 20, "unreachable_to_cs": 50, "calls_moved_to_next_morning": 0}, "flow_b": {"memos": 91}, "extraction": {"auto_applied": 209, "confirmed_in_chat": 22, "cs_review": 16}, "opt_out": 3, "cs_queue": {"refused": 50, "unreachable": 50, "low_confidence": 16, "total": 116}, "rescheduled_with_card": 231, "messages_sent": 6110, "call_minutes_answered": 89.1, "memo_seconds": 678, "calls_placed": 187, "scripted_demo_orders": 7} as const;
 

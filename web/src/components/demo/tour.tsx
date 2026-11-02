@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useDemo } from "@/lib/demo/engine";
@@ -11,6 +12,7 @@ import { Person } from "./cast";
 import { PhoneFrame } from "./phone";
 import { ShipperApp } from "./shipper-app";
 import { useFit } from "./stage";
+import { TourCover } from "./tour-cover";
 import { TourAgent, TourDashboard } from "./tour-surfaces";
 
 const NARROW = "(max-width: 900px)";
@@ -116,16 +118,11 @@ export function DemoTour() {
           {single ? surfaces[showing as keyof typeof surfaces] : [shipper, buyer, ops, agent]}
         </div>
 
-        {(!started || finished) && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-white/85 px-6 text-center backdrop-blur">
-            <Wordmark className="text-[44px]" />
-            <h1 className="ui-h text-[30px] leading-tight">{finished ? "Make the second drop land." : "Watch one failed delivery get rescued"}</h1>
-            <p className="max-w-[460px] text-[15px] ui-muted">{finished ? "One tap from the shipper. The agent did the rest, and a person stays in charge of the hard calls." : "One buyer, one missed delivery and one tap. Turn your sound on."}</p>
-            <button className="ui-btn ui-btn-accent mt-2 min-h-[56px] px-10 text-[17px]" onClick={start}>{finished ? "Watch again" : "Start with sound"}</button>
-            <p className="text-[12px] ui-muted">A scripted example with fictional data and synthesized voices.</p>
-          </div>
-        )}
       </div>
+
+      <AnimatePresence>
+        {(!started || finished) && <TourCover key={finished ? "end" : "start"} mode={finished ? "end" : "start"} onPlay={start} />}
+      </AnimatePresence>
 
       <footer className="shrink-0 border-t border-[var(--ui-line)] bg-white px-4 pb-3 pt-2.5">
         <p className="mx-auto mb-2 min-h-[20px] max-w-[860px] text-center text-[14px]">{started && !finished ? subtitle : ""}</p>

@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     ai_mode: Literal["stub", "live"] = "stub"
     offline_mode: bool = False
     auto_buyer: bool = False
-    demo_start: datetime = datetime.fromisoformat("2026-10-31T06:28:00+07:00")
+    demo_start: datetime = datetime.fromisoformat("2026-10-31T05:58:00+07:00")
     demo_clock_speed: float = Field(default=600, gt=0, allow_inf_nan=False)
     demo_scenario: ScenarioName = "A_main"
 
