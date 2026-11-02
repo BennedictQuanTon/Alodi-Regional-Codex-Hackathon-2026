@@ -12,7 +12,7 @@
   "couriers": 20,
   "orders": 4000,
   "stops_per_route": 200,
-  "morning_run": "06:30",
+  "morning_run": "06:00",
   "route_cutoff": "08:00",
   "call_hours": "08:00–20:30",
   "note": "Fictional hub. Ward names follow the HCMC ward-level structure in force since 1 July 2025; addresses, people and phone numbers are invented."

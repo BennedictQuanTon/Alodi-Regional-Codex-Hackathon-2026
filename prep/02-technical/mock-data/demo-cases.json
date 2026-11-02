@@ -5,7 +5,7 @@
     "tracking_id": "SPXVN0123456789",
     "steps": [
       {
-        "clock": "2026-10-31T06:30:00+07:00",
+        "clock": "2026-10-31T06:00:00+07:00",
         "actor": "system",
         "do": "morning_load",
         "expect_ws": {
@@ -13,7 +13,7 @@
         }
       },
       {
-        "clock": "2026-10-31T06:32:00+07:00",
+        "clock": "2026-10-31T06:02:00+07:00",
         "actor": "agent",
         "do": "ask_window",
         "expect_ws": {
@@ -282,7 +282,7 @@
     "tracking_id": "SPXVN0123459012",
     "steps": [
       {
-        "clock": "2026-10-31T06:32:00+07:00",
+        "clock": "2026-10-31T06:02:00+07:00",
         "actor": "agent",
         "do": "ask_window"
       },

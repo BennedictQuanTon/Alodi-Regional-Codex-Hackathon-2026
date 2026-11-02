@@ -29,7 +29,7 @@ CANT = "SPXVN0123459012"
 
 async def ask(morning):
     result = await morning.service.load(morning.job)
-    morning.clock.set("06:32")
+    morning.clock.set("06:02")
     await morning.service.dispatch(morning.generation)
     return result
 
@@ -90,7 +90,7 @@ async def test_tc01_loads_all_4000_and_only_marks_accepted_messages_sent(seeded,
             "W4",
             "cannot_today",
         ]
-    clock.set("06:32")
+    clock.set("06:02")
     assert (await service.dispatch(summary.generation_id))["sent"] == 4000
     assert not (await service.load(job))["created"]
     assert (await service.dispatch(summary.generation_id))["sent"] == 0
@@ -266,7 +266,7 @@ async def test_later_morning_does_not_move_horizon_or_allow_old_question(morning
     await morning.service.reply(
         await answer(morning, answer_type="cannot_today", windows=[], reason="Away")
     )
-    morning.clock.set("06:30", day="2026-11-01")
+    morning.clock.set("06:00", day="2026-11-01")
     assert (await morning.service.load(morning.job))["questions_created"] == 1
     await morning.service.dispatch(morning.generation)
     late_date = await answer(

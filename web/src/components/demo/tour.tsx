@@ -1,9 +1,10 @@
 "use client";
 
+import { AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useDemo } from "@/lib/demo/engine";
-import { fmtClock, fmtDay } from "@/lib/demo/scenarios";
+import { fmtClock, fmtDay, setLiveAnswer, stepsFor } from "@/lib/demo/scenarios";
 import { CHAPTERS, TOUR_STEPS, TourAudio, currentChapter, focusOf, useTourEffects } from "@/lib/demo/tour";
 import { DropRing, Wordmark } from "@/components/site/brand";
 import { BuyerPhone } from "./buyer-phone";
@@ -11,6 +12,8 @@ import { Person } from "./cast";
 import { PhoneFrame } from "./phone";
 import { ShipperApp } from "./shipper-app";
 import { useFit } from "./stage";
+import { TourCover } from "./tour-cover";
+import { LiveTurn, useTrial } from "./tour-live";
 import { TourAgent, TourDashboard } from "./tour-surfaces";
 
 const NARROW = "(max-width: 900px)";
@@ -19,6 +22,8 @@ const watchNarrow = (notify: () => void) => {
   query.addEventListener("change", notify);
   return () => query.removeEventListener("change", notify);
 };
+
+const SPEAKER: Record<string, string> = { narrator: "Narrator", agent: "Alodi", buyer: "Buyer" };
 
 type View = "all" | "shipper" | "buyer" | "ops" | "agent";
 const VIEWS: { id: View; label: string }[] = [
@@ -56,7 +61,12 @@ export function DemoTour() {
   const [audio] = useState(() => new TourAudio());
   const [started, setStarted] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [subtitle, setSubtitle] = useState("");
+  const [speech, setSpeech] = useState({ text: "", voice: "narrator" });
+  const [isLive, setIsLive] = useState(false);
+  const [person, setPerson] = useState(false);
+  const [turn, setTurn] = useState<{ resolve: (mode: "live" | "auto") => void } | null>(null);
+  const [mic, setMic] = useState<MediaStream | null>(null);
+  const { trial, setTrial, refresh } = useTrial();
   const narrow = useSyncExternalStore(watchNarrow, () => window.matchMedia(NARROW).matches, () => false);
   const [view, setView] = useState<View>("all");
   const single = narrow || view !== "all";
@@ -66,7 +76,7 @@ export function DemoTour() {
   useTourEffects(s, audio);
 
   useEffect(() => {
-    audio.listen(setSubtitle);
+    audio.listen((text, voice) => setSpeech({ text, voice }));
     engine.reset("A_main");
     engine.setAuto(true);
     engine.setSpeed(1);
@@ -78,15 +88,29 @@ export function DemoTour() {
     };
   }, [engine, audio]);
 
-  const start = () => {
+  const begin = (live: boolean) => {
     audio.unlock();
+    setLiveAnswer(null);
+    setPerson(false);
+    setIsLive(live);
+    audio.setTurn(live ? () => new Promise((resolve) => setTurn({ resolve })) : undefined);
     setStarted(true);
     engine.reset("A_main");
     engine.play();
   };
+  const start = () => { mic?.getTracks().forEach((t) => t.stop()); setMic(null); begin(false); };
+  const startLive = async () => {
+    try {
+      mic?.getTracks().forEach((t) => t.stop());
+      setMic(await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }));
+      begin(true);
+    } catch {
+      start(); // no microphone, or permission refused: the story still runs
+    }
+  };
   const toggleMute = () => { audio.setMuted(!muted); setMuted(!muted); };
 
-  const finished = started && s.step >= TOUR_STEPS.length;
+  const finished = started && s.step >= stepsFor(s.scenario).length;
   const base = focusOf(s);
   const focus = base === "ops" ? "agent" : s.stage === "ready" || s.stage === "closed" ? "ops" : base;
   const showing = view === "all" ? focus : view;
@@ -116,36 +140,62 @@ export function DemoTour() {
           {single ? surfaces[showing as keyof typeof surfaces] : [shipper, buyer, ops, agent]}
         </div>
 
-        {(!started || finished) && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-white/85 px-6 text-center backdrop-blur">
-            <Wordmark className="text-[44px]" />
-            <h1 className="ui-h text-[30px] leading-tight">{finished ? "Make the second drop land." : "Watch one failed delivery get rescued"}</h1>
-            <p className="max-w-[460px] text-[15px] ui-muted">{finished ? "One tap from the shipper. The agent did the rest, and a person stays in charge of the hard calls." : "One buyer, one missed delivery and one tap. Turn your sound on."}</p>
-            <button className="ui-btn ui-btn-accent mt-2 min-h-[56px] px-10 text-[17px]" onClick={start}>{finished ? "Watch again" : "Start with sound"}</button>
-            <p className="text-[12px] ui-muted">A scripted example with fictional data and synthesized voices.</p>
-          </div>
-        )}
       </div>
 
-      <footer className="shrink-0 border-t border-[var(--ui-line)] bg-white px-4 pb-3 pt-2.5">
-        <p className="mx-auto mb-2 min-h-[20px] max-w-[860px] text-center text-[14px]">{started && !finished ? subtitle : ""}</p>
-        <div className="mx-auto flex max-w-[1100px] items-center gap-3">
-          <button className="ui-btn ui-btn-primary min-w-[84px]" disabled={!started || finished} onClick={engine.toggle}>{s.playing ? "Pause" : "Play"}</button>
-          <ol className="grid flex-1 gap-1.5" style={{ gridTemplateColumns: `repeat(${CHAPTERS.length}, minmax(0, 1fr))` }}>
+      <AnimatePresence>
+        {(!started || finished) && <TourCover key={finished ? "end" : "start"} mode={finished ? "end" : "start"} person={person} trial={trial} onPlay={start} onLive={() => void startLive()} />}
+      </AnimatePresence>
+
+      {turn && mic && (
+        <LiveTurn
+          stream={mic}
+          trial={trial}
+          onTrial={setTrial}
+          onAck={audio.acknowledge}
+          onDone={(answer) => {
+            setLiveAnswer(answer);
+            if (answer?.outcome === "person") engine.branch("A_lowconf");
+            setPerson(answer?.outcome === "person");
+            if (answer) setSpeech({ text: answer.transcript, voice: "buyer" });
+            turn.resolve(answer ? "live" : "auto");
+            setTurn(null);
+          }}
+        />
+      )}
+
+      <footer className="tf">
+        <div className="tf-say" aria-live="polite">
+          {started && !finished && speech.text && (
+            <p key={speech.text}><span>{SPEAKER[speech.voice] ?? "Narrator"}</span>{speech.text}</p>
+          )}
+        </div>
+        <div className="tf-bar">
+          <div className="tf-controls">
+            <button className="tf-btn tf-play" aria-label={s.playing ? "Pause" : "Play"} disabled={!started || finished || !!turn} onClick={engine.toggle}>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>{s.playing ? <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /> : <path d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.6-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z" />}</svg>
+            </button>
+            <button className="tf-btn" aria-label={muted ? "Unmute" : "Mute"} aria-pressed={muted} onClick={toggleMute}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor" />{muted ? <path d="M16.5 9.5l4.5 5M21 9.5l-4.5 5" /> : <path d="M16 9a4.5 4.5 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" />}</svg>
+            </button>
+            <button className="tf-btn" aria-label="Restart" disabled={!started} onClick={() => { void refresh(); setStarted(false); setTurn(null); setLiveAnswer(null); engine.reset("A_main"); engine.setAuto(true); audio.stop(); audio.ring(false); }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M4 12a8 8 0 1 0 2.6-5.9" /><path d="M4 4.5V9h4.5" /></svg>
+            </button>
+          </div>
+          <ol className="tf-line" style={{ gridTemplateColumns: `repeat(${CHAPTERS.length}, minmax(0, 1fr))` }}>
             {CHAPTERS.map((item, index) => {
               const end = CHAPTERS[index + 1]?.step ?? TOUR_STEPS.length;
               const fill = Math.max(0, Math.min(1, (s.step - item.step) / (end - item.step)));
+              const now = started && index === chapter;
               return (
-                <li key={item.label}>
-                  <button className="group w-full text-left" disabled={!started} aria-current={started && index === chapter ? "step" : undefined} onClick={() => engine.seek(item.step)}>
-                    <span className="block h-1.5 overflow-hidden rounded-full bg-[var(--ui-line)] group-hover:bg-[#d4d4d4]"><span className="block h-full rounded-full bg-[var(--ui-accent)] transition-[width] duration-500" style={{ width: `${fill * 100}%` }} /></span>
-                    <span className={`mt-1 hidden truncate text-[12px] sm:block ${started && index === chapter ? "font-medium" : "ui-muted"}`}>{item.label}</span>
+                <li key={item.label} className={now ? "now" : ""}>
+                  <button disabled={!started || isLive} aria-current={now ? "step" : undefined} onClick={() => engine.seek(item.step)}>
+                    <i><b style={{ transform: `scaleX(${started ? fill : 0})` }} /></i>
+                    <span>{item.label}</span>
                   </button>
                 </li>
               );
             })}
           </ol>
-          <button className="ui-btn ui-btn-outline min-w-[84px]" aria-pressed={muted} onClick={toggleMute}>{muted ? "Unmute" : "Mute"}</button>
         </div>
       </footer>
     </div>

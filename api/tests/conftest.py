@@ -63,7 +63,7 @@ async def seeded(database, settings, pack):
 
 
 class FixedClock:
-    def __init__(self, hhmm="06:30"):
+    def __init__(self, hhmm="06:00"):
         self.set(hhmm)
 
     def set(self, hhmm, day="2026-10-31"):

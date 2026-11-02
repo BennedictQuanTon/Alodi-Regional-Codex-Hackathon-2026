@@ -46,7 +46,7 @@ async def test_order_detail_has_initial_context_windows_and_audit(settings):
         assert body["context"]["extracted"]["time_window"] is None
         assert [window["id"] for window in body["slots_offered"]] == ["W1", "W2", "W3", "W4"]
         assert body["events"][0]["type"] == "order_seeded"
-        assert body["events"][0]["at"] == "2026-10-31T06:28:00+07:00"
+        assert body["events"][0]["at"] == "2026-10-31T05:58:00+07:00"
         assert body["events"][0]["data_source"] == "synthetic"
         assert (await client.get("/orders/missing")).status_code == 404
 

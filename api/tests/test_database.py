@@ -222,7 +222,7 @@ async def test_revision_two_upgrades_existing_seed_and_closes_unverified_legacy_
         assert question.service_date.isoformat() == "2026-10-31"
         assert question.generation_id == summary.generation_id
         hub = await session.scalar(select(Hub))
-        assert hub.morning_run.isoformat() == "06:30:00"
+        assert hub.morning_run.isoformat() == "06:00:00"
         assert not (await session.execute(text("PRAGMA foreign_key_check"))).all()
     from conftest import FixedClock
 
