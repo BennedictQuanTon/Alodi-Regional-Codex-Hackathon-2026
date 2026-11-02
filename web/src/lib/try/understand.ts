@@ -14,7 +14,7 @@ export class OpenAiError extends Error {
 async function call(path: string, init: RequestInit) {
   const response = await fetch(`${API}${path}`, {
     ...init,
-    headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, ...init.headers },
+    headers: { Authorization: `Bearer ${(process.env.OPENAI_API_KEY ?? "").trim().replace(/^["']|["']$/g, "")}`, ...init.headers },
     signal: AbortSignal.timeout(TIMEOUT),
     cache: "no-store",
   });

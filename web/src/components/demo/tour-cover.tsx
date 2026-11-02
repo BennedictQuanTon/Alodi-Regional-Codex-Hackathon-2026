@@ -98,7 +98,7 @@ export function TourCover({ mode, person, trial, onPlay, onLive }: { mode: "star
         {sorry ? (
           <motion.small className="tc-sorry" {...rise(0.42)}>{sorry}</motion.small>
         ) : canTry ? (
-          <motion.small {...rise(0.42)}>Answer the call yourself · {trial.left} live {trial.left === 1 ? "try" : "tries"} left today · Your voice goes to OpenAI to transcribe, and Alodi doesn’t keep it. Please use made-up details.</motion.small>
+          <motion.small {...rise(0.42)}>Answer the call yourself · {trial.left} live {trial.left === 1 ? "try" : "tries"} left today · Your voice goes to OpenAI and your browser’s speech service for captions. Alodi doesn’t keep it. Please use made-up details.</motion.small>
         ) : (
           !end && <motion.small {...rise(0.42)}>About 2 minutes · Sound on</motion.small>
         )}

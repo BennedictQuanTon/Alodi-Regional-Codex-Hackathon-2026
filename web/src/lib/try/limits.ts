@@ -138,18 +138,19 @@ export async function closeTrials() {
   await store()?.([["SET", "try:closed", 1]]);
 }
 
-export function issueToken(ip: string) {
+// A token proves this site's page asked for it. It isn't tied to an address, which can change mid-visit on private relays and mobile networks.
+export function issueToken() {
   const key = secret();
   if (!key) return null;
   const body = `${Date.now()}.${randomBytes(9).toString("hex")}`;
-  return `${body}.${createHmac("sha256", key).update(`${body}.${ip}`).digest("hex")}`;
+  return `${body}.${createHmac("sha256", key).update(body).digest("hex")}`;
 }
 
-export function checkToken(token: string, ip: string): { nonce: string } | null {
+export function checkToken(token: string): { nonce: string } | null {
   const key = secret();
   const [ts, nonce, mac] = token.split(".");
   if (!key || !ts || !nonce || !mac) return null;
-  const want = Buffer.from(createHmac("sha256", key).update(`${ts}.${nonce}.${ip}`).digest("hex"));
+  const want = Buffer.from(createHmac("sha256", key).update(`${ts}.${nonce}`).digest("hex"));
   const got = Buffer.from(mac);
   if (want.length !== got.length || !timingSafeEqual(want, got)) return null;
   const age = Date.now() - Number(ts);
