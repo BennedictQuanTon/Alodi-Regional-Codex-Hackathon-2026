@@ -381,6 +381,7 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:#f6f3f1}
 <!-- what it runs on -->
 <section class="sc" id="o3" style="background:#000;color:#fff">
   <div class="a" id="o3h" style="left:110px;top:92px;display:flex;align-items:center;gap:32px"><img src="assets/openai-white.png" style="width:96px;height:96px"><span style="font-size:84px;font-weight:500;letter-spacing:-.035em">Alodi runs on OpenAI</span></div>
+  <div class="a" id="o3ev" style="right:110px;top:62px;display:flex;flex-direction:column;align-items:flex-end;gap:12px"><div style="font-size:27px;font-weight:500;color:#e8e8e8">Built during the hackathon</div><div style="display:flex;align-items:center;gap:26px"><img src="assets/regional-codex-hackathon.png" style="height:112px"><img src="assets/sea-openai.png" style="height:62px"></div></div>
   <div class="orow" id="o3a" style="top:255px"><b>GPT-Live-1</b><span>Makes the call</span></div>
   <div class="orow" id="o3b" style="top:385px"><b>GPT Transcribe</b><span>Hears the memo</span></div>
   <div class="orow" id="o3c" style="top:515px"><b>GPT-6.1 Terra</b><span>Writes the card</span></div>
@@ -744,6 +745,7 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:#f6f3f1}
   // O3: the bar narrows into the wire that joins the three models
   sheet("#o1", "#o3", c("o03"));
   tl.from("#o3h", { opacity: 0, y: 24, duration: 0.8, ease: heavy }, S.o03 + 0.1);
+  tl.from("#o3ev", { opacity: 0, y: 16, duration: 0.7, ease: heavy }, S.o03 + 0.5);
   tl.from([".orow", "#o3e"], { opacity: 0, y: 18, duration: 0.6, stagger: 0.08, ease: heavy }, S.o03 + 1.0);
   [["#o3a", "#o3pa", S.o03 + 2.25], ["#o3b", "#o3pb", S.o03 + 4.85], ["#o3c", "#o3pc", S.o03 + 7.35], ["#o3d", "#o3pd", S.o04]].forEach(([row, panel, at], i, all) => {
     tl.to(row, { color: "#ffffff", duration: 0.3 }, at);
