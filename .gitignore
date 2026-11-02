@@ -55,6 +55,13 @@ dist/
 !/ai/README.md
 !/prep/01-pitch/video/story/CREDITS.md
 !/prep/01-pitch/video/skit/CREDITS.md
+!/prep/01-pitch/video/story-full/CREDITS.md
+# Film source material stays local; fetch_stock.sh downloads the licensed clips, music and effects
+/prep/01-pitch/video/story-full/assets/
+/prep/01-pitch/video/story-full/vo/
+/prep/01-pitch/video/story-full/mix.wav
+# Over GitHub's 100 MB file limit
+/prep/01-pitch/video/alodi-story-full.mp4
 # Local browser test output
 /output/
 /.playwright-cli/

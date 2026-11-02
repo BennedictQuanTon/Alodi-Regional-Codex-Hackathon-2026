@@ -1,0 +1,129 @@
+{
+ "h02": [
+  "One meeting. One silent phone.",
+  "And your parcel rides away."
+ ],
+ "h03": [
+  "Across Vietnam, 8–12% of orders",
+  "are refused at the door."
+ ],
+ "h04": [
+  "And buyers can’t choose a delivery time.",
+  "Not on Shopee.",
+  "So everything rides on one phone call."
+ ],
+ "h05": [
+  "Buyers want a say.",
+  "Shippers just want someone to pick up."
+ ],
+ "h06": [
+  "Every failed order costs the seller up to ₫40,000.",
+  "For one area, we estimate ₫473 million a month."
+ ],
+ "h07": [
+  "So let’s follow just one of those calls."
+ ],
+ "n01": [
+  "It’s 10:02.",
+  "Quan is in a meeting.",
+  "And the phone? On silent."
+ ],
+ "n02": [
+  "At the door, Tuong is waiting, air fryer in hand.",
+  "One call. Two calls… Nothing."
+ ],
+ "n03": [
+  "Thirty more orders are waiting.",
+  "So the parcel goes back on the bike.",
+  "And all that’s left is two sad little words.",
+  "No answer."
+ ],
+ "n04": [
+  "We’ve all been Quan.",
+  "And we’ve all felt a little bad for Tuong."
+ ],
+ "n05": [
+  "So we built Alodi.",
+  "An agentic recovery system for failed deliveries,",
+  "so the second try actually lands."
+ ],
+ "p01": [
+  "Here’s how it works.",
+  "At 6:00 in the morning, Alodi asks Quan when to come.",
+  "Three windows, or not today. Just a tap or two."
+ ],
+ "p02": [
+  "But Quan’s still asleep.",
+  "No reply by eight, so the route locks as planned."
+ ],
+ "n06": [
+  "Then at 10:02, the same missed call.",
+  "But now, Tuong taps one button.",
+  "No typing. No calling back.",
+  "And off to the next stop."
+ ],
+ "n07": [
+  "From here, Alodi takes over.",
+  "First, a friendly message to Quan, right away."
+ ],
+ "n08": [
+  "An hour later? Still quiet.",
+  "So Alodi does something lovely.",
+  "It picks up the phone."
+ ],
+ "a01": [
+  "Hi Quan! This is Alodi, your delivery assistant.",
+  "This call is recorded. When’s a good time?"
+ ],
+ "m01": [
+  "Oh, sorry! Tomorrow after five, please.",
+  "Leave it with security in Tower B.",
+  "Or call my wife."
+ ],
+ "n09": [
+  "Did you catch all that? Alodi did.",
+  "When. Where. Who.",
+  "All in one neat little card."
+ ],
+ "n10": [
+  "It checks the rules,",
+  "then sends the card straight to Loi, the next shipper."
+ ],
+ "n11": [
+  "And the next evening?",
+  "No calls. No guessing.",
+  "Just… delivered."
+ ],
+ "n12": [
+  "Quan gets the parcel.",
+  "Loi saves a trip.",
+  "The seller keeps the sale."
+ ],
+ "n13": [
+  "Already agreed a new time at the door?",
+  "Tuong holds the button and says it, in ten seconds.",
+  "Alodi writes the same card."
+ ],
+ "n14": [
+  "And when an answer isn’t clear, or a buyer says no?",
+  "Alodi stops, and hands it to Yoshio, in customer support.",
+  "Because some calls should stay human."
+ ],
+ "n15": [
+  "Meanwhile, the hub sees every rescue,",
+  "live, on one dashboard."
+ ],
+ "o01": [
+  "So what’s it worth?",
+  "For one area, we estimate up to ₫187 million saved, every month."
+ ],
+ "o03": [
+  "And it runs on OpenAI.",
+  "GPT-Live-1 makes the call.",
+  "GPT Transcribe hears the memo.",
+  "GPT-6.1 Terra writes the card."
+ ],
+ "o04": [
+  "And we built it all with Codex."
+ ]
+}

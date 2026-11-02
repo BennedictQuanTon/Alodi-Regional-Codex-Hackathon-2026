@@ -137,8 +137,8 @@ A disclosure plays before each call, and the call won't connect without the buye
 ## The product
 
 <p align="center">
-  <a href="web/public/video/alodi-story.mp4"><img src="web/public/video/alodi-story.jpg" alt="Watch the 2:05 story film" width="100%" /></a>
-  <br/><sub><b>The story film (2:05).</b> One parcel, one missed call, one rescue. Click to open.</sub>
+  <a href="web/public/video/alodi-story.mp4"><img src="web/public/video/alodi-story.jpg" alt="Watch the 3:30 story film" width="100%" /></a>
+  <br/><sub><b>The story film (3:30).</b> One parcel, one missed call, one rescue. Click to open.</sub>
 </p>
 
 <table>
