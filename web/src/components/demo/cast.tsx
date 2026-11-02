@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import { Mark } from "@/components/site/brand";
 import type { DemoState } from "@/lib/demo/types";
 
 // The people in the demo, with faces and lines that follow the story.
@@ -51,6 +52,7 @@ function ops(s: DemoState): Role {
 }
 
 const WHO = { shipper, buyer, ops };
+const GLYPH = { shipper: "square", buyer: "dot", ops: "check" } as const;
 
 export function Person({ who, state }: { who: keyof typeof WHO; state: DemoState }) {
   const r = WHO[who](state);
@@ -71,7 +73,7 @@ export function Person({ who, state }: { who: keyof typeof WHO; state: DemoState
         />
       </AnimatePresence>
       <div className="min-w-0 text-left">
-        <div className="text-[13px] font-medium text-[var(--ui-muted)]">{r.name}</div>
+        <div className="flex items-center gap-1.5 text-[13px] font-medium text-[var(--ui-muted)]"><Mark kind={GLYPH[who]} size={14} ring="#f05a00" />{r.name}</div>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={r.say}

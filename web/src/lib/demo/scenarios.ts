@@ -276,7 +276,7 @@ function endCall(duration: number, result = "answered"): Step["apply"] {
 function startExtract(source: "ai_call" | "shipper_memo" | "chat", fields: ExtractField[]): Step["apply"] {
   return mut((n) => {
     n.stage = "extract";
-    n.extraction = { source, fields, revealed: 0, decision: null };
+    n.extraction = { source, fields: LIVE ? liveFields(LIVE) : fields, revealed: 0, decision: null };
     log(n, "agent", "Context extractor: strict JSON schema");
   });
 }
@@ -284,6 +284,29 @@ function startExtract(source: "ai_call" | "shipper_memo" | "chat", fields: Extra
 const revealAll = mut((n) => {
   if (n.extraction) n.extraction.revealed = n.extraction.fields.length;
 });
+
+/** What a visitor really said in "Try it live". While set, it replaces the scripted buyer's answer. */
+export type LiveAnswer = {
+  outcome: "applied" | "person";
+  transcript: string;
+  when: string | null;
+  where: string | null;
+  who: string | null;
+  confidence: { when: number | null; where: number | null; who: number | null };
+  iso: { date: string; from: string; to: string } | null;
+  dayOffset: number;
+  fromMinutes: number;
+};
+let LIVE: LiveAnswer | null = null;
+export const setLiveAnswer = (answer: LiveAnswer | null) => { LIVE = answer; };
+export const getLiveAnswer = () => LIVE;
+
+const liveFields = (answer: LiveAnswer): ExtractField[] => [
+  { key: "time_window", label: "Window", value: answer.when ?? "Not clear", conf: answer.confidence.when ?? 0.3 },
+  { key: "drop_location", label: "Drop-off", value: answer.where, conf: answer.confidence.where },
+  { key: "alt_receiver", label: "Alt. receiver", value: answer.who, conf: answer.confidence.who },
+  { key: "address_correction", label: "Address fix", value: null, conf: null },
+];
 
 const GOOD_FIELDS: ExtractField[] = [
   { key: "time_window", label: "Window", value: "1 Nov · 17:00–20:00", conf: 0.94 },
@@ -297,9 +320,9 @@ function applyGood(source: "ai_call" | "shipper_memo", sourceLabel: string): Ste
     n.stage = "ready";
     if (n.extraction) n.extraction.decision = "auto_applied";
     n.card = {
-      window: "Sun 1 Nov, 17:00–20:00",
-      drop: "Tower B security desk",
-      alt: "Wife · 0903 *** 214",
+      window: LIVE?.when ?? "Sun 1 Nov, 17:00–20:00",
+      drop: LIVE ? (LIVE.where ?? "Address on the order") : "Tower B security desk",
+      alt: LIVE ? LIVE.who : "Wife · 0903 *** 214",
       source: sourceLabel,
       by: "agent",
     };
@@ -308,12 +331,14 @@ function applyGood(source: "ai_call" | "shipper_memo", sourceLabel: string): Ste
     bumpOco(n, "agent", (o) => {
       o.channel = source;
       o.extracted = {
-        time_window: { date: "2026-11-01", from: "17:00", to: "20:00" },
-        drop_location: { type: "security_desk", note: "Tower B security" },
-        alt_receiver: { phone: "09xxxxxxxx", relation: "wife" },
+        time_window: LIVE?.iso ?? { date: "2026-11-01", from: "17:00", to: "20:00" },
+        drop_location: LIVE ? (LIVE.where ? { type: "as_told", note: LIVE.where } : null) : { type: "security_desk", note: "Tower B security" },
+        alt_receiver: LIVE ? (LIVE.who ? { phone: "09xxxxxxxx", relation: LIVE.who } : null) : { phone: "09xxxxxxxx", relation: "wife" },
         address_correction: null,
       };
-      o.confidence = { time_window: 0.94, drop_location: 0.88, alt_receiver: 0.91 };
+      o.confidence = LIVE
+        ? Object.fromEntries(Object.entries({ time_window: LIVE.confidence.when, drop_location: LIVE.confidence.where, alt_receiver: LIVE.confidence.who }).filter((e): e is [string, number] => e[1] != null))
+        : { time_window: 0.94, drop_location: 0.88, alt_receiver: 0.91 };
       o.decision = "auto_applied";
     });
     log(n, "agent", "Auto-applied · every field ≥ 0.85 threshold", "good");
@@ -325,7 +350,7 @@ const confirmToBuyer = mut((n) => {
   chat(
     n,
     "agent",
-    "Got it: Sun 1 Nov, 17:00–20:00, Tower B security. Reply “change” anytime.",
+    LIVE ? `Got it: ${n.card?.window}, ${n.card?.drop}. Reply “change” anytime.` : "Got it: Sun 1 Nov, 17:00–20:00, Tower B security. Reply “change” anytime.",
   );
 });
 
@@ -333,7 +358,7 @@ const nextDay = mut((n) => {
   n.shipper = { screen: "route", day: 1 };
   n.stage = "delivering";
   n.call = { status: "idle", attempt: 0, lines: [] };
-  log(n, "system", "Route for 1 Nov · order slotted into the evening shift per context card");
+  log(n, "system", LIVE ? `Route updated · order slotted in for ${n.card?.window}` : "Route for 1 Nov · order slotted into the evening shift per context card");
 });
 
 const delivered = mut((n) => {
@@ -344,8 +369,8 @@ const delivered = mut((n) => {
     o.delivery_attempt += 1;
     o.contact_log.push({ at: iso(n.clock), type: "delivered", result: "security_desk" });
   });
-  chat(n, "system", "Delivered · received by Tower B security");
-  log(n, "shipper", "Delivered on attempt 2 · Tower B security", "good");
+  chat(n, "system", LIVE ? `Delivered · ${n.card?.drop}` : "Delivered · received by Tower B security");
+  log(n, "shipper", LIVE ? `Delivered on attempt 2 · ${n.card?.drop}` : "Delivered on attempt 2 · Tower B security", "good");
 });
 
 function callScript(): Step[] {
@@ -393,22 +418,15 @@ const goodCall: Step[] = [
     ms: 3400,
     dt: 0.3,
     caption: "A real-world answer: time, drop-off and a stand-in receiver in one breath",
-    apply: line(
-      "buyer",
-      "Tomorrow after five, please. I’m out until late, so leave it with security in Tower B. Or call my wife, 0903 xxx 214.",
-    ),
+    apply: mut((n) => say(n, "buyer", LIVE?.transcript ?? "Tomorrow after five, please. I’m out until late, so leave it with security in Tower B. Or call my wife, 0903 xxx 214.")),
   },
   {
     id: "c_confirm",
     ms: 3000,
     dt: 0.2,
-    apply: line(
-      "ai",
-      "Confirming: Sunday 1 November, 5 to 8 pm, left with Tower B security, and your wife on 0903 xxx 214 if needed. Is that right?",
-      "tts",
-    ),
+    apply: mut((n) => say(n, "ai", LIVE ? "Thanks, I’ve noted that. Your delivery card is on its way." : "Confirming: Sunday 1 November, 5 to 8 pm, left with Tower B security, and your wife on 0903 xxx 214 if needed. Is that right?", "tts")),
   },
-  { id: "c_ok", ms: 1600, dt: 0.1, apply: line("buyer", "That’s right.") },
+  { id: "c_ok", ms: 1600, dt: 0.1, apply: mut((n) => { if (!LIVE) say(n, "buyer", "That’s right."); }) },
   {
     id: "c_bye",
     ms: 2000,
@@ -464,7 +482,7 @@ const BRANCHES: Record<ScenarioId, Step[]> = {
     { id: "a_confirm", ms: 1800, apply: confirmToBuyer },
     {
       id: "a_nextday",
-      to: t(17, 22, 1),
+      get to() { return LIVE ? t(0, LIVE.fromMinutes + 22, LIVE.dayOffset) : t(17, 22, 1); },
       ms: 4200,
       caption: "Next day · Sunday 1 Nov, evening shift",
       apply: nextDay,
@@ -494,13 +512,13 @@ const BRANCHES: Record<ScenarioId, Step[]> = {
       ms: 3200,
       dt: 0.3,
       caption: "A vague answer that mentions two different times",
-      apply: line("buyer", "Hmm, let me check tomorrow, maybe afternoon-ish… actually I might be home tonight, just leave it anywhere."),
+      apply: mut((n) => say(n, "buyer", LIVE?.transcript ?? "Hmm, let me check tomorrow, maybe afternoon-ish… actually I might be home tonight, just leave it anywhere.")),
     },
     {
       id: "l_bye",
       ms: 2400,
       dt: 0.2,
-      apply: line("ai", "Noted. We’ll get back to you to confirm a time. Thank you.", "recorded"),
+      apply: mut((n) => say(n, "ai", LIVE ? "I want to get this right, so a person from our team will confirm it with you. Thank you." : "Noted. We’ll get back to you to confirm a time. Thank you.", "recorded")),
     },
     { id: "l_end", ms: 1200, dt: 0.1, apply: endCall(52) },
     {

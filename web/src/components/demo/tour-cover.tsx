@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import Link from "next/link";
 import { Mark } from "@/components/site/brand";
+import { SORRY, type Trial } from "./tour-live";
 
 // The first and last thing the narrated demo shows. The "o" of the logo is the play button: it is already a call.
 // People: "Notionists" by Zoish (CC0), web/public/people.
@@ -30,6 +31,12 @@ const RECAP = [
   { mark: "check", title: "Delivered", text: "On the second attempt" },
 ] as const;
 
+const RECAP_PERSON = [
+  { mark: "wave", title: "One tap", text: "The shipper moves on" },
+  { mark: "dot", title: "Answer unclear", text: "Alodi applied nothing" },
+  { mark: "check", title: "A person decides", text: "Customer support confirms it" },
+] as const;
+
 const rise = (delay: number) => ({
   initial: { opacity: 0, y: 18 },
   animate: { opacity: 1, y: 0 },
@@ -37,8 +44,11 @@ const rise = (delay: number) => ({
 });
 
 /* eslint-disable @next/next/no-img-element */
-export function TourCover({ mode, onPlay }: { mode: "start" | "end"; onPlay: () => void }) {
+export function TourCover({ mode, person, trial, onPlay, onLive }: { mode: "start" | "end"; person?: boolean; trial: Trial; onPlay: () => void; onLive: () => void }) {
   const end = mode === "end";
+  const canTry = trial.state === "ready";
+  const sorry = SORRY[trial.state];
+  const recap = person ? RECAP_PERSON : RECAP;
   return (
     <motion.div
       className="tc"
@@ -63,12 +73,12 @@ export function TourCover({ mode, onPlay }: { mode: "start" | "end"; onPlay: () 
         </motion.div>
 
         <motion.h1 {...rise(0.15)}>
-          {end ? <>Make the second <em>drop land.</em></> : <>One missed call. <em>One rescue.</em></>}
+          {end ? (person ? <>Some calls should <em>stay human.</em></> : <>Make the second <em>drop land.</em></>) : <>One missed call. <em>One rescue.</em></>}
         </motion.h1>
 
         {end ? (
           <motion.ul className="tc-recap" {...rise(0.25)}>
-            {RECAP.map((r) => (
+            {recap.map((r) => (
               <li key={r.title}>
                 <Mark kind={r.mark} size={30} ring="#f05a00" />
                 <b>{r.title}</b>
@@ -81,12 +91,17 @@ export function TourCover({ mode, onPlay }: { mode: "start" | "end"; onPlay: () 
         )}
 
         <motion.div className="tc-actions" {...rise(0.35)}>
-          <button className="tc-cta" onClick={onPlay}>
-            {end ? "Watch again" : "Start with sound"}
-          </button>
-          {end && <Link href="/demo" className="tc-cta tc-cta-line">Try it yourself</Link>}
+          {canTry && <button className="tc-cta tc-cta-live" onClick={onLive}>Try it live</button>}
+          <button className={`tc-cta ${canTry ? "tc-cta-line" : ""}`} onClick={onPlay}>{end ? "Watch again" : canTry ? "Watch on auto" : "Start with sound"}</button>
+          {end && <Link href="/demo" className="tc-cta tc-cta-line">Open the judges’ demo</Link>}
         </motion.div>
-        {!end && <motion.small {...rise(0.42)}>About 2 minutes · Sound on</motion.small>}
+        {sorry ? (
+          <motion.small className="tc-sorry" {...rise(0.42)}>{sorry}</motion.small>
+        ) : canTry ? (
+          <motion.small {...rise(0.42)}>Answer the call yourself · {trial.left} live {trial.left === 1 ? "try" : "tries"} left today · Your voice goes to OpenAI to transcribe, and Alodi doesn’t keep it. Please use made-up details.</motion.small>
+        ) : (
+          !end && <motion.small {...rise(0.42)}>About 2 minutes · Sound on</motion.small>
+        )}
       </div>
 
       <div className="tc-foot">

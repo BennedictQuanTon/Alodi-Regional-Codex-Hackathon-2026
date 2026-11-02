@@ -19,5 +19,10 @@
   "a_apply": { "voice": "narrator", "text": "Every field scores above point eight five, so it's applied automatically. Anything lower would go to a person." },
   "a_nextday": { "voice": "narrator", "text": "The next evening, the order is back on the route, in the window the buyer asked for." },
   "a_deliver": { "voice": "narrator", "text": "The shipper reads the context card, and knows exactly when and where to go." },
-  "a_end": { "voice": "narrator", "text": "Delivered on the second attempt. Alodi. Make the second drop land." }
+  "a_end": { "voice": "narrator", "text": "Delivered on the second attempt. Alodi. Make the second drop land." },
+  "c_live_ack": { "voice": "agent", "text": "Got it, one moment." },
+  "c_live_confirm": { "voice": "agent", "text": "Thanks, I've noted that. Your delivery card is on its way." },
+  "a_live_nextday": { "voice": "narrator", "text": "On the next attempt, the order is back on the route, in the window the buyer asked for." },
+  "l_live_bye": { "voice": "agent", "text": "I want to get this right, so a person from our team will confirm it with you. Thank you." },
+  "l_live_review": { "voice": "narrator", "text": "That answer isn't clear enough to apply. So Alodi stops, and hands it to customer support." }
 }

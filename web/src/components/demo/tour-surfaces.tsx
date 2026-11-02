@@ -25,7 +25,7 @@ export function TourDashboard({ state: s }: { state: DemoState }) {
   return (
     <div className="ui-card flex h-full flex-col overflow-hidden">
       <div className="flex items-baseline justify-between px-5 pt-5">
-        <div className="text-[19px] font-semibold tracking-tight">{HUB.name}</div>
+        <div className="flex items-center gap-2 text-[19px] font-semibold tracking-tight"><Mark kind="check" size={18} ring="#f05a00" />{HUB.name}</div>
         <span className="text-[12px] ui-muted">Mock data · simulated day</span>
       </div>
       <div className="mx-5 mt-4 grid grid-cols-3 divide-x divide-[var(--ui-line)] rounded-[18px] border border-[var(--ui-line)]">

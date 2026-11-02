@@ -9,6 +9,8 @@ import type { ActionKey, ChoiceKey, DemoState, ScenarioId, Step } from "./types"
 export type StepDirector = {
   pace?: (step: Step) => number | undefined;
   begin?: (step: Step) => Promise<void> | undefined;
+  /** Holds a step back before it applies, for something it depends on, such as a visitor's answer. */
+  gate?: (step: Step) => Promise<void> | undefined;
   pause?: () => void;
   resume?: () => void;
   stop?: () => void;
@@ -46,6 +48,7 @@ class DemoEngine {
   private director: StepDirector | null = null;
   private hold: Promise<void> | null = null;
   private begun: string | null = null;
+  private gated: string | null = null;
 
   setDirector = (director: StepDirector | null) => {
     this.director = director;
@@ -54,6 +57,7 @@ class DemoEngine {
   private endMedia() {
     this.hold = null;
     this.begun = null;
+    this.gated = null;
     this.director?.stop?.();
   }
 
@@ -183,6 +187,12 @@ class DemoEngine {
     this.set({ ...this.state, speed });
   };
 
+  /** Moves to another scenario at the same step, keeping what has happened so far. */
+  branch = (scenario: ScenarioId) => {
+    this.takeover();
+    this.set({ ...this.state, scenario });
+  };
+
   /** Skip the wait: run the current step now (or perform the pending action). */
   next = () => {
     this.takeover();
@@ -254,6 +264,15 @@ class DemoEngine {
     }
 
     const started = `${s.scenario}:${s.step}`;
+    if (this.gated !== started) {
+      this.gated = started;
+      const gate = this.director?.gate?.(step);
+      if (gate) {
+        this.hold = gate;
+        this.schedule();
+        return;
+      }
+    }
     if (this.begun !== started) {
       this.begun = started;
       this.hold = this.director?.begin?.(step) ?? null;

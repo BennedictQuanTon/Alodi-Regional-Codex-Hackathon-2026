@@ -2,13 +2,23 @@
 
 import { useEffect, useRef } from "react";
 import type { StepDirector } from "./engine";
-import { stepsFor } from "./scenarios";
+import { getLiveAnswer, stepsFor } from "./scenarios";
 import script from "./tour-script.json";
 import type { DemoState, Step } from "./types";
 
 const CLIPS = script as Record<string, { voice: string; text: string }>;
 
 export const TOUR_STEPS = stepsFor("A_main");
+
+// Lines that change once a visitor has answered for themselves.
+const LIVE_CLIP: Record<string, string> = { c_confirm: "c_live_confirm", a_nextday: "a_live_nextday", l_bye: "l_live_bye", l_extract: "l_live_review" };
+const LIVE_SILENT = new Set(["c_reply", "c_ok", "l_reply"]);
+const clipFor = (id: string) => {
+  if (!getLiveAnswer()) return CLIPS[id] ? id : null;
+  if (LIVE_SILENT.has(id)) return null;
+  const clip = LIVE_CLIP[id] ?? id;
+  return CLIPS[clip] ? clip : null;
+};
 
 export const CHAPTERS = [
   { label: "Morning", from: "p_fetch" },
@@ -35,13 +45,19 @@ export function focusOf(s: DemoState): "shipper" | "buyer" | "ops" {
 export class TourAudio implements StepDirector {
   private voice?: HTMLAudioElement;
   private ringing?: HTMLAudioElement;
+  private ack?: HTMLAudioElement;
   private finish?: () => void;
   private paused = false;
   muted = false;
-  private onSubtitle?: (text: string) => void;
+  private onSubtitle?: (text: string, voice: string) => void;
+  /** Set for a live run: resolves with "auto" if the scripted answer should play instead. */
+  private turn?: () => Promise<"live" | "auto">;
+  setTurn(turn?: () => Promise<"live" | "auto">) {
+    this.turn = turn;
+  }
 
   /** Receives the words being spoken, for subtitles. */
-  listen(onSubtitle: (text: string) => void) {
+  listen(onSubtitle: (text: string, voice: string) => void) {
     this.onSubtitle = onSubtitle;
   }
 
@@ -50,6 +66,7 @@ export class TourAudio implements StepDirector {
     this.voice ||= new Audio();
     this.ringing ||= Object.assign(new Audio("/tour/sfx-ring.mp3"), { loop: true, volume: 0.15 });
     this.setMuted(this.muted);
+    this.ack ||= new Audio("/tour/c_live_ack.mp3");
     // Fetch every clip up front, so a slow network doesn't leave gaps in the story.
     for (const id of Object.keys(CLIPS)) new Audio(`/tour/${id}.mp3`).preload = "auto";
   }
@@ -62,21 +79,43 @@ export class TourAudio implements StepDirector {
   }
 
   // Dialogue appears as it starts, then the clip sets the pace.
-  pace = (step: Step) => (CLIPS[step.id]?.voice && CLIPS[step.id].voice !== "narrator" ? 150 : undefined);
+  pace = (step: Step) => {
+    const clip = clipFor(step.id);
+    return clip && CLIPS[clip].voice !== "narrator" ? 150 : undefined;
+  };
 
-  begin = (step: Step) => {
+  /** Plays at once when the visitor stops talking, so the wait never feels like silence. */
+  acknowledge = () => {
+    if (this.muted || !this.ack) return;
+    this.ack.currentTime = 0;
+    this.ack.playbackRate = 1.12;
+    void this.ack.play().catch(() => {});
+    this.onSubtitle?.(CLIPS.c_live_ack.text, "agent");
+  };
+
+  gate = (step: Step): Promise<void> | undefined => {
+    if (!this.turn || step.id !== "c_reply") return undefined;
+    return this.turn().then(() => undefined);
+  };
+
+  begin = (step: Step): Promise<void> | undefined => {
+    const clip = clipFor(step.id);
+    return clip ? this.play(clip) : undefined;
+  };
+
+  private play(clip: string) {
     const voice = this.voice;
-    if (!voice || !CLIPS[step.id]) return undefined;
+    if (!voice) return undefined;
     this.settle();
-    this.onSubtitle?.(CLIPS[step.id].text);
+    this.onSubtitle?.(CLIPS[clip].text, CLIPS[clip].voice);
     return new Promise<void>((resolve) => {
       this.finish = resolve;
       voice.onended = voice.onerror = () => this.settle();
-      voice.src = `/tour/${step.id}.mp3`;
+      voice.src = `/tour/${clip}.mp3`;
       voice.playbackRate = 1.12;
       voice.play().catch(() => this.settle());
     });
-  };
+  }
 
   private settle() {
     const finish = this.finish;

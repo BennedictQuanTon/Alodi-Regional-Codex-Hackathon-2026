@@ -989,3 +989,47 @@ html.theme-vt::view-transition-new(root) {
 .tc-person span { font-size: 13px; font-weight: 500; color: #3a4358; }
 @media (max-width: 720px) { .tc h1 em { display: block; } .tc-recap { grid-template-columns: 1fr; width: min(340px, 100%); } .tc-recap li { padding: 14px 18px; } .tc-person img { width: 50px; height: 50px; } .tc-rail { top: 24px; } .tc-dot { top: 19px; } }
 @media (max-height: 760px) { .tc-recap b { margin-top: 6px; } .tc-recap li { padding: 12px 16px; } }
+.tc-cta-live { background: #f05a00; border-color: #f05a00; }
+.tc small { max-width: 620px; line-height: 1.45; }
+.tc-sorry { padding: 10px 18px; border-radius: 14px; background: #1f2a44; color: #fff !important; }
+
+/* Narrated demo controls and transcript */
+.tf { flex-shrink: 0; padding: 10px clamp(16px, 3vw, 40px) 14px; background: #fff; border-top: 1px solid var(--ui-line); }
+.tf-say { display: flex; align-items: center; justify-content: center; min-height: 46px; }
+.tf-say p { max-width: 980px; text-align: center; font-size: 17px; line-height: 1.35; letter-spacing: -0.012em; color: #1f2a44; animation: tf-in 320ms cubic-bezier(0.22, 1, 0.36, 1); }
+.tf-say span { margin-right: 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #e25400; }
+@keyframes tf-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+.tf-bar { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 32px); margin: 6px auto 0; max-width: 1360px; }
+.tf-controls { display: flex; flex-shrink: 0; align-items: center; gap: 8px; }
+.tf-btn { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: #1f2a44; background: #f3f1ef; transition: background 150ms ease, transform 150ms ease; cursor: pointer; }
+.tf-btn:hover:not(:disabled) { background: #e8e5e2; }
+.tf-btn:active:not(:disabled) { transform: scale(0.94); }
+.tf-btn:disabled { opacity: 0.4; cursor: default; }
+.tf-btn svg { width: 20px; height: 20px; }
+.tf-play { width: 50px; height: 50px; background: #1f2a44; color: #fff; }
+.tf-play:hover:not(:disabled) { background: #2b3858; }
+.tf-line { display: grid; flex: 1; gap: 6px; list-style: none; }
+.tf-line button { display: block; width: 100%; padding: 8px 0 2px; text-align: left; cursor: pointer; }
+.tf-line button:disabled { cursor: default; }
+.tf-line i { display: block; height: 3px; overflow: hidden; border-radius: 2px; background: #e9e6e3; transition: height 150ms ease; }
+.tf-line button:hover:not(:disabled) i { height: 5px; }
+.tf-line b { display: block; height: 100%; background: #f05a00; transform-origin: left; transition: transform 300ms linear; }
+.tf-line span { display: block; margin-top: 7px; font-size: 13px; color: #4a556e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tf-line .now span { color: #1f2a44; font-weight: 600; }
+@media (max-width: 720px) { .tf-say p { font-size: 15px; } .tf-line span { display: none; } .tf-line .now span { display: block; overflow: visible; } .tf-btn { width: 38px; height: 38px; } .tf-play { width: 44px; height: 44px; } }
+
+/* The visitor's turn on the call */
+.tl { position: fixed; left: 50%; bottom: 128px; z-index: 30; display: flex; align-items: center; gap: 22px; width: min(720px, calc(100vw - 32px)); padding: 18px 22px; border-radius: 28px; background: #1f2a44; color: #fff; box-shadow: 0 40px 80px -30px rgba(18, 26, 44, 0.8); transform: translateX(-50%); animation: tl-in 420ms cubic-bezier(0.22, 1, 0.36, 1); flex-wrap: wrap; }
+@keyframes tl-in { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.tl-verify { position: absolute; bottom: 100%; left: 0; margin-bottom: 8px; }
+.tl-head { flex: 1; min-width: 220px; }
+.tl-head b { display: block; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
+.tl-head span { display: block; margin-top: 3px; font-size: 14.5px; line-height: 1.35; color: #e6e9f0; }
+.tl-mic { position: relative; display: grid; place-items: center; flex-shrink: 0; width: 66px; height: 66px; border-radius: 50%; background: #f05a00; color: #fff; cursor: pointer; }
+.tl-mic svg { position: relative; width: 28px; height: 28px; }
+.tl-mic i { position: absolute; inset: 0; border-radius: 50%; background: rgba(240, 90, 0, 0.35); transition: transform 90ms linear; }
+.tl-wait { display: flex; gap: 7px; padding: 0 20px; }
+.tl-wait i { width: 11px; height: 11px; border-radius: 50%; background: #f05a00; animation: tl-dot 900ms ease-in-out infinite; }
+.tl-wait i:nth-child(2) { animation-delay: 120ms; } .tl-wait i:nth-child(3) { animation-delay: 240ms; }
+@keyframes tl-dot { 0%, 100% { transform: translateY(3px); opacity: 0.5; } 50% { transform: translateY(-5px); opacity: 1; } }
+.tl-skip { width: 100%; font-size: 13.5px; text-decoration: underline; text-underline-offset: 3px; color: #e6e9f0; cursor: pointer; text-align: left; }
